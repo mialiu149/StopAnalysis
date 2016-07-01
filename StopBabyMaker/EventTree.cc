@@ -14,41 +14,6 @@ EventTree::EventTree (const std::string &prefix)
     : prefix_(prefix)
 {
 }
-
-void EventTree::SetMetFilterEvents(){
-
-    //BE AWARE THAT THOSE FILES DON'T DO ANYTHING IF YOU USE BATCH SUBMISSION - NEED TO APPLY THEM ON LOOPER LEVEL
-    cout<<"Loading bad event files ..."<<endl;
-    metFilterTxt.loadBadEventList("/nfs-6/userdata/mt2utils/eventlist_DoubleEG_csc2015.txt");
-    metFilterTxt.loadBadEventList("/nfs-6/userdata/mt2utils/eventlist_DoubleMuon_csc2015.txt");
-    metFilterTxt.loadBadEventList("/nfs-6/userdata/mt2utils/eventlist_HTMHT_csc2015.txt");
-    metFilterTxt.loadBadEventList("/nfs-6/userdata/mt2utils/eventlist_JetHT_csc2015.txt");
-    metFilterTxt.loadBadEventList("/nfs-6/userdata/mt2utils/eventlist_MET_csc2015.txt");
-    metFilterTxt.loadBadEventList("/nfs-6/userdata/mt2utils/eventlist_MuonEG_csc2015.txt");
-    metFilterTxt.loadBadEventList("/nfs-6/userdata/mt2utils/eventlist_SingleElectron_csc2015.txt");
-    metFilterTxt.loadBadEventList("/nfs-6/userdata/mt2utils/eventlist_SingleMuon_csc2015.txt");
-    metFilterTxt.loadBadEventList("/nfs-6/userdata/mt2utils/eventlist_SinglePhoton_csc2015.txt");
-    // new lists: supposed to include above but do not always
-    metFilterTxt.loadBadEventList("/nfs-6/userdata/mt2utils/DoubleEG_csc2015.txt");
-    metFilterTxt.loadBadEventList("/nfs-6/userdata/mt2utils/DoubleMuon_csc2015.txt");
-    metFilterTxt.loadBadEventList("/nfs-6/userdata/mt2utils/HTMHT_csc2015.txt");
-    metFilterTxt.loadBadEventList("/nfs-6/userdata/mt2utils/JetHT_csc2015.txt");
-    metFilterTxt.loadBadEventList("/nfs-6/userdata/mt2utils/MET_csc2015.txt");
-    metFilterTxt.loadBadEventList("/nfs-6/userdata/mt2utils/MuonEG_csc2015.txt");
-    metFilterTxt.loadBadEventList("/nfs-6/userdata/mt2utils/SingleElectron_csc2015.txt");
-    metFilterTxt.loadBadEventList("/nfs-6/userdata/mt2utils/SingleMuon_csc2015.txt");
-    metFilterTxt.loadBadEventList("/nfs-6/userdata/mt2utils/SinglePhoton_csc2015.txt");
-    // not all samples have events which failed the ecal SC filter
-    metFilterTxt.loadBadEventList("/nfs-6/userdata/mt2utils/DoubleEG_ecalscn1043093.txt");
-    metFilterTxt.loadBadEventList("/nfs-6/userdata/mt2utils/HTMHT_ecalscn1043093.txt");
-    metFilterTxt.loadBadEventList("/nfs-6/userdata/mt2utils/JetHT_ecalscn1043093.txt");
-    metFilterTxt.loadBadEventList("/nfs-6/userdata/mt2utils/MET_ecalscn1043093.txt");
-    metFilterTxt.loadBadEventList("/nfs-6/userdata/mt2utils/SinglePhoton_ecalscn1043093.txt");
-    metFilterTxt.loadBadEventList("/nfs-6/userdata/mt2utils/SingleElectron_ecalscn1043093.txt");
-    metFilterTxt.loadBadEventList("/nfs-6/userdata/mt2utils/SingleMuon_ecalscn1043093.txt");
-
-    cout<<" ... finished!"<<endl;
-}
  
 void EventTree::FillCommon (const std::string &root_file_name)
 {
@@ -79,8 +44,8 @@ void EventTree::FillCommon (const std::string &root_file_name)
     if(!signal){
       if(nvtxs>0) filt_met = true;
       else filt_met = false;
-      filt_met = filt_met*filt_cscBeamHalo()*filt_ecalTP()*filt_eeBadSc()*filt_hbheNoise()*filt_hbheNoiseIso();
-
+      filt_met = filt_met*filt_cscBeamHalo()*filt_ecalTP()*filt_eeBadSc()*filt_hbheNoise()*filt_hbheNoiseIso()*filt_goodVertices()*filt_globalTightHalo2016();
+      filt_badMuonFilter                      = badMuonFilter();
       filt_badChargedCandidateFilter = badChargedCandidateFilter();
       filt_cscbeamhalo = filt_cscBeamHalo();
       filt_cscbeamhalo2015 = filt_cscBeamHalo2015();
@@ -92,7 +57,6 @@ void EventTree::FillCommon (const std::string &root_file_name)
       filt_ecallaser = filt_ecalLaser();
       filt_ecaltp = filt_ecalTP();
       filt_hcallaser = filt_hcalLaser();
-//      filt_met = filt_metfilter();
       filt_trkfail = filt_trackingFailure();
       filt_trkPOG = filt_trkPOGFilters();
       filt_trkPOG_logerr_tmc = filt_trkPOG_logErrorTooManyClusters();
@@ -414,6 +378,7 @@ void EventTree::Reset ()
      filt_trkPOG_logerr_tmc = false;
      filt_trkPOG_tmc = false;
      filt_trkPOG_tms = false;
+     filt_badMuonFilter = false;
      filt_badChargedCandidateFilter = false;
 
     nPhotons             = -9999;
@@ -567,6 +532,8 @@ void EventTree::SetBranches (TTree* tree)
     tree->Branch("ph_ngoodjets",         &ph_ngoodjets);
     tree->Branch("ph_ngoodbtags",        &ph_ngoodbtags);
     tree->Branch("filt_met", &filt_met);
+    tree->Branch("filt_badMuonFilter", &filt_badMuonFilter);
+    tree->Branch("filt_badChargedCandidateFilter", &filt_badChargedCandidateFilter);
     tree->Branch("filt_cscbeamhalo2015", &filt_cscbeamhalo2015);
     tree->Branch("hardgenpt", &hardgenpt);
     tree->Branch("filt_badChargedCandidateFilter", &filt_badChargedCandidateFilter);
