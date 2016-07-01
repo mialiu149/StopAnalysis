@@ -278,6 +278,8 @@ void EventTree::Reset ()
     HLT_DiEl               = -9999.;
     HLT_MuE                = -9999.;
     HLT_DiMu               = -9999.;
+    HLT_SingleMuNoIso      = -9999.;
+    HLT_SingleElNoIso      = -9999.;
 
     HLT_Photon90_CaloIdL_PFHT500 = -9999.;
     HLT_Photon22_R9Id90_HE10_IsoM = -9999.;
@@ -310,7 +312,6 @@ void EventTree::Reset ()
     HLT_SingleElTight      = -9999.;
     HLT_SingleElHT200      = -9999.;
     HLT_SingleMuNoEta      = -9999.;
-    HLT_SingleMuNoIso      = -9999.;
     HLT_SingleMuNoIsoNoEta = -9999.;
     HLT_Mu6HT200MET125     = -9999.;
     HLT_HT350MET100	   = -9999.;
@@ -513,6 +514,8 @@ void EventTree::SetBranches (TTree* tree)
     tree->Branch("Mlb_closestb", &Mlb_closestb); 
     tree->Branch("HLT_SingleEl", &HLT_SingleEl );
     tree->Branch("HLT_SingleMu", &HLT_SingleMu );
+    tree->Branch("HLT_SingleMuNoIso", &HLT_SingleMuNoIso );
+    tree->Branch("HLT_SingleElNoIso", &HLT_SingleElNoIso );
     tree->Branch("HLT_MET", &HLT_MET);
     tree->Branch("HLT_DiEl", &HLT_DiEl );
     tree->Branch("HLT_DiMu", &HLT_DiMu );

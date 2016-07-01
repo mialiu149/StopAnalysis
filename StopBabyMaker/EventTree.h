@@ -111,6 +111,7 @@ public:
     float filt_hbheisonoise;
     float filt_hcallaser;
     float filt_met;
+    float filt_badMuonFilter;
     float filt_badChargedCandidateFilter;
     float filt_trkfail;
     float filt_trkPOG;
@@ -190,6 +191,8 @@ public:
     //trigger
     //int  HLT_HT900;
     int HLT_SingleMu; 
+    int HLT_SingleMuNoIso;
+    int HLT_SingleElNoIso;
     int HLT_SingleEl;
     int HLT_MET;
     int HLT_DiEl;
@@ -305,7 +308,6 @@ public:
     int HLT_SingleEl27Tight;
     int HLT_SingleElHT200;
     int HLT_SingleMuNoEta;
-    int HLT_SingleMuNoIso;
     int HLT_SingleMuNoIsoNoEta;
     int HLT_Mu6HT200MET125;
 
