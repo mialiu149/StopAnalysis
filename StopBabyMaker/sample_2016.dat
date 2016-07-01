@@ -168,11 +168,57 @@ Path /hadoop/cms/store/group/snt/run2_25ns_80MiniAODv2/W3JetsToLNu_TuneCUETP8M1_
 SAMPLE
 Name W4JetsToLNu_madgraph_pythia8_25ns
 Path /hadoop/cms/store/group/snt/run2_25ns_80MiniAODv2/W4JetsToLNu_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/V08-00-05/
+#with filter#
+SAMPLE
+Name W1JetsToLNu_NuPt-200
+Path /hadoop/cms/store/group/snt/run2_25ns_80MiniAODv2/W1JetsToLNu_NuPt-200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/V08-00-05/
 
+SAMPLE
+Name W2JetsToLNu_NuPt-200
+Path /hadoop/cms/store/group/snt/run2_25ns_80MiniAODv2/W2JetsToLNu_NuPt-200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/V08-00-05/
+
+SAMPLE
+Name W3JetsToLNu_NuPt-200
+Path /hadoop/cms/store/group/snt/run2_25ns_80MiniAODv2/W3JetsToLNu_NuPt-200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/V08-00-05/
+
+SAMPLE
+Name W4JetsToLNu_NuPt-200
+Path /hadoop/cms/store/group/snt/run2_25ns_80MiniAODv2/W4JetsToLNu_NuPt-200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/V08-00-05/
+## multiboson ##
+SAMPLE
+Name WZZ
+Path /hadoop/cms/store/group/snt/run2_25ns_80MiniAODv2/WZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/V08-00-05/
+SAMPLE
+Name WWW
+Path /hadoop/cms/store/group/snt/run2_25ns_80MiniAODv2/WWW_4F_TuneCUETP8M1_13TeV-amcatnlo-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/V08-00-05/
+
+SAMPLE
+Name ZZZ
+Path /hadoop/cms/store/group/snt/run2_25ns_80MiniAODv2/ZZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/V08-00-05/
+SAMPLE
+Name WWZ
+Path /hadoop/cms/store/group/snt/run2_25ns_80MiniAODv2/WWZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/V08-00-05/
+SAMPLE
+Name WWG
+Path /hadoop/cms/store/group/snt/run2_25ns_80MiniAODv2/WWG_TuneCUETP8M1_13TeV-amcatnlo-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0_ext1-v3/V08-00-05/
+
+## wh samples ##
+SAMPLE
+Name WplusH_HToBB_WToLNu
+Path /hadoop/cms/store/group/snt/run2_25ns_80MiniAODv1/WplusH_HToBB_WToLNu_M125_13TeV_powheg_pythia8_RunIISpring16MiniAODv1-PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_v3-v1/V08-00-01/
+
+SAMPLE
+Name WminusH_HToBB_WToLNu-ext1
+Path /hadoop/cms/store/group/snt/run2_25ns_80MiniAODv1/WminusH_HToBB_WToLNu_M125_13TeV_powheg_pythia8_RunIISpring16MiniAODv1-PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_v3_ext1-v1/V08-00-01/
+
+#SAMPLE
+#Name WminusH_HToBB_WToLNu
+#Path /hadoop/cms/store/group/snt/run2_25ns_80MiniAODv2/WminusH_HToBB_WToLNu_M125_13TeV_powheg_pythia8_RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/V08-00-05/
 ## diboson ##
+
 SAMPLE
 Name WW_pythia8_25ns
-Path /hadoop/cms/store/group/snt/run2_25ns_80MiniAODv2/WW_TuneCUETP8M1_13TeV-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/V08-00-05/ 
+Path /hadoop/cms/store/group/snt/run2_25ns_80MiniAODv2/WW_TuneCUETP8M1_13TeV-pythia8_RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/V08-00-05/
 
 SAMPLE
 Name WWToLNuQQ_powheg_25ns

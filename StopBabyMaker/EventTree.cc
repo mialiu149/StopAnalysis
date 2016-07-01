@@ -567,6 +567,7 @@ void EventTree::SetBranches (TTree* tree)
     tree->Branch("ph_ngoodjets",         &ph_ngoodjets);
     tree->Branch("ph_ngoodbtags",        &ph_ngoodbtags);
     tree->Branch("filt_met", &filt_met);
+    tree->Branch("filt_cscbeamhalo2015", &filt_cscbeamhalo2015);
     tree->Branch("hardgenpt", &hardgenpt);
     tree->Branch("filt_badChargedCandidateFilter", &filt_badChargedCandidateFilter);
 }

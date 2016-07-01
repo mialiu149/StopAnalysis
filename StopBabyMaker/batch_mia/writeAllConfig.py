@@ -11,12 +11,16 @@ ttbar = ['ttbar_singleLeptFromT_madgraph_pythia8_25ns',
           'ttbar_singleLeptFromTbar_madgraph_pythia8_25ns',
           'ttbar_singleLeptFromTbar_madgraph_pythia8_ext1_25ns',
           'ttbar_diLept_madgraph_pythia8_25ns',
-          'ttbar_diLept_madgraph_pythia8_ext1_25ns','ttbarTo2L2Nu_powheg_25ns']
+          'ttbar_diLept_madgraph_pythia8_ext1_25ns','ttbarTo2L2Nu_powheg_25ns','ttbar_powheg_pythia8_ext4_25ns']
 singletop = ['tbar_tch_4f_powheg_pythia8_25ns',
                't_sch_4f_amcnlo_pythia8_25ns',
               't_tbarW_5f_powheg_pythia8_25ns',
               't_tW_5f_powheg_pythia8_25ns']
 wjets = [
+         'W1JetsToLNu_madgraph_pythia8_25ns',
+         'W2JetsToLNu_madgraph_pythia8_25ns',
+         'W3JetsToLNu_madgraph_pythia8_25ns',
+         'W4JetsToLNu_madgraph_pythia8_25ns',
          'WJetsToLNu_madgraph_pythia8_25ns',
          'WJetsToLNu_HT100To200_madgraph_pythia8_25ns',
          'WJetsToLNu_HT100To200_madgraph_pythia8_ext1_25ns',
@@ -38,8 +42,8 @@ zjets = [
    #      'DYJetsToLL_M-50_HT-600toInf'
          ]
 diboson = ['WW_pythia8_25ns','WWToLNuQQ_powheg_25ns','WWTo2l2Nu_powheg_25ns','WZ_pythia8_25ns','WZTo3LNu_powheg_pythia8_25ns','WZTo2L2Q_amcnlo_pythia8_25ns','WZTo1L3Nu_amcnlo_pythia8_25ns','WZTo1LNu2Q_amcnlo_pythia8_25ns','ZZ_pythia8_25ns','ZZTo2L2Q_amcnlo_pythia8_25ns','ZZTo2Q2Nu_amcnlo_pythia8_25ns','ZZTo2L2Nu_powheg_pythia8_25ns']
-
-wjets_highht = [
+addon = ['WplusH_HToBB_WToLNu','WminusH_HToBB_WToLNu-ext1','WminusH_HToBB_WToLNu','WZZ','WWW','ZZZ','WWZ','WWG']
+wjets_highht = ['W1JetsToLNu_NuPt-200','W2JetsToLNu_NuPt-200','W3JetsToLNu_NuPt-200','W4JetsToLNu_NuPt-200'
             ]
 ttv = ['TTWJetsToQQ_amcnlo_pythia8_25ns',
        'TTWJetsToLNu_amcnlo_pythia8_25ns',
@@ -51,8 +55,9 @@ f = open('../sample_2016.dat')
 towrite.write('source settings.sh\n')
 towrite.write('TAG=${analysis_version}\n')
 for line in f:
-    for sample in singletop+ttv+ttbar+wjets+zjets+diboson:
-    #    print 'run ',sample
+    for sample in wjets_highht:
+    #for sample in singletop+ttv+ttbar+wjets+zjets+diboson:
+        #print 'run ',sample
         if sample in line and 'Name' in line:
            print sample
            path = next(f).split()[1]
