@@ -547,7 +547,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   //
   // Set JSON file
   //
-  const char* json_file = "json_files/Cert_271036-275125_13TeV_PromptReco_Collisions16_JSON.txt";
+  const char* json_file = "json_files/Cert_271036-276097_13TeV_PromptReco_Collisions16_JSON_NoL1T.txt";
   set_goodrun_file_json(json_file);
   
   //
@@ -561,11 +561,11 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
 
   // files for RunIISpring15 MC
   if (isDataFromFileName) {
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Spring16_25nsV3_DATA_L1FastJet_AK4PFchs.txt");
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Spring16_25nsV3_DATA_L2Relative_AK4PFchs.txt");
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Spring16_25nsV3_DATA_L3Absolute_AK4PFchs.txt");
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Spring16_25nsV3_DATA_L2L3Residual_AK4PFchs.txt");
-    jetcorr_uncertainty_filename = "jecfiles/Spring16_25nsV3_DATA_Uncertainty_AK4PFchs.txt";
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Spring16_25nsV6_DATA_L1FastJet_AK4PFchs.txt");
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Spring16_25nsV6_DATA_L2Relative_AK4PFchs.txt");
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Spring16_25nsV6_DATA_L3Absolute_AK4PFchs.txt");
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Spring16_25nsV6_DATA_L2L3Residual_AK4PFchs.txt");
+    jetcorr_uncertainty_filename = "jecfiles/Spring16_25nsV6_DATA_Uncertainty_AK4PFchs.txt";
   } else if(isSignalFromFileName){
     jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Fastsim15_L1FastJet_AK4PFchs.txt");
     jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Fastsim15_L2Relative_AK4PFchs.txt");
@@ -573,10 +573,10 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
     jetcorr_uncertainty_filename = "jecfiles/Fastsim15_Uncertainty_AK4PFchs.txt";
   }  
   else {
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Spring16_25nsV3_MC_L1FastJet_AK4PFchs.txt");
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Spring16_25nsV3_MC_L2Relative_AK4PFchs.txt");
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Spring16_25nsV3_MC_L3Absolute_AK4PFchs.txt");
-    jetcorr_uncertainty_filename = "jecfiles/Spring16_25nsV3_MC_Uncertainty_AK4PFchs.txt";
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Spring16_25nsV6_MC_L1FastJet_AK4PFchs.txt");
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Spring16_25nsV6_MC_L2Relative_AK4PFchs.txt");
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Spring16_25nsV6_MC_L3Absolute_AK4PFchs.txt");
+    jetcorr_uncertainty_filename = "jecfiles/Spring16_25nsV6_MC_Uncertainty_AK4PFchs.txt";
   }
 
   cout << "applying JEC from the following files:" << endl;
@@ -599,13 +599,6 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   // btagging scale factor//
   //
   if (skim_applyBtagSFs) {
-    //reader_heavy = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "mujets", "central"); // central
-    //reader_heavy_UP = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "mujets", "up");  // sys up
-    //reader_heavy_DN = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "mujets", "down");  // sys down
-    //reader_light = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "comb", "central");  // central
-   // reader_light_UP = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "comb", "up");  // sys up
-   // reader_light_DN = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "comb", "down");  // sys down
-
     // get btag efficiencies
     TFile* f_btag_eff;
     if(!skim_isFastsim) f_btag_eff = new TFile("btagsf/btageff__ttbar_powheg_pythia8_25ns.root");
@@ -667,6 +660,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       //
       InitBabyNtuple();
 
+      //nEvents_pass_skim_nVtx++;
       //
       // calculate sum of weights and save them in a hisogram.
       //      
@@ -710,6 +704,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       //////////////////////////////////////////
       // If data, check against good run list//
       /////////////////////////////////////////
+      //
       if( evt_isRealData() && !goodrun(evt_run(), evt_lumiBlock()) ) continue;
       if( evt_isRealData() ) {
 	DorkyEventIdentifier id(evt_run(), evt_event(), evt_lumiBlock());
@@ -1776,6 +1771,8 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       StopEvt.HLT_DiEl =  passHLTTriggerPattern("HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v");
       StopEvt.HLT_DiMu =  passHLTTriggerPattern("HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v") || passHLTTriggerPattern("HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v");
       StopEvt.HLT_MuE = passHLTTriggerPattern("HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v") || passHLTTriggerPattern("HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v"); 
+      StopEvt.HLT_SingleElNoIso = passHLTTriggerPattern("HLT_Ele105_CaloIdVT_GsfTrkIdT");
+      StopEvt.HLT_SingleMuNoIso = passHLTTriggerPattern("HLT_Mu45_eta2p1")||passHLTTriggerPattern("HLT_Mu50");
      //photons more complicated because of prescales
       StopEvt.HLT_Photon90_CaloIdL_PFHT500 = passHLTTriggerPattern("HLT_Photon90_CaloIdL_PFHT500_v");
       StopEvt.HLT_Photon22_R9Id90_HE10_IsoM  = HLT_prescale(triggerName("HLT_Photon22_R9Id90_HE10_IsoM_v" ));

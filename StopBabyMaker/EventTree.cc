@@ -27,7 +27,6 @@ void EventTree::FillCommon (const std::string &root_file_name)
     if (filestr.find(signalstr) != string::npos) signal = true;
     if (filestr.find(lspstr)    != string::npos) signal = true;
     if (filestr.find(smsstr)    != string::npos) signal = true;
-    //std::cout << "run "<<evt_run()<<" lumiblock "<<evt_lumiBlock() <<" event "<<evt_event()<<" nvtxs "<<numberOfGoodVertices()<<" pfmet "<<evt_pfmet()<<" pfmetphi "<< evt_pfmetPhi()<< std::endl;
     run = evt_run();
     ls  = evt_lumiBlock();
     evt = evt_event();
@@ -44,8 +43,8 @@ void EventTree::FillCommon (const std::string &root_file_name)
     if(!signal){
       if(nvtxs>0) filt_met = true;
       else filt_met = false;
-      filt_met = filt_met*filt_cscBeamHalo()*filt_ecalTP()*filt_eeBadSc()*filt_hbheNoise()*filt_hbheNoiseIso()*filt_goodVertices()*filt_globalTightHalo2016();
-      filt_badMuonFilter                      = badMuonFilter();
+      filt_met = filt_met*filt_ecalTP()*filt_eeBadSc()*filt_hbheNoise()*filt_hbheNoiseIso()*filt_goodVertices()*filt_globalTightHalo2016();
+      filt_badMuonFilter  = badMuonFilter();
       filt_badChargedCandidateFilter = badChargedCandidateFilter();
       filt_cscbeamhalo = filt_cscBeamHalo();
       filt_cscbeamhalo2015 = filt_cscBeamHalo2015();
@@ -538,8 +537,8 @@ void EventTree::SetBranches (TTree* tree)
     tree->Branch("filt_badMuonFilter", &filt_badMuonFilter);
     tree->Branch("filt_badChargedCandidateFilter", &filt_badChargedCandidateFilter);
     tree->Branch("filt_cscbeamhalo2015", &filt_cscbeamhalo2015);
+    tree->Branch("filt_cscbeamhalo", &filt_cscbeamhalo);
     tree->Branch("hardgenpt", &hardgenpt);
-    tree->Branch("filt_badChargedCandidateFilter", &filt_badChargedCandidateFilter);
 }
 
 void EventTree::SetSecondLepBranches (TTree* tree)
