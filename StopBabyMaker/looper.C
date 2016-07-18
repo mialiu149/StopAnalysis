@@ -453,7 +453,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
     //fxsec = TFile::Open("xsec_stop_13TeV.root");
     fxsec = new TFile("xsec_stop_13TeV.root","READ");
     if(fxsec->IsZombie()) {
-      std::cout << "Somehow xsec_stop_13TeV.root is corrupted. Exit..." << std::endl;
+      std::cout << "Somehow C1N2_wino_13TeV.root is corrupted. Exit..." << std::endl;
       exit(0);
     }
     hxsec = (TH1D*)fxsec->Get("stop");
@@ -735,10 +735,10 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
           if(sparm_names().at(nsparm).Contains("mGl")) StopEvt.mass_gluino = sparm_values().at(nsparm);
 	}
 	//std::cout << "Got signal mass point mStop " << StopEvt.mass_stop << " mLSP " << StopEvt.mass_lsp << std::endl;
-	if(genps_weight()>0) histNEvts->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,1);
-	else if(genps_weight()<0) histNEvts->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,-1);
-	StopEvt.xsec = hxsec->GetBinContent(hxsec->FindBin(StopEvt.mass_stop));
-	StopEvt.xsec_uncert = hxsec->GetBinError(hxsec->FindBin(StopEvt.mass_stop));
+	if(genps_weight()>0) histNEvts->Fill(StopEvt.mass_chargino,StopEvt.mass_lsp,1);
+	else if(genps_weight()<0) histNEvts->Fill(StopEvt.mass_chargino,StopEvt.mass_lsp,-1);
+	StopEvt.xsec = hxsec->GetBinContent(hxsec->FindBin(StopEvt.mass_chargino));
+	StopEvt.xsec_uncert = hxsec->GetBinError(hxsec->FindBin(StopEvt.mass_chargino));
 	//note to get correct scale1fb you need to use in your looper xsec/nevt, where nevt you get via
 	//histNEvts->GetBinContent(histNEvts->FindBin(StopEvt.mass_stop,StopEvt.mass_lsp));
 

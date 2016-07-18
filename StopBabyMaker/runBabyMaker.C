@@ -61,7 +61,7 @@ int main(int argc, char **argv){
   //
   int nVtx              = 1;
 
-  float met             = 50;
+  float met             = 100;
 
   int nGoodLeptons      = 1;
   float goodLep_el_pt   = 20.0;
@@ -85,7 +85,7 @@ int main(int argc, char **argv){
 
   int nBJets            = 0; 
 
-  bool applyJECfromFile = false;
+  bool applyJECfromFile = true;
   int JES_central_up_down = 0;  //0 cetranl, 1 up, -1 down;
   bool applyBtagSFs = true; 
   bool applyLeptonSFs = true;
