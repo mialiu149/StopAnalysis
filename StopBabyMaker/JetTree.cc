@@ -17,29 +17,25 @@ JetTree::JetTree (const std::string &prefix)
 void JetTree::InitBtagSFTool(TH2D* h_btag_eff_b_, TH2D* h_btag_eff_c_, TH2D* h_btag_eff_udsg_, bool isFastsim_) {
     isFastsim = isFastsim_;
     //calib = calib_;
-    calib = new BTagCalibration("csvv2", "btagsf/CSVv2_4invfb.csv"); // 25s ve$rsion of SFs
-/*    reader_heavy = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "mujets", "central"); // central
-    reader_heavy_UP = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "mujets", "up");  // sys up
-    reader_heavy_DN = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "mujets", "down");  // sys down
-    reader_light = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "comb", "central");  // central
-    reader_light_UP = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "comb", "up");  // sys up
-    reader_light_DN = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "comb", "down");  // sys down
-*/
-     reader_heavy = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "comb", "central"); // central
-     reader_heavy_UP = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "comb", "up");  // sys up
-     reader_heavy_DN = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "comb", "down");  // sys down
-     reader_light = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "incl", "central");  // central
-     reader_light_UP = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "incl", "up");  // sys up
-     reader_light_DN = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "incl", "down");  // sys down
-
-    calib_fastsim = new BTagCalibration("CSV", "btagsf/CSV_13TEV_Combined_20_11_2015.csv"); // 25ns fastsim version of SFs
+    calib = new BTagCalibration("csvv2", "btagsf/CSVv2_ichep_slimmed.csv"); // 25s version of SFs - slimmed version removed mujets and iterativefit from original one
+    //reader_heavy = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "mujets", "central"); // central
+    //reader_heavy_UP = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "mujets", "up");  // sys up
+    //reader_heavy_DN = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "mujets", "down");  // sys down
+    reader_heavy = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "comb", "central"); // central
+    reader_heavy_UP = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "comb", "up");  // sys up
+    reader_heavy_DN = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "comb", "down");  // sys down
+    reader_light = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "incl", "central");  // central
+    reader_light_UP = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "incl", "up");  // sys up
+    reader_light_DN = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "incl", "down");  // sys down
+    std::cout << "loaded fullsim btag SFs" << std::endl;
+    calib_fastsim = new BTagCalibration("CSV", "btagsf/CSV_13TEV_Combined_14_7_2016.csv"); // 25ns fastsim version of SFs
     reader_fastsim = new BTagCalibrationReader(calib_fastsim, BTagEntry::OP_MEDIUM, "fastsim", "central"); // central
     reader_fastsim_UP = new BTagCalibrationReader(calib_fastsim, BTagEntry::OP_MEDIUM, "fastsim", "up");  // sys up
     reader_fastsim_DN = new BTagCalibrationReader(calib_fastsim, BTagEntry::OP_MEDIUM, "fastsim", "down");  // sys down
     h_btag_eff_b = h_btag_eff_b_;
     h_btag_eff_c = h_btag_eff_c_;
     h_btag_eff_udsg = h_btag_eff_udsg_;
-    std::cout << "loaded fullsim btag SFs" << std::endl;
+    std::cout << "loaded fastsim btag SFs" << std::endl;
     return;
 }
 
@@ -76,7 +72,7 @@ float JetTree::getBtagEffFromFile(float pt, float eta, int mcFlavour, bool isFas
     return h->GetBinContent(binx,biny);
 }
 
-void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx,  FactorizedJetCorrector* corrector, float& btagprob_data, float &btagprob_mc, float &btagprob_err_heavy_UP, float & btagprob_err_heavy_DN,float & btagprob_err_light_UP, float & btagprob_err_light_DN, float & btagprob_err_FS_UP, float & btagprob_err_FS_DN, unsigned int overlep1_idx, unsigned int overlep2_idx, bool applynewcorr, JetCorrectionUncertainty* jetcorr_uncertainty, int JES_type, bool applyBtagSFs, bool isFastsim)
+void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx,  FactorizedJetCorrector* corrector, float& btagprob_data, float &btagprob_mc, float &btagprob_heavy_UP, float & btagprob_heavy_DN,float & btagprob_light_UP, float & btagprob_light_DN, float & btagprob_FS_UP, float & btagprob_FS_DN, unsigned int overlep1_idx, unsigned int overlep2_idx, bool applynewcorr, JetCorrectionUncertainty* jetcorr_uncertainty, int JES_type, bool applyBtagSFs, bool isFastsim)
 {
     
     // fill info for ak4pfjets
@@ -270,20 +266,30 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx,  Factoriz
   //              cout<<"got uncertainty from btagsf reader:"<<endl;
                 btagprob_data *= weight_cent * eff;
                 btagprob_mc *= eff;
-                float abserr_UP = weight_UP - weight_cent;
-                float abserr_DN = weight_cent - weight_DN;
-		float abserr_FS_UP = weight_FS_UP - weight_cent;
-                float abserr_FS_DN = weight_cent - weight_FS_DN;
+                //float abserr_UP = weight_UP - weight_cent;
+                //float abserr_DN = weight_cent - weight_DN;
+		//float abserr_FS_UP = weight_FS_UP - weight_cent;
+                //float abserr_FS_DN = weight_cent - weight_FS_DN;
 		if (flavor == BTagEntry::FLAV_UDSG) {
-                  btagprob_err_light_UP += abserr_UP/weight_cent;
-                  btagprob_err_light_DN += abserr_DN/weight_cent;
+                  //btagprob_err_light_UP += abserr_UP/weight_cent;
+                  //btagprob_err_light_DN += abserr_DN/weight_cent;
+		  btagprob_light_UP *= weight_UP * eff;
+		  btagprob_light_DN *= weight_DN * eff;
+		  btagprob_heavy_UP *= weight_cent * eff;
+		  btagprob_heavy_DN *= weight_cent * eff;
 		} else {
-                  btagprob_err_heavy_UP += abserr_UP/weight_cent;
-                  btagprob_err_heavy_DN += abserr_DN/weight_cent;
+                  //btagprob_err_heavy_UP += abserr_UP/weight_cent;
+                  //btagprob_err_heavy_DN += abserr_DN/weight_cent;
+		  btagprob_light_UP *= weight_cent * eff;
+		  btagprob_light_DN *= weight_cent * eff;
+		  btagprob_heavy_UP *= weight_UP * eff;
+		  btagprob_heavy_DN *= weight_DN * eff;
                 }
 		if(isFastsim){
-		  btagprob_err_FS_UP += abserr_FS_UP/weight_cent;
-		  btagprob_err_FS_DN += abserr_FS_DN/weight_cent;
+		  //btagprob_err_FS_UP += abserr_FS_UP/weight_cent;
+		  //btagprob_err_FS_DN += abserr_FS_DN/weight_cent;
+		  btagprob_FS_UP *= weight_FS_UP * eff;
+		  btagprob_FS_DN *= weight_FS_DN * eff;
 		}
 //                cout<<"btagprob_err_heavy_UP"<<btagprob_err_heavy_UP<<endl;
                }
@@ -316,20 +322,30 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx,  Factoriz
 
               btagprob_data *= (1. - weight_cent * eff);
               btagprob_mc *= (1. - eff);
-              float abserr_UP = weight_UP - weight_cent;
-              float abserr_DN = weight_cent - weight_DN;
-	      float abserr_FS_UP = weight_FS_UP - weight_cent;
-	      float abserr_FS_DN = weight_cent - weight_FS_DN;
+              //float abserr_UP = weight_UP - weight_cent;
+              //float abserr_DN = weight_cent - weight_DN;
+	      //float abserr_FS_UP = weight_FS_UP - weight_cent;
+	      //float abserr_FS_DN = weight_cent - weight_FS_DN;
 	      if (flavor == BTagEntry::FLAV_UDSG) {
-                btagprob_err_light_UP += (-eff * abserr_UP)/(1 - eff * weight_cent);
-                btagprob_err_light_DN += (-eff * abserr_DN)/(1 - eff * weight_cent);
+                //btagprob_err_light_UP += (-eff * abserr_UP)/(1 - eff * weight_cent);
+                //btagprob_err_light_DN += (-eff * abserr_DN)/(1 - eff * weight_cent);
+		btagprob_light_UP *= (1. - weight_UP * eff);
+		btagprob_light_DN *= (1. - weight_DN * eff);
+		btagprob_heavy_UP *= (1. - weight_cent * eff);
+		btagprob_heavy_DN *= (1. - weight_cent * eff);
               } else {
-                btagprob_err_heavy_UP += (-eff * abserr_UP)/(1 - eff * weight_cent);
-                btagprob_err_heavy_DN += (-eff * abserr_DN)/(1 - eff * weight_cent);
+                //btagprob_err_heavy_UP += (-eff * abserr_UP)/(1 - eff * weight_cent);
+                //btagprob_err_heavy_DN += (-eff * abserr_DN)/(1 - eff * weight_cent);
+		btagprob_light_UP *= (1. - weight_cent * eff);
+		btagprob_light_DN *= (1. - weight_cent * eff);
+		btagprob_heavy_UP *= (1. - weight_UP * eff);
+		btagprob_heavy_DN *= (1. - weight_DN * eff);
               }
 	      if(isFastsim){
-		btagprob_err_FS_UP += (-eff * abserr_FS_UP)/(1 - eff * weight_cent);
-		btagprob_err_FS_DN += (-eff * abserr_FS_DN)/(1 - eff * weight_cent);
+		//btagprob_err_FS_UP += (-eff * abserr_FS_UP)/(1 - eff * weight_cent);
+		//btagprob_err_FS_DN += (-eff * abserr_FS_DN)/(1 - eff * weight_cent);
+		btagprob_FS_UP *= (1. - weight_FS_UP * eff);
+		btagprob_FS_DN *= (1. - weight_FS_DN * eff);
 	      }
            }
          }

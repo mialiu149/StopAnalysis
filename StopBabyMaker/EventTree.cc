@@ -23,10 +23,12 @@ void EventTree::FillCommon (const std::string &root_file_name)
     string signalstr ("mStop");
     string lspstr ("mLSP");//add those for testing purpose
     string smsstr ("SMS");//add those for testing purpose
-
+    string tchwhstr("TChiWH");
     if (filestr.find(signalstr) != string::npos) signal = true;
     if (filestr.find(lspstr)    != string::npos) signal = true;
     if (filestr.find(smsstr)    != string::npos) signal = true;
+    if (filestr.find(tchwhstr)    != string::npos) signal = true;
+
     run = evt_run();
     ls  = evt_lumiBlock();
     evt = evt_event();
@@ -39,18 +41,16 @@ void EventTree::FillCommon (const std::string &root_file_name)
     is_data = evt_isRealData();
 
     // the recommended met filters //
-   if (is_data){  //safety for CMS3_V08-00-01
     if(!signal){
       if(nvtxs>0) filt_met = true;
       else filt_met = false;
       filt_met = filt_met*filt_ecalTP()*filt_eeBadSc()*filt_hbheNoise()*filt_hbheNoiseIso()*filt_goodVertices()*filt_globalTightHalo2016();
-      filt_badMuonFilter  = badMuonFilter();
+      if (is_data) filt_badMuonFilter = badMuonFilter(); //still some problems with MC
       filt_badChargedCandidateFilter = badChargedCandidateFilter();
       filt_cscbeamhalo = filt_cscBeamHalo();
       filt_cscbeamhalo2015 = filt_cscBeamHalo2015();
-      //not in miniaod yet 
-      //filt_globaltighthalo2016 = filt_globalTightHalo2016();
-      //filt_globalsupertighthalo2016 = filt_globalSuperTightHalo2016();
+      filt_globaltighthalo2016 = filt_globalTightHalo2016();
+      filt_globalsupertighthalo2016 = filt_globalSuperTightHalo2016();
       filt_eebadsc = filt_eeBadSc();
       filt_goodvtx = filt_goodVertices(); //not working but same as our 1goodvertex requirement
       filt_ecallaser = filt_ecalLaser();
@@ -61,10 +61,9 @@ void EventTree::FillCommon (const std::string &root_file_name)
       filt_trkPOG_logerr_tmc = filt_trkPOG_logErrorTooManyClusters();
       filt_trkPOG_tmc =filt_trkPOG_manystripclus53X();
       filt_trkPOG_tms = filt_trkPOG_toomanystripclus53X();
+      filt_hbhenoise = filt_hbheNoise(); // hbheNoiseFilter_25ns();
+      filt_hbheisonoise = filt_hbheNoiseIso();//hbheIsoNoiseFilter();
     }
-    filt_hbhenoise = filt_hbheNoise(); // hbheNoiseFilter_25ns();
-    filt_hbheisonoise = filt_hbheNoiseIso();//hbheIsoNoiseFilter();
-}   
     
     if (!is_data)
     {
@@ -84,6 +83,15 @@ void EventTree::FillCommon (const std::string &root_file_name)
       }
       genmet = gen_met();
       genmet_phi = gen_metPhi();
+
+      // calculate nupt
+         LorentzVector nup4 (0.,0.,0.,0.);
+         for(int iGen=0; iGen<(int)genps_p4().size(); iGen++){
+              if(!(abs(genps_id().at(iGen) ) ==12 || abs(genps_id().at(iGen) ) == 14 || abs(genps_id().at(iGen) ) ==16)) continue;
+                if(!genps_isHardProcess().at(iGen)) continue;
+                nup4=nup4+genps_p4().at(iGen);
+          }
+          nupt = nup4.pt();
      
        //calculate genht
          float _genht=0;
@@ -173,44 +181,49 @@ void EventTree::Reset ()
     firstVtx_posZ     = -9999.;
     firstVtx_posp4    = LorentzVector(0,0, 0,0);
 */
-    pfmet             = -9999.;
-    pfmet_phi         = -9999.;
-    calomet           = -9999.;
-    calomet_phi       = -9999.;
-    scale1fb          = -9999.;
-    xsec              = -9999.;
-    xsec_uncert       = -9999.;
-    kfactor           = -9999.;
-    pu_ntrue          = -9999.;
-    dR_lep_leadb      = -9999.;
-    dR_lep2_leadb     = -9999.;
-    MT2W              = -9999.;
-    MT2W_lep2         = -9999.;
-    mindphi_met_j1_j2 = -9999.;
-    mt_met_lep        = -9999.;
-    mt_met_lep2       = -9999.;
-    hadronic_top_chi2 = -9999.; 
-    is_data = false;
- 
-    topness              = -9999.; 
-    topness_lep2         = -9999.; 
-    topnessMod           = -9999.; 
-    topnessMod_lep2      = -9999.; 
-    MT2_l_l              = -9999.; 
-    MT2_lb_b             = -9999.; 
-    MT2_lb_b_lep2        = -9999.; 
-    MT2_lb_b_mass        = -9999.; 
-    MT2_lb_b_mass_lep2   = -9999.; 
-    MT2_lb_bqq           = -9999.; 
-    MT2_lb_bqq_lep2      = -9999.; 
-    MT2_lb_bqq_mass      = -9999.; 
-    MT2_lb_bqq_mass_lep2 = -9999.; 
-    Mlb_closestb         = -9999.; 
-    Mlb_lead_bdiscr      = -9999.; 
-    Mlb_closestb_lep2    = -9999.; 
-    Mlb_lead_bdiscr_lep2 = -9999.; 
-    Mjjj                 = -9999.; 
-    Mjjj_lep2            = -9999.; 
+    pfmet                = -9999.;
+    pfmet_phi            = -9999.;
+    pfmet_rl             = -9999.;
+    pfmet_phi_rl         = -9999.;
+    calomet              = -9999.;
+    calomet_phi          = -9999.;
+    scale1fb             = -9999.;
+    xsec                 = -9999.;
+    xsec_uncert          = -9999.;
+    kfactor              = -9999.;
+    pu_ntrue             = -9999.;
+    dR_lep_leadb         = -9999.;
+    dR_lep2_leadb        = -9999.;
+    MT2W                 = -9999.;
+    MT2W_lep2            = -9999.;
+    MT2W_rl              = -9999.;
+    mindphi_met_j1_j2    = -9999.;
+    mindphi_met_j1_j2_rl = -9999.;
+    mt_met_lep           = -9999.;
+    mt_met_lep2          = -9999.;
+    mt_met_lep_rl        = -9999.;
+    hadronic_top_chi2    = -9999.; 
+    is_data              = false;
+
+    topness                = -9999.; 
+    topness_lep2           = -9999.; 
+    topnessMod             = -9999.; 
+    topnessMod_lep2        = -9999.;
+    topnessMod_rl          = -9999.;
+    MT2_lb_b               = -9999.; 
+    MT2_lb_b_lep2          = -9999.; 
+    MT2_lb_b_mass          = -9999.; 
+    MT2_lb_b_mass_lep2     = -9999.; 
+    MT2_lb_bqq             = -9999.; 
+    MT2_lb_bqq_lep2        = -9999.; 
+    MT2_lb_bqq_mass        = -9999.; 
+    MT2_lb_bqq_mass_lep2   = -9999.; 
+    Mlb_closestb           = -9999.; 
+    Mlb_lead_bdiscr        = -9999.; 
+    Mlb_closestb_lep2      = -9999.; 
+    Mlb_lead_bdiscr_lep2   = -9999.; 
+    Mjjj                   = -9999.; 
+    Mjjj_lep2              = -9999.; 
 
     dphi_Wlep       = -9999.;
     MET_over_sqrtHT = -9999.;
@@ -247,7 +260,13 @@ void EventTree::Reset ()
     weight_PUup    = -9999;
     weight_PUdown  = -9999;
     hardgenpt      = -9999.;
-
+    weight_ISRnjets     = -9999;
+    weight_ISRnjets_UP  = -9999;
+    weight_ISRnjets_DN  = -9999;
+    NISRjets            = -9999;
+    NnonISRjets         = -9999;
+    filt_fastsimjets    = false;
+    
     sparms_names.clear();
   /*  sparms_filterEfficiency	= -9999.;
     sparms_pdfScale		= -9999.;
@@ -265,6 +284,7 @@ void EventTree::Reset ()
 
     genmet 	= -9999.;
     genmet_phi 	= -9999.;
+     nupt = -99999.;
     genht = -9999.;
     PassTrackVeto    = false;
 //    PassTrackVeto_v2 = false;
@@ -274,6 +294,7 @@ void EventTree::Reset ()
     HLT_SingleMu           = -9999.; 
     HLT_SingleEl           = -9999.;
     HLT_MET                = -9999.;
+    HLT_MET100_MHT100 = -9999.;
     HLT_DiEl               = -9999.;
     HLT_MuE                = -9999.;
     HLT_DiMu               = -9999.;
@@ -380,6 +401,7 @@ void EventTree::Reset ()
      filt_trkPOG_tms = false;
      filt_badMuonFilter = false;
      filt_badChargedCandidateFilter = false;
+     filt_badMuonFilter = false;
 
     nPhotons             = -9999;
     ph_selectedidx       = -9999;
@@ -443,6 +465,8 @@ void EventTree::SetBranches (TTree* tree)
     tree->Branch("pu_nvtxs", &pu_nvtxs);
     tree->Branch("pfmet", &pfmet);
     tree->Branch("pfmet_phi", &pfmet_phi);
+    tree->Branch("pfmet_rl", &pfmet_rl);
+    tree->Branch("pfmet_phi_rl", &pfmet_phi_rl);
     tree->Branch("scale1fb", &scale1fb);
     tree->Branch("xsec", &xsec);
     tree->Branch("xsec_uncert", &xsec_uncert);
@@ -466,8 +490,11 @@ void EventTree::SetBranches (TTree* tree)
     tree->Branch("is1lepFromW", &is1lepFromW);
     tree->Branch("is1lepFromTop", &is1lepFromTop);
     tree->Branch("MT2W",&MT2W);
+    tree->Branch("MT2W_rl",&MT2W_rl); 
     tree->Branch("mindphi_met_j1_j2", &mindphi_met_j1_j2);
+    tree->Branch("mindphi_met_j1_j2_rl", &mindphi_met_j1_j2_rl);
     tree->Branch("mt_met_lep", &mt_met_lep);
+    tree->Branch("mt_met_lep_rl", &mt_met_lep_rl);
     tree->Branch("hadronic_top_chi2", &hadronic_top_chi2);
     tree->Branch("ak4pfjets_rho", &ak4pfjets_rho);
     tree->Branch("pdf_up_weight", &pdf_up_weight);
@@ -496,6 +523,12 @@ void EventTree::SetBranches (TTree* tree)
     tree->Branch("weight_PU", &weight_PU);
     tree->Branch("weight_PUup", &weight_PUup);
     tree->Branch("weight_PUdown", &weight_PUdown);
+    tree->Branch("weight_ISRnjets", &weight_ISRnjets);
+    tree->Branch("weight_ISRnjets_UP", &weight_ISRnjets_UP);
+    tree->Branch("weight_ISRnjets_DN", &weight_ISRnjets_DN);
+    tree->Branch("NISRjets", &NISRjets);
+    tree->Branch("NnonISRjets", &NnonISRjets);
+    tree->Branch("filt_fastsimjets", &filt_fastsimjets);
     tree->Branch("sparms_names", &sparms_names);
     tree->Branch("sparms_values", &sparms_values);
     tree->Branch("sparms_subProcessId", &sparms_subProcessId);
@@ -505,17 +538,20 @@ void EventTree::SetBranches (TTree* tree)
     tree->Branch("mass_gluino", &mass_gluino);
     tree->Branch("genmet", &genmet);
     tree->Branch("genmet_phi", &genmet_phi);
+    tree->Branch("nupt", &nupt);
     tree->Branch("genht", &genht);
     tree->Branch("PassTrackVeto",&PassTrackVeto);
     tree->Branch("PassTauVeto",&PassTauVeto);
     tree->Branch("topness", &topness); 
-    tree->Branch("topnessMod", &topnessMod); 
+    tree->Branch("topnessMod", &topnessMod);
+    tree->Branch("topnessMod_rl", &topnessMod_rl);  
     tree->Branch("Mlb_closestb", &Mlb_closestb); 
     tree->Branch("HLT_SingleEl", &HLT_SingleEl );
     tree->Branch("HLT_SingleMu", &HLT_SingleMu );
     tree->Branch("HLT_SingleMuNoIso", &HLT_SingleMuNoIso );
     tree->Branch("HLT_SingleElNoIso", &HLT_SingleElNoIso );
     tree->Branch("HLT_MET", &HLT_MET);
+    tree->Branch("HLT_MET100_MHT100", &HLT_MET100_MHT100);
     tree->Branch("HLT_DiEl", &HLT_DiEl );
     tree->Branch("HLT_DiMu", &HLT_DiMu );
     tree->Branch("HLT_MuE", &HLT_MuE);
@@ -539,6 +575,8 @@ void EventTree::SetBranches (TTree* tree)
     tree->Branch("filt_cscbeamhalo2015", &filt_cscbeamhalo2015);
     tree->Branch("filt_cscbeamhalo", &filt_cscbeamhalo);
     tree->Branch("hardgenpt", &hardgenpt);
+    tree->Branch("calomet", &calomet);
+    tree->Branch("calomet_phi", &calomet_phi);
 }
 
 void EventTree::SetSecondLepBranches (TTree* tree)
@@ -575,8 +613,6 @@ void EventTree::SetExtraVariablesBranches (TTree* tree)
 
 void EventTree::SetMETFilterBranches (TTree* tree)
 {
-    tree->Branch("calomet", &calomet);
-    tree->Branch("calomet_phi", &calomet_phi);
     tree->Branch("filt_cscbeamhalo", &filt_cscbeamhalo);
     tree->Branch("filt_cscbeamhalo2015", &filt_cscbeamhalo2015);
     tree->Branch("filt_globaltighthalo2016", &filt_globaltighthalo2016);

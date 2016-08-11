@@ -113,6 +113,9 @@ void LeptonTree::FillCommon (int id, int idx)
             d0err = mus_d0Err().at(idx);
             dzerr = mus_z0Err().at(idx);
        // }
+
+        gfit_ptErr = mus_gfit_ptErr().at(idx);
+        gfit_pt    = mus_gfit_p4().at(idx).pt();
         passLooseID = muonID(idx, STOP_loose_v3);
         passMediumID = muonID(idx, STOP_medium_v3);
         passTightID =  muonID(idx, STOP_tight_v2);
@@ -201,7 +204,8 @@ void LeptonTree::Reset()
     d0err           = -9999.;
     dz              = -9999.;
     dzerr           = -9999.;
-
+    gfit_ptErr  = -9999.;
+   gfit_pt     = -9999.;
     sigmaIEtaEta_fill5x5 = -9999.; 
     dEtaIn            = -9999.;
     dPhiIn            = -9999.;
@@ -286,6 +290,8 @@ void LeptonTree::SetBranches(TTree* tree)
     tree->Branch(Form("%sproduction_type" , prefix_.c_str()) , &production_type );
      tree->Branch(Form("%sMiniIso"       , prefix_.c_str()) , &MiniIso);
      tree->Branch(Form("%srelIso"       , prefix_.c_str()) , &relIso       );
+     tree->Branch(Form("%sgfit_ptErr"       , prefix_.c_str()) , &gfit_ptErr       );
+     tree->Branch(Form("%sgfit_pt"       , prefix_.c_str()) , &gfit_pt       );
 
     tree->Branch(Form("%spassLooseID"   , prefix_.c_str()) , &passLooseID);
     tree->Branch(Form("%spassMediumID"   , prefix_.c_str()) , &passMediumID);

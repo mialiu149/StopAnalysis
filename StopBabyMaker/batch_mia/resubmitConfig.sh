@@ -53,7 +53,8 @@ do
 	input_file=$(echo ${arg_list[$i]} | awk '{print $3}' | cut -d= -f2)
 	file=$(basename ${input_file})
         echo $file
-	if [ ! $(find ${output_path} -type f -regex .*${file}.root$) ]; then
+        echo find ${output_path} -type f -regex .*_${file}.root$
+	if [ ! "$(find ${output_path} -type f -regex .*_${file}.root$)" ]; then
 	        echo "missing file"
 		index_of_missing_files=(${index_of_missing_files[@]} $i)
 	fi

@@ -16,7 +16,7 @@ void mergeHadoopFiles(const TString& indir, const TString& sample, const TString
 
   // Declare new TChain
   TChain *chain = new TChain("t");
- if(!TString(sample).Contains("SMS"))  chain->SetMaxTreeSize(5000000000LL); //default is 100000000000LL = 100Gb
+  chain->SetMaxTreeSize(5000000000LL); //default is 100000000000LL = 100Gb
 
   // Get number of files from input directory
   int nFiles_in = (int)chain->Add( Form("%s/%s*.root", indir.Data(), sample.Data() ) );

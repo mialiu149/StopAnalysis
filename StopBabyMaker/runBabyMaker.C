@@ -59,11 +59,11 @@ int main(int argc, char **argv){
   //
   // Skim Parameters 
   //
-  int nVtx              = 1;
+  int nVtx              = 0;
 
-  float met             = 100;
+  float met             = 0;
 
-  int nGoodLeptons      = 1;
+  int nGoodLeptons      = 0;
   float goodLep_el_pt   = 20.0;
   float goodLep_el_eta  = 1.4442;
   float goodLep_mu_pt   = 20.0;
@@ -79,7 +79,7 @@ int main(int argc, char **argv){
   float vetoLep_mu_pt   = 5.0;
   float vetoLep_mu_eta  = 2.4;
 
-  int nJets             = 2;
+  int nJets             = 0;
   float jet_pt          = 30.0;
   float jet_eta         = 2.4;
 
@@ -90,7 +90,7 @@ int main(int argc, char **argv){
   bool applyBtagSFs = true; 
   bool applyLeptonSFs = true;
   bool applyVetoLeptonSFs = true;
-  bool isFastsim = false;
+  bool isFastsim =true;
   bool apply2ndlepVeto =  false;
 
   float jet_ak8_pt      = 100.0;
@@ -100,8 +100,8 @@ int main(int argc, char **argv){
   float phs_pt          = 20.0;
   float phs_eta         = 2.4;
 
-  bool filltaus_  =  false;
-  bool filltracks_  =  false;
+  bool filltaus_  =  true;
+  bool filltracks_  =  true;
   bool fillZll_  =  false;
   bool fillPhoton_  =  false;
   bool fillMETfilt_  =  false;
@@ -142,13 +142,15 @@ int main(int argc, char **argv){
   if(argc>2) nevents = atoi(argv[2]);  
   
   int file=-1;
-  if(argc>3) file = atoi(argv[3]);
+  char *filename = "";
+  if(argc>3) {filename = argv[3];file =0;}
 
   char* dirpath = ".";
   if(argc>4) dirpath = argv[4];
 
 //const char* filename = (file == -1 ? "*postprocess.root" : Form("%spostprocess.root"));
-  const char* filename = (file == -1 ? "merged_ntuple_*.root" : Form("merged_ntuple_%i.root", file));
+  
+//  filename = (file == -1 ? "merged_ntuple_*.root" : Form("merged_ntuple_%i.root", file));
   cout << filename << endl;
   
   const char* suffix = file == -1 ? "" : Form("_%i", file);

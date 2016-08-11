@@ -77,7 +77,8 @@ public:
     
     float MiniIso;
     float relIso;
-
+    float gfit_ptErr;
+    float gfit_pt;
     //
     // lepton gen info
     //

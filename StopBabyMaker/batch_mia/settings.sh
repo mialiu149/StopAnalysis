@@ -1,6 +1,11 @@
 #! /bin/bash
+#export analysis_version="V80_13fb_v2" 
+#export analysis_version="V80_13fb_v0_jecdn" 
+#export analysis_version="V80_13fb_v0_jecdn" 
+#export analysis_version="V80_signalscanv4" 
+export analysis_version="V80_signalscanv3_jecdn" 
+# v2 has latest scale factors
 
-export analysis_version="V08-00-01"
 echo "Analysis version = $analysis_version"
 localdirectory=`pwd`
 

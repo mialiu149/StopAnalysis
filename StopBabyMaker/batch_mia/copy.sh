@@ -51,6 +51,7 @@ cp -r $BABYMAKER_DIR_NAME/stop_variables/ $CONDOR_DIR_NAME/StopBabyMaker/
 cp -r $BABYMAKER_DIR_NAME/json_files/ $CONDOR_DIR_NAME/StopBabyMaker/
 cp -r $BABYMAKER_DIR_NAME/jecfiles/ $CONDOR_DIR_NAME/StopBabyMaker/
 cp -r $BABYMAKER_DIR_NAME/xsec_stop_13TeV.root $CONDOR_DIR_NAME/StopBabyMaker/
+cp -r $BABYMAKER_DIR_NAME/xsec_susy_13tev.root $CONDOR_DIR_NAME/StopBabyMaker/
 cp -r $BABYMAKER_DIR_NAME/puWeights_2015data_2p2fbinv.root $CONDOR_DIR_NAME/StopBabyMaker/
 cp -r $BABYMAKER_DIR_NAME/btagsf/ $CONDOR_DIR_NAME/StopBabyMaker/
 cp -r $BABYMAKER_DIR_NAME/lepsf/ $CONDOR_DIR_NAME/StopBabyMaker/

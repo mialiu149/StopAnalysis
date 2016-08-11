@@ -1,6 +1,9 @@
-data = ['data_double_eg_Run2016B_MINIAOD_PromptReco-v2','data_double_mu_Run2016B_MINIAOD_PromptReco-v2','data_muon_eg_Run2016B_MINIAOD_PromptReco-v2','data_single_electron_Run2016B_MINIAOD_PromptReco-v2','data_single_muon_Run2016B_MINIAOD_PromptReco-v2','data_met_Run2016B_MINIAOD_PromptReco-v2']
-dataC = ['data_double_eg_Run2016C_MINIAOD_PromptReco-v2','data_double_mu_Run2016C_MINIAOD_PromptReco-v2','data_muon_eg_Run2016C_MINIAOD_PromptReco-v2','data_single_electron_Run2016C_MINIAOD_PromptReco-v2','data_single_muon_Run2016C_MINIAOD_PromptReco-v2','data_met_Run2016C_MINIAOD_PromptReco-v2']
-signal = ['SMS_t2bw_scan']
+#data = ['data_double_eg_Run2016B_MINIAOD_PromptReco-v2','data_double_mu_Run2016B_MINIAOD_PromptReco-v2','data_single_electron_Run2016B_MINIAOD_PromptReco-v2','data_single_muon_Run2016B_MINIAOD_PromptReco-v2','data_met_Run2016B_MINIAOD_PromptReco-v2']
+#dataC = ['data_double_eg_Run2016C_MINIAOD_PromptReco-v2','data_double_mu_Run2016C_MINIAOD_PromptReco-v2','data_single_electron_Run2016C_MINIAOD_PromptReco-v2','data_single_muon_Run2016C_MINIAOD_PromptReco-v2','data_met_Run2016C_MINIAOD_PromptReco-v2']
+data = ['data_single_electron_Run2016B_MINIAOD_PromptReco-v2','data_single_muon_Run2016B_MINIAOD_PromptReco-v2']
+dataC = ['data_single_electron_Run2016C_MINIAOD_PromptReco-v2','data_single_muon_Run2016C_MINIAOD_PromptReco-v2']
+dataD = ['data_single_electron_Run2016D_MINIAOD_PromptReco-v2','data_single_muon_Run2016D_MINIAOD_PromptReco-v2']
+signal = ['SMS_tchwh_lnbb']
 qcd = [
        'QCD_Pt-20to30_EMEnriched',
        'QCD_Pt-30to50_EMEnriched-ext1',
@@ -21,7 +24,8 @@ ttbar = [ 'ttbar_singleLeptFromT_madgraph_pythia8_25ns',
           #'ttbar_diLept_madgraph_pythia8_25ns',
           'ttbar_diLept_madgraph_pythia8_ext1_25ns',
           #'ttbarTo2L2Nu_powheg_25ns',
-          'ttbar_powheg_pythia8_ext4_25ns']
+        #  'ttbar_powheg_pythia8_ext4_25ns'
+        ]
 singletop = ['tbar_tch_4f_powheg_pythia8_25ns',
               't_sch_4f_amcnlo_pythia8_25ns',
               't_tbarW_5f_powheg_pythia8_25ns',
@@ -34,15 +38,16 @@ wjets = [
          'WJetsToLNu_madgraph_pythia8_25ns',
          'WJetsToLNu_HT100To200_madgraph_pythia8_25ns',
          'WJetsToLNu_HT100To200_madgraph_pythia8_ext1_25ns',
-         'WJetsToLNu_HT200To400_madgraph_pythia8_25ns',
+#         'WJetsToLNu_HT200To400_madgraph_pythia8_25ns',
          'WJetsToLNu_HT200To400_madgraph_pythia8_ext1_25ns',
          'WJetsToLNu_HT400To600_madgraph_pythia8_25ns',
          'WJetsToLNu_HT600To800_madgraph_pythia8_25ns',
-         'WJetsToLNu_HT800To1200_madgraph_pythia8_25ns',
+#         'WJetsToLNu_HT800To1200_madgraph_pythia8_25ns',
          'WJetsToLNu_HT800To1200_madgraph_pythia8_ext1_25ns',
          'WJetsToLNu_HT1200To2500_madgraph_pythia8_25ns',
-         'WJetsToLNu_HT2500ToInf_madgraph_pythia8_25ns',
-         'WJetsToLNu_HT600ToInf_madgraph_pythia8_25ns']
+         'WJetsToLNu_HT2500ToInf_madgraph_pythia8_25ns'
+#         'WJetsToLNu_HT600ToInf_madgraph_pythia8_25ns'
+]
 zjets = [
          'DYJetsToLL_m10To50_amcnlo_pythia8_25ns',
           'DYJetsToLL_m50_amcnlo_pythia8_25ns'
@@ -53,6 +58,7 @@ zjets = [
          ]
 diboson = ['WW_pythia8_25ns','WWToLNuQQ_powheg_25ns','WWTo2l2Nu_powheg_25ns','WZ_pythia8_25ns','WZTo3LNu_powheg_pythia8_25ns','WZTo2L2Q_amcnlo_pythia8_25ns','WZTo1L3Nu_amcnlo_pythia8_25ns','WZTo1LNu2Q_amcnlo_pythia8_25ns','ZZ_pythia8_25ns','ZZTo2L2Q_amcnlo_pythia8_25ns','ZZTo2Q2Nu_amcnlo_pythia8_25ns','ZZTo2L2Nu_powheg_pythia8_25ns']
 addon = ['WplusH_HToBB_WToLNu','WminusH_HToBB_WToLNu-ext1','WZZ','WWW','ZZZ','WWZ','WWG']
+wz = ['WZTo1LNu2Q_amcnlo_pythia8_25ns']
 wjets_highpt = ['W1JetsToLNu_NuPt-200','W2JetsToLNu_NuPt-200','W3JetsToLNu_NuPt-200','W4JetsToLNu_NuPt-200']
 ttv = ['TTWJetsToQQ_amcnlo_pythia8_25ns',
        'TTWJetsToLNu_amcnlo_pythia8_25ns',
@@ -65,8 +71,11 @@ towrite.write('source settings.sh\n')
 towrite.write('TAG=${analysis_version}\n')
 for line in f:
     #for sample in data+dataC:
-#    for sample in signal:
-    for sample in singletop+ttv+ttbar+wjets+zjets+diboson+data+dataC+wjets_highpt+addon:
+    for sample in signal:
+#    for sample in wz:
+#    for sample in singletop+ttv+ttbar+wjets+zjets+diboson+data+dataC+wjets_highpt+addon+dataD:
+#    for sample in wjets+data+dataC+dataD: 
+#     for sample in singletop+ttv+ttbar+zjets+diboson+addon:
         print 'run ',sample
         if sample in line and 'Name' in line:
            print sample
