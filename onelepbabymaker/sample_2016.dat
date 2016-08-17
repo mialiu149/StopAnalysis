@@ -445,3 +445,7 @@ Path /nfs-6/userdata/olivito/wh/
 SAMPLE
 Name SMS_tchwh_lnbb_350_1
 Path /nfs-6/userdata/olivito/wh/
+
+SAMPLE
+Name test
+Path /nfs-7/userdata/mliu/

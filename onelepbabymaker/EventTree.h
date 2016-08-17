@@ -280,6 +280,7 @@ public:
     float Zll_MT2_l_l;
     float Zll_MT2_lb_bqq_mass;
     float Zll_MT2_lb_bqq;
+    int nlooseleps;  
 
 
 /*obsolete
@@ -290,7 +291,6 @@ public:
     LorentzVector  firstVtx_posp4;
     int genLepsHardProcess;                                                                                               
     int genNusHardProcess;
-    int nlooseleps;  
 
     float sparms_filterEfficiency;
     float sparms_pdfScale;

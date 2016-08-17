@@ -156,7 +156,7 @@ void EventTree::Reset ()
     evt = 0;
 
     ngoodleps      =  -9999;
-//    nlooseleps     =  -9999;
+    nlooseleps     =  -9999;
     nvetoleps      =  -9999;
     genlepsfromtop = -9999;
 

@@ -13,7 +13,7 @@
 #include "TFile.h"
 #include "TROOT.h"
 #include "TTreeCache.h"
-
+#include "TGraphAsymmErrors.h"
 #include "CMS3.h"
 #include "MCSelections.h"
 #include "StopSelections.h"
@@ -79,12 +79,9 @@ bool CompareIndexValueSmallest(const std::pair<double, int>& firstElem, const st
   return firstElem.first < secondElem.first;
 }
 
-
-//===========//
-//           //
-// Functions //
-//           //
-//===========//
+//==============//
+// object trees //
+//==============//
 
 babyMaker::babyMaker(){
 
@@ -100,24 +97,6 @@ babyMaker::babyMaker(){
    gen_qs  = GenParticleTree("qs_");
    gen_bosons = GenParticleTree("bosons_");
    gen_susy = GenParticleTree("susy_");
-
-//obsolete
-//   gen_tops = GenParticleTree("ts_");  //merged into gen_qs   
-   //gen_els = GenParticleTree("els_");
-   //gen_mus = GenParticleTree("mus_");
-   //gen_taus = GenParticleTree("taus_");
-   //gen_nuels = GenParticleTree("nuels_");
-   //gen_numus = GenParticleTree("numus_");
-   //gen_nutaus = GenParticleTree("nutaus_");
-   //gen_bs  = GenParticleTree("bs_");
-   //gen_cs  = GenParticleTree("cs_");
-   //gen_glus = GenParticleTree("glus_");
-   //gen_ws  = GenParticleTree("ws_");
-   //gen_zs  = GenParticleTree("zs_");
-   //gen_phs = GenParticleTree("phs_");
-   //gen_hs  = GenParticleTree("hs_");
-
-
 }
 
 void babyMaker::setSkimVariables(int nvtx, float met, int nGoodLep, float goodLep_el_pt, float goodLep_el_eta, float goodLep_mu_pt, float goodLep_mu_eta, float looseLep_el_pt, float looseLep_el_eta, float looseLep_mu_pt, float looseLep_mu_eta, float vetoLep_el_pt, float vetoLep_el_eta, float vetoLep_mu_pt, float vetoLep_mu_eta, bool apply2ndlepveto, int njets, float jet_pt, float jet_eta, float jet_ak8_pt, float jet_ak8_eta, int nbjets, int nphs, float phs_pt, float phs_eta, bool applyJEC, int JES_type_central_up_down,   bool applyLeptonSFs, bool applyVetoLeptonSFs, bool applyBtagSFs, bool isFastsim,bool filltaus_, bool filltracks_, bool fillZll_, bool fillPhoton_,bool fillMETfilt_, bool fill2ndlep_, bool fillExtraEvtVar_, bool fillAK4EF_, bool fillAK4_Other_, bool fillOverleps_, bool fillAK4Synch_, bool fillElID_, bool fillIso_, bool fillLepSynch_){
@@ -180,11 +159,8 @@ void babyMaker::setSkimVariables(int nvtx, float met, int nGoodLep, float goodLe
 
 
 void babyMaker::MakeBabyNtuple(const char* output_name){
-
-  //histFile = new TFile(Form("%s/hist_%s", babypath, output_name), "RECREATE");
   BabyFile = new TFile(Form("%s/%s", babypath, output_name), "RECREATE");
   BabyTree = new TTree("t", "Stop2015 Baby Ntuple");
-
   StopEvt.SetBranches(BabyTree);
   lep1.SetBranches(BabyTree);
   lep2.SetBranches(BabyTree);
@@ -216,23 +192,6 @@ void babyMaker::MakeBabyNtuple(const char* output_name){
   if(fillElID)  lep2.SetBranches_electronID(BabyTree);
   if(fillIso)  lep2.SetBranches_Iso(BabyTree);
   if(fillLepSynch)  lep2.SetBranches_SynchTools(BabyTree);
-
-   
-//obsolete
-  //gen_els.SetBranches(BabyTree);
-  //gen_mus.SetBranches(BabyTree);
-  //gen_taus.SetBranches(BabyTree);
-  //gen_nuels.SetBranches(BabyTree);
-  //gen_numus.SetBranches(BabyTree);
-  //gen_nutaus.SetBranches(BabyTree);
-  //gen_tops.SetBranches(BabyTree);
-  //gen_bs.SetBranches(BabyTree);
-  //gen_cs.SetBranches(BabyTree);
-  //gen_glus.SetBranches(BabyTree);
-  //gen_ws.SetBranches(BabyTree);
-  //gen_zs.SetBranches(BabyTree);
-  //gen_phs.SetBranches(BabyTree);
-  //gen_hs.SetBranches(BabyTree); 
 }
 
 void babyMaker::InitBabyNtuple(){
@@ -251,33 +210,10 @@ void babyMaker::InitBabyNtuple(){
   gen_bosons.Reset();
   gen_susy.Reset();
 
-//obsolete
-  //gen_els.Reset();
-  //gen_mus.Reset();
-  //gen_taus.Reset();
-  //gen_nuels.Reset();
-  //gen_numus.Reset();
-  //gen_nutaus.Reset();
-  //gen_tops.Reset();
-  //gen_bs.Reset();
-  //gen_cs.Reset(); 
-  //gen_qs.Reset();
-  //gen_glus.Reset();
-  //gen_ws.Reset();
-  //gen_zs.Reset();
-  //gen_phs.Reset();
-  //gen_lsp.Reset();
-  //gen_stop.Reset();
-  //gen_tops.Reset();
 } 
 
-
-
-
 //================//
-//                //
 // Main function  //
-//                //
 //================//
 
 int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path){
@@ -340,18 +276,15 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
     cout << ", running on MC, based on file name: " << output_name<<endl;
   }
 
-  
-  //
-  // Open lepton SF histos
-  //
-
   // Fullsim Electron file
   TFile *f_el_SF;
 
+  TFile *f_el_SF_tracking;
   // Fullsim Muon files
   TFile *f_mu_SF_id;
   TFile *f_mu_SF_iso;
   TFile *f_mu_SF_ip;
+  TFile *f_mu_SF_tracking;
   TFile *f_mu_SF_veto_id;
   TFile *f_mu_SF_veto_iso;
   TFile *f_mu_SF_veto_ip;
@@ -381,13 +314,15 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   TH2D *h_el_SF_veto = NULL;
   TH2D *h_mu_SF_veto = NULL;
 
+  TH2D *h_el_SF_tracking = NULL;
+  TH1D *h_mu_SF_tracking = NULL;
   // Final scale factor histograms for fastim/fullsim for selected leptons
-  TH3D *h_el_FS = NULL;
-  TH3D *h_mu_FS = NULL;
+  TH2D *h_el_FS = NULL;
+  TH2D *h_mu_FS = NULL;
 
   // Final scale factor histograms for fastim/fullsim for veto leptons
-  TH3D *h_el_veto_FS = NULL;
-  TH3D *h_mu_veto_FS = NULL;
+  TH2D *h_el_veto_FS = NULL;
+  TH2D *h_mu_veto_FS = NULL;
 
   // Final scale factor histograms for lost leptons
   TH2D *h_el_vetoLepEff = NULL;
@@ -399,43 +334,44 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   if( (skim_applyLeptonSFs || skim_applyVetoLeptonSFs) && !isDataFromFileName){
 
     cout << "  Grabbing lepton scale factors " << endl;
-
-    // Electron file
-    f_el_SF       = new TFile("lepsf/analysis2016/scaleFactors.root", "read");
+     // Electron file
+    f_el_SF          = new TFile("lepsf/analysis2016_12p9fb/scaleFactors.root", "read");
+    f_el_SF_tracking = new TFile("lepsf/analysis2016_12p9fb/egammaEffi.txt_SF2D.root", "read");
     
     // Muon files
-    //f_mu_SF_id    = new TFile("lepsf/analysis2016/MuonID_Z_RunBCD_prompt80X_7p65.root", "read");
-    f_mu_SF_id    = new TFile("lepsf/analysis2016/TnP_MuonID_NUM_MediumID_DENOM_generalTracks_VAR_map_pt_eta.root", "read");
-    f_mu_SF_iso   = new TFile("lepsf/analysis2016/TnP_MuonID_NUM_MiniIsoTight_DENOM_MediumID_VAR_map_pt_eta.root", "read"); // double unc for this
-    f_mu_SF_ip    = new TFile("lepsf/analysis2016/TnP_MuonID_NUM_TightIP2D_DENOM_MediumID_VAR_map_pt_eta.root", "read"); // double unc for this
-
-    f_mu_SF_veto_id  = new TFile("lepsf/analysis2016/TnP_MuonID_NUM_LooseID_DENOM_generalTracks_VAR_map_pt_eta.root", "read");
-    f_mu_SF_veto_iso = new TFile("lepsf/analysis2016/TnP_MuonID_NUM_MiniIsoTight_DENOM_LooseID_VAR_map_pt_eta.root", "read");
-    f_mu_SF_veto_ip  = new TFile("lepsf/analysis2016/TnP_MuonID_NUM_MediumIP2D_DENOM_LooseID_VAR_map_pt_eta.root", "read"); // double unc for this
-
+    f_mu_SF_id       = new TFile("lepsf/analysis2016_12p9fb/TnP_MuonID_NUM_MediumID_DENOM_generalTracks_VAR_map_pt_eta.root", "read"); // double unc
+    f_mu_SF_iso      = new TFile("lepsf/analysis2016_12p9fb/TnP_MuonID_NUM_MiniIsoTight_DENOM_MediumID_VAR_map_pt_eta.root", "read"); // double unc
+    f_mu_SF_ip       = new TFile("lepsf/analysis2016_12p9fb/TnP_MuonID_NUM_TightIP2D_DENOM_MediumID_VAR_map_pt_eta.root", "read"); // double unc
+    f_mu_SF_tracking = new TFile("lepsf/analysis2016_12p9fb/muons_tracking_sf.root", "read"); 
+    
+    f_mu_SF_veto_id  = new TFile("lepsf/analysis2016_12p9fb/TnP_MuonID_NUM_LooseID_DENOM_generalTracks_VAR_map_pt_eta.root", "read");
+    f_mu_SF_veto_iso = new TFile("lepsf/analysis2016_12p9fb/TnP_MuonID_NUM_MiniIsoTight_DENOM_LooseID_VAR_map_pt_eta.root", "read");
+    f_mu_SF_veto_ip  = new TFile("lepsf/analysis2016_12p9fb/TnP_MuonID_NUM_MediumIP2D_DENOM_LooseID_VAR_map_pt_eta.root", "read"); // double unc for this
+    
     // Fastsim/Fullsim el files
-    f_el_FS_ID  = new TFile("lepsf/analysis2016/sf_el_mediumCB.root", "read");
-    f_el_FS_Iso = new TFile("lepsf/analysis2016/sf_el_mini01.root", "read");
-
-    f_el_veto_FS_ID  = new TFile("lepsf/analysis2016/sf_el_vetoCB.root", "read");
-    f_el_veto_FS_Iso = new TFile("lepsf/analysis2016/sf_el_mini01.root", "read"); // double unc for this
-
+    f_el_FS_ID  = new TFile("lepsf/analysis2016_12p9fb/sf_el_mediumCB.root", "read");
+    f_el_FS_Iso = new TFile("lepsf/analysis2016_12p9fb/sf_el_mini01.root", "read");
+    
+    f_el_veto_FS_ID  = new TFile("lepsf/analysis2016_12p9fb/sf_el_vetoCB.root", "read");
+    f_el_veto_FS_Iso = new TFile("lepsf/analysis2016_12p9fb/sf_el_mini02.root", "read"); 
+    
     // Fastsim/Fullsim mu files
-    f_mu_FS_ID  = new TFile("lepsf/analysis2016/sf_mu_mediumID.root", "read"); // double unc for this
-    f_mu_FS_Iso = new TFile("lepsf/analysis2016/sf_mu_mini02.root", "read"); // double unc for this
-    f_mu_FS_Ip  = new TFile("lepsf/analysis2016/sf_mu_tightIP2D.root", "read"); // double unc for this
-
-    f_mu_veto_FS_ID  = new TFile("lepsf/analysis2016/sf_mu_looseID.root", "read");
-    f_mu_veto_FS_Iso = new TFile("lepsf/analysis2016/sf_mu_mini02.root", "read");
-    f_mu_veto_FS_Ip  = new TFile("lepsf/analysis2016/sf_mu_tightIP2D.root", "read"); // double unc for this
+    f_mu_FS_ID  = new TFile("lepsf/analysis2016_12p9fb/sf_mu_medium.root", "read"); // double unc for this
+    f_mu_FS_Iso = new TFile("lepsf/analysis2016_12p9fb/sf_mu_mediumID_mini02.root", "read"); // double unc for this
+    f_mu_FS_Ip  = new TFile("lepsf/analysis2016_12p9fb/sf_mu_tightIP2D.root", "read"); // double unc for this
+    
+    f_mu_veto_FS_ID  = new TFile("lepsf/analysis2016_12p9fb/sf_mu_loose.root", "read");
+    f_mu_veto_FS_Iso = new TFile("lepsf/analysis2016_12p9fb/sf_mu_looseID_mini02.root", "read");
+    f_mu_veto_FS_Ip  = new TFile("lepsf/analysis2016_12p9fb/sf_mu_looseIP2D.root", "read"); // double unc for this
 
     // Veto lepton reco efficiency files
-    f_vetoLep_eff = new TFile("lepsf/analysis2016/lepeff__ttbar_diLept_madgraph_pythia8_ext1_25ns__80x.root", "read");
+    f_vetoLep_eff = new TFile("lepsf/analysis2016_12p9fb/lepeff__ttbar_diLept_madgraph_pythia8_ext1_25ns__80x.root", "read");
 
 
     // Grab selected el histos
-    TH2D *h_el_SF_id_temp  = (TH2D*)f_el_SF->Get("GsfElectronToMedium");
-    TH2D *h_el_SF_iso_temp = (TH2D*)f_el_SF->Get("MVAVLooseElectronToMini");
+    TH2D *h_el_SF_id_temp       = (TH2D*)f_el_SF->Get("GsfElectronToMedium");
+    TH2D *h_el_SF_iso_temp      = (TH2D*)f_el_SF->Get("MVAVLooseElectronToMini");
+    TH2D *h_el_SF_tracking_temp = (TH2D*)f_el_SF_tracking->Get("EGamma_SF2D");
 
     // Grab veto el histos
     TH2D *h_el_SF_veto_id_temp  = (TH2D*)f_el_SF->Get("GsfElectronToVeto");
@@ -443,10 +379,10 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
 
 
     // Grab selected mu histos
-    //TH2D *h_mu_SF_id_temp  = (TH2D*)f_mu_SF_id->Get("MC_NUM_TightIDandIPCut_DEN_genTracks_PAR_pt_spliteta_bin1/pt_abseta_ratio");
     TH2D *h_mu_SF_id_temp  = (TH2D*)f_mu_SF_id->Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0");
     TH2D *h_mu_SF_iso_temp = (TH2D*)f_mu_SF_iso->Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0_&_Medium2016_pass");
     TH2D *h_mu_SF_ip_temp  = (TH2D*)f_mu_SF_ip->Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0_&_Medium2016_pass");
+    TGraphAsymmErrors *h_mu_SF_tracking_temp  = (TGraphAsymmErrors*)f_mu_SF_tracking->Get("ratio_eta");
 
     // Grab veto mu histos
     TH2D *h_mu_SF_veto_id_temp  = (TH2D*)f_mu_SF_veto_id->Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0");
@@ -455,22 +391,22 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
     
 
     // Grab fastsim/fullsim selected el histos
-    TH3D *h_el_FS_ID_temp  = (TH3D*)f_el_FS_ID->Get("histo3D");
-    TH3D *h_el_FS_Iso_temp = (TH3D*)f_el_FS_Iso->Get("histo3D");
+    TH2D *h_el_FS_ID_temp  = (TH2D*)f_el_FS_ID->Get("histo2D");
+    TH2D *h_el_FS_Iso_temp = (TH2D*)f_el_FS_Iso->Get("histo2D");
 
     // Grab fastsim/fullsim veto el histos
-    TH3D *h_el_veto_FS_ID_temp  = (TH3D*)f_el_veto_FS_ID->Get("histo3D");
-    TH3D *h_el_veto_FS_Iso_temp = (TH3D*)f_el_veto_FS_Iso->Get("histo3D");
+    TH2D *h_el_veto_FS_ID_temp  = (TH2D*)f_el_veto_FS_ID->Get("histo2D");
+    TH2D *h_el_veto_FS_Iso_temp = (TH2D*)f_el_veto_FS_Iso->Get("histo2D");
     
     // Grab fastsim/fullsim selected mu histos
-    TH3D *h_mu_FS_ID_temp  = (TH3D*)f_mu_FS_ID->Get("histo3D");
-    TH3D *h_mu_FS_Iso_temp = (TH3D*)f_mu_FS_Iso->Get("histo3D");
-    TH3D *h_mu_FS_Ip_temp  = (TH3D*)f_mu_FS_Ip->Get("histo3D");
+    TH2D *h_mu_FS_ID_temp  = (TH2D*)f_mu_FS_ID->Get("histo2D");
+    TH2D *h_mu_FS_Iso_temp = (TH2D*)f_mu_FS_Iso->Get("histo2D");
+    TH2D *h_mu_FS_Ip_temp  = (TH2D*)f_mu_FS_Ip->Get("histo2D");
     
     // Grab fastsim/fullsim veto mu histos
-    TH3D *h_mu_veto_FS_ID_temp  = (TH3D*)f_mu_veto_FS_ID->Get("histo3D");
-    TH3D *h_mu_veto_FS_Iso_temp = (TH3D*)f_mu_veto_FS_Iso->Get("histo3D");
-    TH3D *h_mu_veto_FS_Ip_temp  = (TH3D*)f_mu_veto_FS_Ip->Get("histo3D");
+    TH2D *h_mu_veto_FS_ID_temp  = (TH2D*)f_mu_veto_FS_ID->Get("histo2D");
+    TH2D *h_mu_veto_FS_Iso_temp = (TH2D*)f_mu_veto_FS_Iso->Get("histo2D");
+    TH2D *h_mu_veto_FS_Ip_temp  = (TH2D*)f_mu_veto_FS_Ip->Get("histo2D");
 
     
     // Grab mc eff for veto lepton (for lost lepto SFs) histos
@@ -483,6 +419,9 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
     TH2D *h_el_SF_iso = (TH2D*)h_el_SF_iso_temp->Clone("h_el_SF_iso");
     h_el_SF = (TH2D*)h_el_SF_id->Clone("h_el_SF");
     h_el_SF->Multiply(h_el_SF_iso);
+    
+    // Get final fullsim, selected el, tracking sfs
+    h_el_SF_tracking = (TH2D*)h_el_SF_tracking_temp->Clone("h_el_SF_iso");
     
     // Get final fullsim, veto el, sfs
     TH2D *h_el_SF_veto_id  = (TH2D*)h_el_SF_veto_id_temp->Clone("h_el_SF_veto_id");
@@ -516,7 +455,19 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
     h_mu_SF = (TH2D*)h_mu_SF_id->Clone("h_mu_SF");
     h_mu_SF->Multiply(h_mu_SF_iso);
     h_mu_SF->Multiply(h_mu_SF_ip);
-    
+ 
+    // Get final fullsim, selected muon, tracking sfs, convert TGraphErrors
+    int nX = h_mu_SF_tracking_temp->GetN();
+    Double_t *x_val = h_mu_SF_tracking_temp->GetX();
+    Double_t *y_val = h_mu_SF_tracking_temp->GetY();
+    Double_t *y_err_up = h_mu_SF_tracking_temp->GetEYhigh();
+    Double_t *y_err_low = h_mu_SF_tracking_temp->GetEYhigh();
+    h_mu_SF_tracking = new TH1D("h_mu_SF_tracking","h_mu_SF_tracking",nX-1,x_val);
+    for(int i=0; i<nX; i++){
+      h_mu_SF_tracking->SetBinContent(i+1,y_val[i]);
+      h_mu_SF_tracking->SetBinError(i+1,std::max(y_err_up[i],y_err_low[i]));
+    }
+     
     // Get final fullsim, veto mu, sfs
     TH2D *h_mu_SF_veto_id  = (TH2D*)h_mu_SF_veto_id_temp->Clone("h_mu_SF_veto_id");
     TH2D *h_mu_SF_veto_iso = (TH2D*)h_mu_SF_veto_iso_temp->Clone("h_mu_SF_veto_iso");
@@ -533,70 +484,54 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
     
 
     // Get final fullsim/fastsim, selected el, sfs
-    TH3D* h_el_FS_ID  = (TH3D*)h_el_FS_ID_temp->Clone("h_el_FS_ID");
-    TH3D* h_el_FS_Iso = (TH3D*)h_el_FS_Iso_temp->Clone("h_el_FS_Iso");
-    h_el_FS = (TH3D*)h_el_FS_ID->Clone("h_el_FS");
+    TH2D* h_el_FS_ID  = (TH2D*)h_el_FS_ID_temp->Clone("h_el_FS_ID");
+    TH2D* h_el_FS_Iso = (TH2D*)h_el_FS_Iso_temp->Clone("h_el_FS_Iso");
+    h_el_FS = (TH2D*)h_el_FS_ID->Clone("h_el_FS");
     h_el_FS->Multiply(h_el_FS_Iso);
     
     // Get final fullsim/fastsim, veto el, sfs
-    TH3D* h_el_veto_FS_ID  = (TH3D*)h_el_veto_FS_ID_temp->Clone("h_el_veto_FS_ID");
-    TH3D* h_el_veto_FS_Iso = (TH3D*)h_el_veto_FS_Iso_temp->Clone("h_el_veto_FS_Iso");
-    // Double unc. on veto electron FS iso sfs, since not for our exact wp
-    for(int x=1; x<=(int)h_el_veto_FS_Iso->GetNbinsX(); x++){
-      for(int y=1; y<=(int)h_el_veto_FS_Iso->GetNbinsY(); y++){
-	for(int z=1; z<=(int)h_el_veto_FS_Iso->GetNbinsZ(); z++){
-	  h_el_veto_FS_Iso->SetBinError(x,y,z,h_el_veto_FS_Iso->GetBinError(x,y,z)*2.0);
-	}
-      }
-    }
-    h_el_veto_FS = (TH3D*)h_el_veto_FS_ID->Clone("h_el_FS");
+    TH2D* h_el_veto_FS_ID  = (TH2D*)h_el_veto_FS_ID_temp->Clone("h_el_veto_FS_ID");
+    TH2D* h_el_veto_FS_Iso = (TH2D*)h_el_veto_FS_Iso_temp->Clone("h_el_veto_FS_Iso");
+    h_el_veto_FS = (TH2D*)h_el_veto_FS_ID->Clone("h_el_FS");
     h_el_veto_FS->Multiply(h_el_veto_FS_Iso);
     
     // Get final fullsim/fastsim, selected mu, sfs
-    TH3D* h_mu_FS_ID  = (TH3D*)h_mu_FS_ID_temp->Clone("h_mu_FS_ID");
-    TH3D* h_mu_FS_Iso = (TH3D*)h_mu_FS_Iso_temp->Clone("h_mu_FS_Iso");
-    TH3D* h_mu_FS_Ip  = (TH3D*)h_mu_FS_Ip_temp->Clone("h_mu_FS_Ip");
+    TH2D* h_mu_FS_ID  = (TH2D*)h_mu_FS_ID_temp->Clone("h_mu_FS_ID");
+    TH2D* h_mu_FS_Iso = (TH2D*)h_mu_FS_Iso_temp->Clone("h_mu_FS_Iso");
+    TH2D* h_mu_FS_Ip  = (TH2D*)h_mu_FS_Ip_temp->Clone("h_mu_FS_Ip");
     // Double unc. on selected muon FS id sfs, since not for our exact wp
     for(int x=1; x<=(int)h_mu_FS_ID->GetNbinsX(); x++){
       for(int y=1; y<=(int)h_mu_FS_ID->GetNbinsY(); y++){
-	for(int z=1; z<=(int)h_mu_FS_ID->GetNbinsZ(); z++){
-	  h_mu_FS_ID->SetBinError(x,y,z,h_mu_FS_ID->GetBinError(x,y,z)*2.0);
-	}
+	h_mu_FS_ID->SetBinError(x,y,h_mu_FS_ID->GetBinError(x,y)*2.0);
       }
     }
     // Double unc. on selected muon FS iso sfs, since not for our exact wp
     for(int x=1; x<=(int)h_mu_FS_Iso->GetNbinsX(); x++){
       for(int y=1; y<=(int)h_mu_FS_Iso->GetNbinsY(); y++){
-	for(int z=1; z<=(int)h_mu_FS_Iso->GetNbinsZ(); z++){
-	  h_mu_FS_Iso->SetBinError(x,y,z,h_mu_FS_Iso->GetBinError(x,y,z)*2.0);
-	}
+	h_mu_FS_Iso->SetBinError(x,y,h_mu_FS_Iso->GetBinError(x,y)*2.0);
       }
     }
     // Double unc. on selected muon FS ip sfs, since not for our exact wp
     for(int x=1; x<=(int)h_mu_FS_Ip->GetNbinsX(); x++){
       for(int y=1; y<=(int)h_mu_FS_Ip->GetNbinsY(); y++){
-	for(int z=1; z<=(int)h_mu_FS_Ip->GetNbinsZ(); z++){
-	  h_mu_FS_Ip->SetBinError(x,y,z,h_mu_FS_Ip->GetBinError(x,y,z)*2.0);
-	}
+	h_mu_FS_Ip->SetBinError(x,y,h_mu_FS_Ip->GetBinError(x,y)*2.0);
       }
     }
-    h_mu_FS = (TH3D*)h_mu_FS_ID->Clone("h_mu_FS");
+    h_mu_FS = (TH2D*)h_mu_FS_ID->Clone("h_mu_FS");
     h_mu_FS->Multiply(h_mu_FS_Iso);
     h_mu_FS->Multiply(h_mu_FS_Ip);
     
     // Get final fullsim/fastsim, veto mu, sfs
-    TH3D* h_mu_veto_FS_ID  = (TH3D*)h_mu_veto_FS_ID_temp->Clone("h_mu_veto_FS_ID");
-    TH3D* h_mu_veto_FS_Iso = (TH3D*)h_mu_veto_FS_Iso_temp->Clone("h_mu_veto_FS_Iso");
-    TH3D* h_mu_veto_FS_Ip  = (TH3D*)h_mu_veto_FS_Ip_temp->Clone("h_mu_veto_FS_Ip");
+    TH2D* h_mu_veto_FS_ID  = (TH2D*)h_mu_veto_FS_ID_temp->Clone("h_mu_veto_FS_ID");
+    TH2D* h_mu_veto_FS_Iso = (TH2D*)h_mu_veto_FS_Iso_temp->Clone("h_mu_veto_FS_Iso");
+    TH2D* h_mu_veto_FS_Ip  = (TH2D*)h_mu_veto_FS_Ip_temp->Clone("h_mu_veto_FS_Ip");
     // Double unc. on selected muon FS ip sfs, since not for our exact wp
     for(int x=1; x<=(int)h_mu_veto_FS_Ip->GetNbinsX(); x++){
       for(int y=1; y<=(int)h_mu_veto_FS_Ip->GetNbinsY(); y++){
-	for(int z=1; z<=(int)h_mu_veto_FS_Ip->GetNbinsZ(); z++){
-	  h_mu_veto_FS_Ip->SetBinError(x,y,z,h_mu_veto_FS_Ip->GetBinError(x,y,z)*2.0);
-	}
+	h_mu_veto_FS_Ip->SetBinError(x,y,h_mu_veto_FS_Ip->GetBinError(x,y)*2.0);
       }
     }
-    h_mu_veto_FS = (TH3D*)h_mu_veto_FS_ID->Clone("h_mu_veto_FS");
+    h_mu_veto_FS = (TH2D*)h_mu_veto_FS_ID->Clone("h_mu_veto_FS");
     h_mu_veto_FS->Multiply(h_mu_veto_FS_Iso);
     h_mu_veto_FS->Multiply(h_mu_veto_FS_Ip);
     
@@ -608,87 +543,11 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
     
     
     
-    /*
-    f_el_SF       = new TFile("lepsf/analysis2015/kinematicBinSFele.root", "read");
-
-    f_mu_SF_id    = new TFile("lepsf/analysis2015/TnP_MuonID_NUM_MediumID_DENOM_generalTracks_VAR_map_pt_eta.root", "read");
-    f_mu_SF_iso   = new TFile("lepsf/analysis2015/TnP_MuonID_NUM_MiniIsoTight_DENOM_LooseID_VAR_map_pt_eta.root");
-
-    f_mu_SF_veto_id  = new TFile("lepsf/analysis2015/TnP_MuonID_NUM_LooseID_DENOM_generalTracks_VAR_map_pt_eta.root", "read");
-    f_mu_SF_veto_iso = new TFile("lepsf/analysis2015/TnP_MuonID_NUM_MiniIsoTight_DENOM_LooseID_VAR_map_pt_eta.root");
-
-    
-    f_el_FS_ID       = new TFile("lepsf/analysis2015/sf_el_mediumCB.root", "read");
-    f_el_FS_Iso      = new TFile("lepsf/analysis2015/sf_el_mini01.root", "read");
-
-    f_mu_FS_ID       = new TFile("lepsf/analysis2015/sf_mu_mediumID.root", "read");
-    f_mu_FS_Iso      = new TFile("lepsf/analysis2015/sf_mu_mini02.root", "read");
-    
-    f_vetoLep_eff = new TFile("lepsf/analysis2015/lepeff__ttbar_powheg_pythia8_25ns__SRcuts.root", "read");
-       
-    
-    TH2D *h_el_SF_id_temp       = (TH2D*)f_el_SF->Get("CutBasedMedium");
-    TH2D *h_el_SF_iso_temp      = (TH2D*)f_el_SF->Get("MiniIso0p1_vs_AbsEta");
-
-    TH2D *h_el_SF_veto_id_temp  = (TH2D*)f_el_SF->Get("CutBasedVeto");
-    TH2D *h_el_SF_veto_iso_temp = (TH2D*)f_el_SF->Get("MiniIso0p4_vs_AbsEta");
-    
-    TH2D *h_mu_SF_id_temp   = (TH2D*)f_mu_SF_id->Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0_&_tag_combRelIsoPF04dBeta_bin0_&_tag_pt_bin0_&_tag_IsoMu20_pass");
-    TH2D *h_mu_SF_iso_temp  = (TH2D*)f_mu_SF_iso->Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0_&_tag_combRelIsoPF04dBeta_bin0_&_tag_pt_bin0_&_PF_pass_&_tag_IsoMu20_pass");
-
-    TH2D *h_mu_SF_veto_id_temp  = (TH2D*)f_mu_SF_veto_id->Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0_&_tag_combRelIsoPF04dBeta_bin0_&_tag_pt_bin0_&_tag_IsoMu20_pass");
-    TH2D *h_mu_SF_veto_iso_temp = (TH2D*)f_mu_SF_veto_iso->Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0_&_tag_combRelIsoPF04dBeta_bin0_&_tag_pt_bin0_&_PF_pass_&_tag_IsoMu20_pass");
-    
-    TH2D *h_el_FS_ID_temp  = (TH2D*)f_el_FS_ID->Get("histo2D");
-    TH2D *h_el_FS_Iso_temp = (TH2D*)f_el_FS_Iso->Get("histo2D");
-    
-    TH2D *h_mu_FS_ID_temp  = (TH2D*)f_mu_FS_ID->Get("histo2D");
-    TH2D *h_mu_FS_Iso_temp = (TH2D*)f_mu_FS_Iso->Get("histo2D");
-    
-    TH2D *h_el_vetoLepEff_temp = (TH2D*)f_vetoLep_eff->Get("h2_lepEff_vetoSel_rebin_Eff_el");
-    TH2D *h_mu_vetoLepEff_temp = (TH2D*)f_vetoLep_eff->Get("h2_lepEff_vetoSel_rebin_Eff_mu");
-    
-    //BabyFile->cd();
-    
-    TH2D *h_el_SF_id  = (TH2D*)h_el_SF_id_temp->Clone("h_el_SF_id");
-    TH2D *h_el_SF_iso = (TH2D*)h_el_SF_iso_temp->Clone("h_el_SF_iso");
-    TH2D *h_mu_SF_id  = (TH2D*)h_mu_SF_id_temp->Clone("h_mu_SF_id");
-    TH2D *h_mu_SF_iso = (TH2D*)h_mu_SF_iso_temp->Clone("h_mu_SF_iso");
-    
-    TH2D *h_el_SF_veto_id  = (TH2D*)h_el_SF_veto_id_temp->Clone("h_el_SF_veto_id");
-    TH2D *h_el_SF_veto_iso = (TH2D*)h_el_SF_veto_iso_temp->Clone("h_el_SF_veto_iso");
-    TH2D *h_mu_SF_veto_id  = (TH2D*)h_mu_SF_veto_id_temp->Clone("h_mu_SF_veto_id");
-    TH2D *h_mu_SF_veto_iso = (TH2D*)h_mu_SF_veto_iso_temp->Clone("h_mu_SF_veto_iso");
-    
-    h_el_FS          = (TH2D*)h_el_FS_ID_temp->Clone("h_el_FS");
-    h_el_FS->Multiply(h_el_FS_Iso_temp);
-
-    h_mu_FS          = (TH2D*)h_mu_FS_ID_temp->Clone("h_mu_FS");
-    h_mu_FS->Multiply(h_mu_FS_Iso_temp);
-
-
-    h_el_vetoLepEff = (TH2D*)h_el_vetoLepEff_temp->Clone("h_el_vetoLepEff");
-    h_mu_vetoLepEff = (TH2D*)h_mu_vetoLepEff_temp->Clone("h_mu_vetoLepEff");
-
-    h_el_SF = (TH2D*)h_el_SF_id->Clone("h_el_SF");
-    h_el_SF->Multiply(h_el_SF_iso);
-
-    h_el_SF_veto = (TH2D*)h_el_SF_veto_id->Clone("h_el_SF_veto");
-    h_el_SF_veto->Multiply(h_el_SF_veto_iso);
-
-    h_mu_SF = (TH2D*)h_mu_SF_id->Clone("h_mu_SF");
-    h_mu_SF->Multiply(h_mu_SF_iso);
-
-    h_mu_SF_veto = (TH2D*)h_mu_SF_veto_id->Clone("h_mu_SF_veto");
-    h_mu_SF_veto->Multiply(h_mu_SF_veto_iso);
-    */
-  }
-  
-
+      
+}
   TFile *fxsec;
   TH1D *hxsec;
   if(isSignalFromFileName){
-    //fxsec = TFile::Open("xsec_stop_13TeV.root");
     fxsec = new TFile("xsec_susy_13tev.root","READ");
     if(fxsec->IsZombie()) {
       std::cout << "Somehow xsec_stop_13TeV.root is corrupted. Exit..." << std::endl;
@@ -855,33 +714,14 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
     jetcorr_uncertainty = new JetCorrectionUncertainty(jetcorr_uncertainty_filename);
   }
 
-  //
-  // Get bad events from txt files
-  //
-  //StopEvt.SetMetFilterEvents();
-  // btagging scale factor//
-  //
   if (skim_applyBtagSFs) {
-    //reader_heavy = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "mujets", "central"); // central
-    //reader_heavy_UP = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "mujets", "up");  // sys up
-    //reader_heavy_DN = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "mujets", "down");  // sys down
-    //reader_light = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "comb", "central");  // central
-    //reader_light_UP = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "comb", "up");  // sys up
-    //reader_light_DN = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "comb", "down");  // sys down
-
     // get btag efficiencies
     TFile* f_btag_eff;
     TH2D* h_btag_eff_b_temp = NULL;
     TH2D* h_btag_eff_c_temp = NULL;
     TH2D* h_btag_eff_udsg_temp = NULL;
 
-    //if(!skim_isFastsim) f_btag_eff = new TFile("btagsf/btageff__ttbar_powheg_pythia8_25ns.root");
-    //else f_btag_eff = new TFile("btagsf/btageff__SMS-T1bbbb-T1qqqq_fastsim.root");
     if(!skim_isFastsim){
-      //f_btag_eff = new TFile("btagsf/bTagEffs_80X.root");
-      //h_btag_eff_b_temp = (TH2D*) f_btag_eff->Get("eff_total_M_b");
-      //h_btag_eff_c_temp = (TH2D*) f_btag_eff->Get("eff_total_M_c");
-      //h_btag_eff_udsg_temp = (TH2D*) f_btag_eff->Get("eff_total_M_udsg");
       f_btag_eff = new TFile("btagsf/btageff__ttbar_powheg_pythia8_25ns.root");
       h_btag_eff_b_temp = (TH2D*) f_btag_eff->Get("h2_BTaggingEff_csv_med_Eff_b");
       h_btag_eff_c_temp = (TH2D*) f_btag_eff->Get("h2_BTaggingEff_csv_med_Eff_c");
@@ -893,14 +733,16 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       h_btag_eff_c_temp = (TH2D*) f_btag_eff->Get("h2_BTaggingEff_csv_med_Eff_c");
       h_btag_eff_udsg_temp = (TH2D*) f_btag_eff->Get("h2_BTaggingEff_csv_med_Eff_udsg");
     }
+
     BabyFile->cd();
+
     h_btag_eff_b = (TH2D*) h_btag_eff_b_temp->Clone("h_btag_eff_b");
     h_btag_eff_c = (TH2D*) h_btag_eff_c_temp->Clone("h_btag_eff_c");
     h_btag_eff_udsg = (TH2D*) h_btag_eff_udsg_temp->Clone("h_btag_eff_udsg");
     f_btag_eff->Close(); 
- }    
-   jets.InitBtagSFTool(h_btag_eff_b,h_btag_eff_c,h_btag_eff_udsg, skim_isFastsim); 
-   
+    }    
+ 
+    jets.InitBtagSFTool(h_btag_eff_b,h_btag_eff_c,h_btag_eff_udsg, skim_isFastsim); 
 
   //
   // File Loop
@@ -998,10 +840,11 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       //
       // Fill Event Variables
       //
-if(debug)      std::cout << "[babymaker::looper]: filling event vars" << std::endl;
+      if(debug)      std::cout << "[babymaker::looper]: filling event vars" << std::endl;
       StopEvt.FillCommon(file.GetName()); 
-if(debug)      std::cout << "[babymaker::looper]: filling event vars completed" << std::endl; 
+      if(debug)      std::cout << "[babymaker::looper]: filling event vars completed" << std::endl; 
       //dumpDocLines();
+
       if(!StopEvt.is_data){
 	StopEvt.weight_PU     = hPU    ->GetBinContent(hPU    ->FindBin(StopEvt.pu_ntrue));
 	StopEvt.weight_PUup   = hPUup  ->GetBinContent(hPUup  ->FindBin(StopEvt.pu_ntrue));
@@ -1012,22 +855,16 @@ if(debug)      std::cout << "[babymaker::looper]: filling event vars completed" 
       if(isSignalFromFileName){
 	//get stop and lsp mass from sparms
 	for(unsigned int nsparm = 0; nsparm<sparm_names().size(); ++nsparm){
-	  //if(sparm_names().at(nsparm).Contains("mGluino")) StopEvt.mass_stop = sparm_values().at(nsparm);//dummy for testing as only T1's exist
-//	  if(sparm_names().at(nsparm).Contains("mStop")) StopEvt.mass_stop = sparm_values().at(nsparm);
 	  if(sparm_names().at(nsparm).Contains("mCh")) StopEvt.mass_chargino = sparm_values().at(nsparm);
           StopEvt.mass_stop = StopEvt.mass_chargino;// modification for whmet
 	  if(sparm_names().at(nsparm).Contains("mLSP")) StopEvt.mass_lsp = sparm_values().at(nsparm);
           if(sparm_names().at(nsparm).Contains("mGl")) StopEvt.mass_gluino = sparm_values().at(nsparm);
 	}
-	//std::cout << "Got signal mass point mStop " << StopEvt.mass_stop << " mLSP " << StopEvt.mass_lsp << std::endl;
 	if(genps_weight()>0) histNEvts->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,1);
 	else if(genps_weight()<0) histNEvts->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,-1);
 	StopEvt.xsec = hxsec->GetBinContent(hxsec->FindBin(StopEvt.mass_stop));
 	StopEvt.xsec_uncert = hxsec->GetBinError(hxsec->FindBin(StopEvt.mass_stop));
-	//note to get correct scale1fb you need to use in your looper xsec/nevt, where nevt you get via
-	//histNEvts->GetBinContent(histNEvts->FindBin(StopEvt.mass_stop,StopEvt.mass_lsp));
 
-        //copy from Mia's code
         float SMSpdf_weight_up = 1;
         float SMSpdf_weight_down = 1;
         float SMSsum_of_weights= 0;
@@ -1061,10 +898,10 @@ if(debug)      std::cout << "[babymaker::looper]: filling event vars completed" 
         }
       }// is signal
       //
-      // Gen Information - now goes first
+      // Gen Information
       //
-      //std::cout << "[babymaker::looper]: filling gen particles vars" << std::endl;
-    
+      if(debug) std::cout << "[babymaker::looper]: filling gen particles vars" << std::endl;
+
       //ttbar counters using neutrinos:
       int n_nutaufromt=0;
       int n_nuelfromt=0;
@@ -1098,7 +935,7 @@ if(debug)      std::cout << "[babymaker::looper]: filling event vars completed" 
 	 thisFile.Contains("TTW") || thisFile.Contains("TTZ") )
 	istopevent = true;
       if(isSignalFromFileName ||
-	 thisFile.Contains("T2tt") || thisFile.Contains("T2tb") || thisFile.Contains("T2bW") )
+	 thisFile.Contains("T2tt") || thisFile.Contains("T2tb") || thisFile.Contains("T2bW") || thisFile.Contains("TChWH") )
 	isstopevent = true;
 
       //gen particles
@@ -1111,8 +948,7 @@ if(debug)      std::cout << "[babymaker::looper]: filling event vars completed" 
 	      genps_fromHardProcessFinalState().at(genx) ||
 	      genps_isLastCopy().at(genx) ||
 	      genps_status().at(genx)==1 ){
-
-	    if(abs(genps_id().at(genx)) == pdg_el  ||  abs(genps_id().at(genx)) == pdg_mu || abs(genps_id().at(genx)) == pdg_tau || abs(genps_id().at(genx)) == pdg_b || abs(genps_id().at(genx)) == pdg_c || abs(genps_id().at(genx)) == pdg_s || abs(genps_id().at(genx)) == pdg_d ||abs(genps_id().at(genx)) == pdg_u ){//if have lepton or quark --> those could be matched to a jet
+	     if(abs(genps_id().at(genx)) == pdg_el  ||  abs(genps_id().at(genx)) == pdg_mu || abs(genps_id().at(genx)) == pdg_tau || abs(genps_id().at(genx)) == pdg_b || abs(genps_id().at(genx)) == pdg_c || abs(genps_id().at(genx)) == pdg_s || abs(genps_id().at(genx)) == pdg_d ||abs(genps_id().at(genx)) == pdg_u ){//if have lepton or quark --> those could be matched to a jet
 	      int mother_idx = genps_idx_mother().at(genx);
 	      int mother_id = -999;
 	      if(mother_idx>=0) mother_id = abs(genps_id().at(mother_idx));
@@ -1151,7 +987,7 @@ if(debug)      std::cout << "[babymaker::looper]: filling event vars completed" 
 	hardsystem.SetPxPyPzE(0.,0.,0.,0.);
 	if(isstopevent){
 	  for(unsigned int genx = 0; genx < gen_susy.id.size() ; genx++){
-	    if(abs(gen_susy.id.at(genx))==pdg_stop1 && gen_susy.isLastCopy.at(genx)) hardsystem += gen_susy.p4.at(genx);
+	    if(abs(gen_susy.id.at(genx))==pdg_chi_1plus1&& gen_susy.isLastCopy.at(genx)) hardsystem += gen_susy.p4.at(genx);
 	  }
 	}
 	if(istopevent){
@@ -1186,6 +1022,7 @@ if(debug)      std::cout << "[babymaker::looper]: filling event vars completed" 
 	counterhist->Fill(19,StopEvt.weight_ISR);
 	counterhist->Fill(20,StopEvt.weight_ISRup);
 	counterhist->Fill(21,StopEvt.weight_ISRdown);
+
 	if(isSignalFromFileName){
 	  counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,19,StopEvt.weight_ISR);
 	  counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,20,StopEvt.weight_ISRup);
@@ -1196,10 +1033,6 @@ if(debug)      std::cout << "[babymaker::looper]: filling event vars completed" 
       // Gen lepton counting and event classification
       StopEvt.genlepsfromtop = n_nuelfromt+n_numufromt+n_nutaufromt;
       gen_leps.gen_nfromt = n_nuelfromt+ n_numufromt + n_nutaufromt;
-      //gen_els.gen_nfromt = n_nuelfromt;
-      //gen_mus.gen_nfromt = n_numufromt;
-      //gen_taus.gen_nfromt = n_nutaufromt;
- 
       StopEvt.genLepsHardProcess = nLepsHardProcess;
       StopEvt.genNusHardProcess  = nNusHardProcess;
 
@@ -1232,25 +1065,26 @@ if(debug)      std::cout << "[babymaker::looper]: filling event vars completed" 
       //
       // nVertex Cut
       //
-    //  if(StopEvt.nvtxs < skim_nvtx) continue;
-     // if(StopEvt.firstGoodVtxIdx!=0) continue; //really check that first vertex is good
+      if(StopEvt.nvtxs < skim_nvtx) continue;
+      if(StopEvt.firstGoodVtxIdx!=0) continue; //really check that first vertex is good
       nEvents_pass_skim_nVtx++;
-      //keep those here - any event without vertex is BS
-      //save met here because of JEC
+
+      //save met here beased on JEC
+
       if(applyJECfromFile){
         pair<float,float> newmet;
         if(!evt_isRealData() && applyJECunc){
 	  if(JES_type > 0)  newmet = getT1CHSMET_fromMINIAOD(jet_corrector_pfL1FastJetL2L3, jetcorr_uncertainty,true,isbadrawMET);
 	  else if(JES_type < 0)  newmet = getT1CHSMET_fromMINIAOD(jet_corrector_pfL1FastJetL2L3, jetcorr_uncertainty,false,isbadrawMET);
-	  else cout << "This should not happen" << endl;
+	  else cout << "JES type is not found" << endl;
         }
 	else if(isbadrawMET) newmet = getT1CHSMET_fromMINIAOD(jet_corrector_pfL1FastJetL2L3,NULL,0,isbadrawMET);
 	else newmet = getT1CHSMET_fromMINIAOD(jet_corrector_pfL1FastJetL2L3);
 	StopEvt.pfmet = newmet.first;
 	StopEvt.pfmet_phi = newmet.second;
 	if(TMath::IsNaN(StopEvt.pfmet)||(!TMath::Finite(StopEvt.pfmet))||StopEvt.pfmet>14000.) continue;
-      }
-      else{
+        }
+        else{
 	StopEvt.pfmet = evt_pfmet();
 	StopEvt.pfmet_phi = evt_pfmetPhi();
       }
@@ -1259,6 +1093,7 @@ if(debug)      std::cout << "[babymaker::looper]: filling event vars completed" 
       //Lepton Variables
       //
       if(debug) std::cout << "[babymaker::looper]: selecting leptons" << std::endl;
+
       int nGoodLeptons = 0;  //stored lep1,lep2
       int nVetoLeptons = 0;
             
@@ -1270,7 +1105,6 @@ if(debug)      std::cout << "[babymaker::looper]: filling event vars completed" 
 
       // Electrons
       for (unsigned int eidx = 0; eidx < els_p4().size(); eidx++){
-
 	if( !PassElectronVetoSelections(eidx, skim_vetoLep_el_pt, skim_vetoLep_el_eta) ) continue;
 	
 	Lepton mylepton;
@@ -1320,7 +1154,7 @@ if(debug)      std::cout << "[babymaker::looper]: filling event vars completed" 
       nVetoLeptons = GoodLeps.size() + LooseLeps.size() + VetoLeps.size();
       
       StopEvt.ngoodleps  = nGoodLeptons; 
-//      StopEvt.nlooseleps = nLooseLeptons; //why are these needed?
+      StopEvt.nlooseleps = nLooseLeptons; // these are used for Zll
       StopEvt.nvetoleps  = nVetoLeptons; 
       
       if(debug) std::cout << "[babymaker::looper]: filling lepton variables" << std::endl;
@@ -1330,7 +1164,6 @@ if(debug)      std::cout << "[babymaker::looper]: filling event vars completed" 
       AllLeps.insert( AllLeps.end(), VetoLeps.begin(),  VetoLeps.end() );
       if( nVetoLeptons > 0 ) lep1.FillCommon( AllLeps.at(0).id, AllLeps.at(0).idx );
       if( nVetoLeptons > 1 ) lep2.FillCommon( AllLeps.at(1).id, AllLeps.at(1).idx );
-
 
       // Lepton SFs
       float lepSF_pt_cutoff = 99.999;
@@ -1343,7 +1176,6 @@ if(debug)      std::cout << "[babymaker::looper]: filling event vars completed" 
       double vetoLepSF    = 1.0;
       double vetoLepSF_Up = 1.0;
       double vetoLepSF_Dn = 1.0;
-
 
       float lepSF_FS_pt_cutoff = 199.999;
       float lepSF_FS_pt_min    = 10.001;
@@ -1362,6 +1194,11 @@ if(debug)      std::cout << "[babymaker::looper]: filling event vars completed" 
 	  lepSF_Up = lepSF + h_el_SF->GetBinError( binX, binY );
 	  lepSF_Dn = lepSF - h_el_SF->GetBinError( binX, binY );
 	  
+	  binX = h_el_SF_tracking->GetXaxis()->FindBin( std::max( std::min(2.39,(double)lep1.p4.Eta()),-2.39) );
+	  binY = h_el_SF_tracking->GetYaxis()->FindBin( std::max( std::min(199.0,(double)lep1.p4.Pt()), 21.0 ) );
+	  lepSF *= h_el_SF_tracking->GetBinContent( binX, binY );
+	  lepSF_Up *= ( h_el_SF_tracking->GetBinContent(binX,binY) + h_el_SF_tracking->GetBinError(binX,binY) );
+	  lepSF_Dn *= ( h_el_SF_tracking->GetBinContent(binX,binY) - h_el_SF_tracking->GetBinError(binX,binY) );
 	  if(skim_isFastsim){
 	    int bin_FS  = h_el_FS->FindBin( std::max( std::min(lepSF_FS_pt_cutoff, (float)lep1.p4.Pt()), lepSF_FS_pt_min ), fabs(lep1.p4.Eta()), StopEvt.pu_ntrue );
 	    lepSF_FS    = h_el_FS->GetBinContent(bin_FS);
@@ -1378,6 +1215,10 @@ if(debug)      std::cout << "[babymaker::looper]: filling event vars completed" 
 	  lepSF_Up = lepSF + h_mu_SF->GetBinError( binX, binY );
 	  lepSF_Dn = lepSF - h_mu_SF->GetBinError( binX, binY );
 	  
+	  binX = h_mu_SF_tracking->GetXaxis()->FindBin( std::max(-2.2,(double)lep1.p4.Eta()) );
+	  lepSF *= h_mu_SF_tracking->GetBinContent( binX );
+	  lepSF_Up *= ( h_mu_SF_tracking->GetBinContent(binX) + h_mu_SF_tracking->GetBinError(binX) );
+	  lepSF_Dn *= ( h_mu_SF_tracking->GetBinContent(binX) - h_mu_SF_tracking->GetBinError(binX) );
 	  if(skim_isFastsim){
 	    int bin_FS  = h_mu_FS->FindBin( std::max( std::min(lepSF_FS_pt_cutoff, (float)lep1.p4.Pt()), lepSF_FS_pt_min ), fabs(lep1.p4.Eta()), StopEvt.pu_ntrue );
 	    lepSF_FS    = h_mu_FS->GetBinContent(bin_FS);
@@ -1402,7 +1243,7 @@ if(debug)      std::cout << "[babymaker::looper]: filling event vars completed" 
 	    lepSF_Dn *= ( lepSF - h_el_SF->GetBinError( binX, binY ) );
 	    
 	    if(skim_isFastsim){
-	      int bin_FS  = h_el_FS->FindBin( std::max( std::min(lepSF_pt_cutoff, (float)lep2.p4.Pt()), lepSF_pt_min ), fabs(lep2.p4.Eta()), StopEvt.pu_ntrue );
+	      int bin_FS  = h_el_FS->FindBin( std::max( std::min(lepSF_pt_cutoff, (float)lep2.p4.Pt()), lepSF_pt_min ), fabs(lep2.p4.Eta()) );
 	      lepSF_FS    *= h_el_FS->GetBinContent(bin_FS);
 	      lepSF_FS_Up *= (lepSF_FS + h_el_FS->GetBinError(bin_FS));
 	      lepSF_FS_Dn *= (lepSF_FS + h_el_FS->GetBinError(bin_FS));
@@ -1423,6 +1264,11 @@ if(debug)      std::cout << "[babymaker::looper]: filling event vars completed" 
 	    }
 	  }
 
+	  int binX = h_el_SF_tracking->GetXaxis()->FindBin( std::max( std::min(2.39, (double)lep2.p4.Eta()), -2.39) );
+	  int binY = h_el_SF_tracking->GetYaxis()->FindBin( std::max( std::min(199.0, (double)lep2.p4.Pt()), 21.0) );
+	  lepSF *= h_el_SF_tracking->GetBinContent( binX, binY );
+	  lepSF_Up *= ( h_el_SF_tracking->GetBinContent(binX,binY) + h_el_SF_tracking->GetBinError(binX,binY) );
+	  lepSF_Dn *= ( h_el_SF_tracking->GetBinContent(binX,binY) - h_el_SF_tracking->GetBinError(binX,binY) );
 	} // end if 2nd lep if el
 	
 
@@ -1459,9 +1305,12 @@ if(debug)      std::cout << "[babymaker::looper]: filling event vars completed" 
 	  }
 	} // end if 2nd lep is mu
 
+	int binX = h_mu_SF_tracking->GetXaxis()->FindBin( std::max(-2.23,(double)lep2.p4.Eta()) );
+	lepSF *= h_mu_SF_tracking->GetBinContent( binX );
+	lepSF_Up *= ( h_mu_SF_tracking->GetBinContent(binX) + h_mu_SF_tracking->GetBinError(binX) );
+	lepSF_Dn *= ( h_mu_SF_tracking->GetBinContent(binX) - h_mu_SF_tracking->GetBinError(binX) );
       } // end if 2nd lepton reco lepton exists
 
-      
       // If only 1 reco lepton, and is2lep event, then find lost gen lepton
       if( skim_applyVetoLeptonSFs && !StopEvt.is_data && nVetoLeptons==1 && StopEvt.is2lep ){
 	
@@ -1490,7 +1339,6 @@ if(debug)      std::cout << "[babymaker::looper]: filling event vars completed" 
 	  double vetoLepSF_temp    = h_lep_sf->GetBinContent( binX_sf, binY_sf );
 	  double vetoLepSF_temp_Up = vetoLepSF_temp + h_lep_sf->GetBinError( binX_sf, binY_sf );
 	  double vetoLepSF_temp_Dn = vetoLepSF_temp - h_lep_sf->GetBinError( binX_sf, binY_sf );
-	  
 	  
 	  if( vetoEff==1.0 ){
 	    vetoLepSF    = 1.0;
@@ -1522,7 +1370,6 @@ if(debug)      std::cout << "[babymaker::looper]: filling event vars completed" 
       StopEvt.weight_lepSF_fastSim_down = lepSF_FS_Dn;
 
       // save the sum of weights for normalization offline to n-babies.
-      // comment: this has to go before the selection cuts - else you create a bias
       if(!evt_isRealData() && skim_applyLeptonSFs) {
        counterhist->Fill(28,StopEvt.weight_lepSF);
        counterhist->Fill(29,StopEvt.weight_lepSF_up);
@@ -1555,10 +1402,9 @@ if(debug)      std::cout << "[babymaker::looper]: filling event vars completed" 
 	counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,34,StopEvt.weight_lepSF_fastSim_up);
 	counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,35,StopEvt.weight_lepSF_fastSim_down);
       }
-           
-
       //
       // Jet Selection
+      //
        float btagprob_data = 1.;
        float btagprob_mc = 1.;
        float btagprob_heavy_UP = 1.;
@@ -1581,6 +1427,7 @@ if(debug)      std::cout << "[babymaker::looper]: filling event vars completed" 
 	jets.SetJetSelection("ak8", skim_jet_ak8_pt, skim_jet_ak8_eta, true); //save only jets passing jid
         jets.FillCommon(idx_alloverlapjets, jet_corrector_pfL1FastJetL2L3,btagprob_data,btagprob_mc,btagprob_heavy_UP, btagprob_heavy_DN, btagprob_light_UP,btagprob_light_DN,btagprob_FS_UP,btagprob_FS_DN,jet_overlep1_idx, jet_overlep2_idx,applyJECfromFile,jetcorr_uncertainty,JES_type, skim_applyBtagSFs, skim_isFastsim);
       }
+
       if (!evt_isRealData()){
 	int NISRjets = 0;
 	int nonISRjets = 0;
@@ -1618,12 +1465,6 @@ if(debug)      std::cout << "[babymaker::looper]: filling event vars completed" 
       // SAVE B TAGGING SF 
      if (!evt_isRealData() && skim_applyBtagSFs) {
         StopEvt.weight_btagsf = btagprob_data / btagprob_mc;
-	//StopEvt.weight_btagsf_heavy_UP = StopEvt.weight_btagsf + btagprob_err_heavy_UP*StopEvt.weight_btagsf;
-        //StopEvt.weight_btagsf_light_UP = StopEvt.weight_btagsf + btagprob_err_light_UP*StopEvt.weight_btagsf;
-        //StopEvt.weight_btagsf_heavy_DN = StopEvt.weight_btagsf - btagprob_err_heavy_DN*StopEvt.weight_btagsf;
-        //StopEvt.weight_btagsf_light_DN = StopEvt.weight_btagsf - btagprob_err_light_DN*StopEvt.weight_btagsf;
- 	//StopEvt.weight_btagsf_fastsim_UP = StopEvt.weight_btagsf + btagprob_err_FS_UP*StopEvt.weight_btagsf;
-        //StopEvt.weight_btagsf_fastsim_DN = StopEvt.weight_btagsf - btagprob_err_FS_DN*StopEvt.weight_btagsf;
         StopEvt.weight_btagsf_heavy_UP = btagprob_heavy_UP/btagprob_mc;
         StopEvt.weight_btagsf_light_UP = btagprob_light_UP/btagprob_mc;
         StopEvt.weight_btagsf_heavy_DN = btagprob_heavy_DN/btagprob_mc;
@@ -1634,7 +1475,6 @@ if(debug)      std::cout << "[babymaker::looper]: filling event vars completed" 
 	}
      }
      // save the sum of weights for normalization offline to n-babies.
-     // comment: this has to go before the skim_nBJets - else you create a bias
      if(!evt_isRealData() && skim_applyBtagSFs) {
        counterhist->Fill(14,StopEvt.weight_btagsf);
        counterhist->Fill(15,StopEvt.weight_btagsf_heavy_UP);
@@ -1658,20 +1498,16 @@ if(debug)      std::cout << "[babymaker::looper]: filling event vars completed" 
        }
      }
 
-     // 
-     // met Cut
+      // 
+      // apply skim
       //
-      if(StopEvt.pfmet < skim_met) continue;
-      nEvents_pass_skim_met++;
-
-      if(nGoodLeptons < skim_nGoodLep) continue;
-      nEvents_pass_skim_nGoodLep++;
-
-      if(jets.ngoodjets < skim_nJets) continue;
-      nEvents_pass_skim_nJets++;
-      if(jets.ngoodbtags < skim_nBJets) continue;
-      nEvents_pass_skim_nBJets++;
-
+      if(StopEvt.pfmet < skim_met)     continue;      nEvents_pass_skim_met++;
+      if(nGoodLeptons < skim_nGoodLep) continue;      nEvents_pass_skim_nGoodLep++;
+      if(jets.ngoodjets < skim_nJets)  continue;      nEvents_pass_skim_nJets++;
+      if(jets.ngoodbtags < skim_nBJets) continue;     nEvents_pass_skim_nBJets++;
+      //
+      // fastsim filter for bad jets//
+      //
       bool fastsimfilt = false;
       for(unsigned int jix = 0; jix<=jets.ak4pfjets_p4.size();++jix){
 	if(jets.ak4pfjets_p4[jix].Pt()<30) continue;
@@ -2272,59 +2108,7 @@ if(debug)      std::cout << "[babymaker::looper]: filling HLT vars" << std::endl
 
      ///////////////////////////////////////////////////////////
 
-      /*obsolete
-      //StopEvt.HLT_SingleMu = passHLTTriggerPattern("HLT_IsoMu20_eta2p1_IterTrk02_v") || passHLTTriggerPattern("HLT_IsoTkMu20_eta2p1_IterTrk02_v");   
-      //StopEvt.HLT_SingleEl = passHLTTriggerPattern("HLT_Ele27_WP85_Gsf_v");   
-      //StopEvt.HLT_MET170 = passHLTTriggerPattern("HLT_PFMET170_NoiseCleaned_v");
-      StopEvt.HLT_MET170 = passHLTTriggerPattern("HLT_PFMET170_NoiseCleaned_v") || passHLTTriggerPattern("HLT_PFMET170_JetIdCleaned_v") || passHLTTriggerPattern("HLT_PFMET170_v");//just to be safe
-      StopEvt.HLT_HT350MET120  = passHLTTriggerPattern("HLT_PFHT350_PFMET120_NoiseCleaned_v");
-      StopEvt.HLT_HT350MET100 = passHLTTriggerPattern("HLT_PFHT350_PFMET100_NoiseCleaned_v");
-      StopEvt.HLT_MET120Btag = passHLTTriggerPattern("HLT_PFMET120_NoiseCleaned_BTagCSV07_v") || passHLTTriggerPattern("HLT_PFMET120_NoiseCleaned_BTagCSV072_v");
-      StopEvt.HLT_MET120Mu5 = passHLTTriggerPattern("HLT_PFMET120_NoiseCleaned_Mu5_v");
-      StopEvt.HLT_MonoCentPFJet80_METNoMu90_MHTNoMu90_IDTight = passHLTTriggerPattern("HLT_MonoCentralPFJet80_PFMETNoMu90_NoiseCleaned_PFMHTNoMu90_IDTight") || passHLTTriggerPattern("HLT_MonoCentralPFJet80_PFMETNoMu90_JetIdCleaned_PFMHTNoMu90_IDTight");
-      StopEvt.HLT_MET90_MHT90_IDTight = passHLTTriggerPattern("HLT_PFMET90_PFMHT90_IDTight") || passHLTTriggerPattern("HLT_PFMET90_PFMHT90_IDLoose");
-      StopEvt.HLT_METNoMu90_NoiseCleaned_MHTNoMu90_IDTight = passHLTTriggerPattern("HLT_PFMETNoMu90_NoiseCleaned_PFMHTNoMu90_IDTight") || passHLTTriggerPattern("HLT_PFMETNoMu90_JetIdCleaned_PFMHTNoMu90_IDTight");     
-
-      StopEvt.HLT_DiEl =  passHLTTriggerPattern("HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v");
-      StopEvt.HLT_DiEl_17_12 = passHLTTriggerPattern("HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ");
-      StopEvt.HLT_DiMu =  passHLTTriggerPattern("HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v") || passHLTTriggerPattern("HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v");
-      StopEvt.HLT_Mu8El17 = passHLTTriggerPattern("HLT_Mu8_TrkIsoVVL_Ele17_CaloIdL_TrackIdL_IsoVL_v");
-      StopEvt.HLT_Mu8El23 = passHLTTriggerPattern("HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v");
-      StopEvt.HLT_Mu17El12 = passHLTTriggerPattern("HLT_Mu17_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v");
-      StopEvt.HLT_Mu23El12 = passHLTTriggerPattern("HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v");
-
-      //notation in RunIISpring15MC is WP85/WP75, for data will have WPLoose and WPTight
-      StopEvt.HLT_SingleEl23 = passHLTTriggerPattern("HLT_Ele23_WPLoose_Gsf_v");
-      StopEvt.HLT_SingleEl27 = passHLTTriggerPattern("HLT_Ele27_eta2p1_WP75_Gsf_v")||passHLTTriggerPattern("HLT_Ele27_WP85_Gsf_v")||passHLTTriggerPattern("Ele27_eta2p1_WPLoose_Gsf_v");//precsaled for 14e33
-      StopEvt.HLT_SingleEl27Tight = passHLTTriggerPattern("HLT_Ele27_eta2p1_WP75_Gsf_v")||passHLTTriggerPattern("Ele27_eta2p1_WPTight_Gsf_v");//precsaled for 14e33
-      StopEvt.HLT_SingleElTight = passHLTTriggerPattern("HLT_Ele32_eta2p1_WP75_Gsf_v")||passHLTTriggerPattern("Ele32_eta2p1_WPTight_Gsf_v");
-      StopEvt.HLT_SingleEl = passHLTTriggerPattern("HLT_Ele32_eta2p1_WP75_Gsf_v")||passHLTTriggerPattern("Ele32_eta2p1_WPLoose_Gsf_v");
-
-      StopEvt.HLT_SingleElHT200 = passHLTTriggerPattern("HLT_Ele27_eta2p1_WP85_Gsf_HT200_v")||passHLTTriggerPattern("HLT_Ele27_eta2p1_WPLoose_Gsf_HT200_v");
-
-      StopEvt.HLT_SingleMu17 = passHLTTriggerPattern("HLT_IsoMu17_eta2p1_v");
-      StopEvt.HLT_SingleMu18 = passHLTTriggerPattern("HLT_IsoMu18_v") || passHLTTriggerPattern("HLT_IsoTkMu18_v");
-      StopEvt.HLT_SingleMu20 = passHLTTriggerPattern("HLT_IsoMu20_eta2p1_v") || passHLTTriggerPattern("HLT_IsoMu20_v") || passHLTTriggerPattern("HLT_IsoTkMu20_eta2p1_v") || passHLTTriggerPattern("HLT_IsoTkMu20_v");
-      StopEvt.HLT_SingleMu24 = passHLTTriggerPattern("HLT_IsoMu24_eta2p1_v") || passHLTTriggerPattern("HLT_IsoTkMu24_eta2p1_v");
-      StopEvt.HLT_SingleMuNoEta = passHLTTriggerPattern("HLT_IsoMu27_v") || passHLTTriggerPattern("HLT_IsoTkMu27_v");
-      StopEvt.HLT_SingleMuNoIso = passHLTTriggerPattern("HLT_Mu45_eta2p1_v");
-      StopEvt.HLT_SingleMuNoIsoNoEta = passHLTTriggerPattern("HLT_Mu50_v");
-      StopEvt.HLT_Mu6HT200MET125 = passHLTTriggerPattern("HLT_Mu6_PFHT200_PFMET125_NoiseCleaned_v");
-      StopEvt.HLT_SingleMu = passHLTTriggerPattern("HLT_IsoMu24_eta2p1_v") || passHLTTriggerPattern("HLT_IsoTkMu24_eta2p1_v");
-
-      StopEvt.HLT_Photon90_CaloIdL_PFHT500 = passHLTTriggerPattern("HLT_Photon90_CaloIdL_PFHT500_v");
-      StopEvt.HLT_Photon22_R9Id90_HE10_IsoM  = HLT_prescale(triggerName("HLT_Photon22_R9Id90_HE10_IsoM_v" ));
-      StopEvt.HLT_Photon30_R9Id90_HE10_IsoM  = HLT_prescale(triggerName("HLT_Photon30_R9Id90_HE10_IsoM_v" ));
-      StopEvt.HLT_Photon36_R9Id90_HE10_IsoM  = HLT_prescale(triggerName("HLT_Photon36_R9Id90_HE10_IsoM_v" ));
-      StopEvt.HLT_Photon50_R9Id90_HE10_IsoM  = HLT_prescale(triggerName("HLT_Photon50_R9Id90_HE10_IsoM_v" ));
-      StopEvt.HLT_Photon75_R9Id90_HE10_IsoM  = HLT_prescale(triggerName("HLT_Photon75_R9Id90_HE10_IsoM_v" ));
-      StopEvt.HLT_Photon90_R9Id90_HE10_IsoM  = HLT_prescale(triggerName("HLT_Photon90_R9Id90_HE10_IsoM_v" ));
-      StopEvt.HLT_Photon120_R9Id90_HE10_IsoM = HLT_prescale(triggerName("HLT_Photon120_R9Id90_HE10_IsoM_v"));
-      StopEvt.HLT_Photon165_R9Id90_HE10_IsoM = HLT_prescale(triggerName("HLT_Photon165_R9Id90_HE10_IsoM_v"));
-      StopEvt.HLT_Photon175 = passHLTTriggerPattern("HLT_Photon175_v");
-      StopEvt.HLT_Photon165_HE10 = passHLTTriggerPattern("HLT_Photon165_HE10_v");
-  */
-      //
+     //
       // Fill Tree
       //
       BabyTree->Fill();
@@ -2380,7 +2164,6 @@ if(debug)      std::cout << "[babymaker::looper]: filling HLT vars" << std::endl
     f_mu_FS_Iso->Close();
     f_vetoLep_eff->Close();
   }
-
   
   //
   // Benchmarking

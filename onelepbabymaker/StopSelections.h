@@ -91,12 +91,4 @@ float DPhi_W_lep(float MET, float MET_Phi, LorentzVector p4);
 
 void passesBaselineCuts(int njets, int nbtag, float met, float ht, int ngoodlep, int ngoodvertex);
 
-//void passesBaselineCuts(int njets, int nbtag, float met, float ht, unsigned int& analysisBitMask);
-
-//  float met;
-//  float metphi;
-//  float metx;
-//  float mety;
-//  float sumet;
-
 #endif

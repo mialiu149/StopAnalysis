@@ -59,11 +59,11 @@ int main(int argc, char **argv){
   //
   // Skim Parameters 
   //
-  int nVtx              = 0;
+  int nVtx              = 1;
 
-  float met             = 0;
+  float met             = 50;
 
-  int nGoodLeptons      = 0;
+  int nGoodLeptons      = 1;
   float goodLep_el_pt   = 20.0;
   float goodLep_el_eta  = 1.4442;
   float goodLep_mu_pt   = 20.0;
@@ -79,7 +79,7 @@ int main(int argc, char **argv){
   float vetoLep_mu_pt   = 5.0;
   float vetoLep_mu_eta  = 2.4;
 
-  int nJets             = 0;
+  int nJets             = 2;
   float jet_pt          = 30.0;
   float jet_eta         = 2.4;
 
@@ -142,7 +142,7 @@ int main(int argc, char **argv){
   if(argc>2) nevents = atoi(argv[2]);  
   
   int file=-1;
-  char *filename = "";
+  const char *filename = "";
   if(argc>3) {filename = argv[3];file =0;}
 
   char* dirpath = ".";
@@ -150,7 +150,7 @@ int main(int argc, char **argv){
 
 //const char* filename = (file == -1 ? "*postprocess.root" : Form("%spostprocess.root"));
   
-//  filename = (file == -1 ? "merged_ntuple_*.root" : Form("merged_ntuple_%i.root", file));
+  filename = (file == -1 ? "merged_ntuple_*.root" : Form("merged_ntuple_%i.root", file));
   cout << filename << endl;
   
   const char* suffix = file == -1 ? "" : Form("_%i", file);
