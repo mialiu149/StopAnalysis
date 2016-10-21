@@ -1,4 +1,5 @@
+source setup.sh
 cd stop_variables
-make
+make -j 30
 cd ..
-make
+make -j 30

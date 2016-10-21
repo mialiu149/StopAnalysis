@@ -61,6 +61,10 @@ Path /hadoop/cms/store/group/snt/run2_data/Run2016C_MuonEG_MINIAOD_PromptReco-v2
 
 ## Single Electron ##
 SAMPLE
+Name data_single_electron_Run2016B_MINIAOD_PromptReco-v2re_test
+Path /nfs-7/userdata/mliu/tupler_babies/localtest/
+
+SAMPLE
 Name data_single_electron_Run2016B_MINIAOD_PromptReco-v2re
 Path /hadoop/cms/store/group/snt/run2_data/Run2016B_SingleElectron_MINIAOD_PromptReco-v2/merged/V08-00-06/
 

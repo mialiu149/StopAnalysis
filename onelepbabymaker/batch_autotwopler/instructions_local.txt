@@ -1,0 +1,6 @@
+#############
+## Examples ##
+#############
+BABY ANALYSIS VERSION /TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM TARBALL.tar.gz EXECUTABLE 1000 output.root,skim.root TTWJetsToLNu_amcnlo_pythia8_25ns
+## Single Electron - RunB PromptRecoV2 ##
+BABY ANALYSIS VERSION /SingleElectron/Run2016B-PromptReco-v2/MINIAOD TARBALL.tar.gz EXECUTABLE 1000 output.root,skim.root data_single_electron_Run2016B_MINIAOD_PromptReco-v2re

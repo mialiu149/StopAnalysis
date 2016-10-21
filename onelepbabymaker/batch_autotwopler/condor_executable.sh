@@ -42,7 +42,8 @@ ISFASTSIM=0
 if [ ! -z ${EXE_ARGS[1]} ]; then
   ISFASTSIM=${EXE_ARGS[1]}
 fi
-    
+
+source setupforcondor.sh    
 echo $PWD
 echo " Running BabyMaker:"
 echo "    ./runBabyMaker $SAMPLE_NAME $NEVENTS $IMERGED ./ sample_2016.dat $ISFASTSIM"
