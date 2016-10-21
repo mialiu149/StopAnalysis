@@ -688,25 +688,26 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   JetCorrectionUncertainty* jetcorr_uncertainty_sys(0);
   jetcorr_filenames_pfL1FastJetL2L3.clear();
   std::string jetcorr_uncertainty_filename;
-
+  char* jecpath;
+  jecpath = getenv ("TOOLSPATH");
   // files for RunIISpring15 MC
   if (isDataFromFileName) {
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Spring16_25nsV6_DATA_L1FastJet_AK4PFchs.txt");
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Spring16_25nsV6_DATA_L2Relative_AK4PFchs.txt");
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Spring16_25nsV6_DATA_L3Absolute_AK4PFchs.txt");
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Spring16_25nsV6_DATA_L2L3Residual_AK4PFchs.txt");
-    jetcorr_uncertainty_filename = "jecfiles/Spring16_25nsV6_DATA_Uncertainty_AK4PFchs.txt";
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  (Form("%s/jetcorr/data/run2_25ns/Spring16_25nsV6_DATA_L1FastJet_AK4PFchs.txt",jecpath));
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  (Form("%s/jetcorr/data/run2_25ns/Spring16_25nsV6_DATA_L2Relative_AK4PFchs.txt",jecpath));
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  (Form("%s/jetcorr/data/run2_25ns/Spring16_25nsV6_DATA_L3Absolute_AK4PFchs.txt",jecpath));
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  (Form("%s/jetcorr/data/run2_25ns/Spring16_25nsV6_DATA_L2L3Residual_AK4PFchs.txt",jecpath));
+    jetcorr_uncertainty_filename = Form("%s/jetcorr/data/run2_25ns/Spring16_25nsV6_DATA_Uncertainty_AK4PFchs.txt",jecpath);
   } else if(isSignalFromFileName){
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Spring16_FastSimV1_L1FastJet_AK4PFchs.txt");
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Spring16_FastSimV1_L2Relative_AK4PFchs.txt");
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Spring16_FastSimV1_L3Absolute_AK4PFchs.txt");
-    jetcorr_uncertainty_filename = "jecfiles/Spring16_FastSimV1_Uncertainty_AK4PFchs.txt";
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  (Form("%s/jetcorr/data/run2_25ns/Spring16_FastSimV1_L1FastJet_AK4PFchs.txt",jecpath));
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  (Form("%s/jetcorr/data/run2_25ns/Spring16_FastSimV1_L2Relative_AK4PFchs.txt",jecpath));
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  (Form("%s/jetcorr/data/run2_25ns/Spring16_FastSimV1_L3Absolute_AK4PFchs.txt",jecpath));
+    jetcorr_uncertainty_filename = Form("%s/jetcorr/data/run2_25ns/Spring16_FastSimV1_Uncertainty_AK4PFchs.txt",jecpath);
   }  
   else {
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Spring16_25nsV6_MC_L1FastJet_AK4PFchs.txt");
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Spring16_25nsV6_MC_L2Relative_AK4PFchs.txt");
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  ("jecfiles/Spring16_25nsV6_MC_L3Absolute_AK4PFchs.txt");
-    jetcorr_uncertainty_filename = "jecfiles/Spring16_25nsV6_MC_Uncertainty_AK4PFchs.txt";
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  (Form("%s/jetcorr/data/run2_25ns/Spring16_25nsV6_MC_L1FastJet_AK4PFchs.txt",jecpath));
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  (Form("%s/jetcorr/data/run2_25ns/Spring16_25nsV6_MC_L2Relative_AK4PFchs.txt",jecpath));
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  (Form("%s/jetcorr/data/run2_25ns/Spring16_25nsV6_MC_L3Absolute_AK4PFchs.txt",jecpath));
+    jetcorr_uncertainty_filename = Form("%s/jetcorr/data/run2_25ns/Spring16_25nsV6_MC_Uncertainty_AK4PFchs.txt",jecpath);
   }
 
   cout << "applying JEC from the following files:" << endl;
@@ -731,13 +732,14 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
     TH2D* h_btag_eff_udsg_temp = NULL;
 
     if(!skim_isFastsim){
-      f_btag_eff = new TFile("btagsf/btageff__ttbar_powheg_pythia8_25ns.root");
+      //f_btag_eff = new TFile("$COREPATH/btagsf/btageff__ttbar_powheg_pythia8_25ns.root");
+      f_btag_eff = new TFile("$COREPATH/Tools/btagsf/data/run2_25ns/btageff__ttbar_powheg_pythia8_25ns.root");
       h_btag_eff_b_temp = (TH2D*) f_btag_eff->Get("h2_BTaggingEff_csv_med_Eff_b");
       h_btag_eff_c_temp = (TH2D*) f_btag_eff->Get("h2_BTaggingEff_csv_med_Eff_c");
       h_btag_eff_udsg_temp = (TH2D*) f_btag_eff->Get("h2_BTaggingEff_csv_med_Eff_udsg");
     }
     else{
-      f_btag_eff = new TFile("btagsf/btageff__SMS-T1bbbb-T1qqqq_fastsim.root");
+      f_btag_eff = new TFile("$COREPATH/Tools/btagsf/data/run2_fastsim/btageff__SMS-T1bbbb-T1qqqq_fastsim.root");
       h_btag_eff_b_temp = (TH2D*) f_btag_eff->Get("h2_BTaggingEff_csv_med_Eff_b");
       h_btag_eff_c_temp = (TH2D*) f_btag_eff->Get("h2_BTaggingEff_csv_med_Eff_c");
       h_btag_eff_udsg_temp = (TH2D*) f_btag_eff->Get("h2_BTaggingEff_csv_med_Eff_udsg");

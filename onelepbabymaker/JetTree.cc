@@ -36,7 +36,10 @@ float getmct(LorentzVector jet1,LorentzVector jet2) {
 void JetTree::InitBtagSFTool(TH2D* h_btag_eff_b_, TH2D* h_btag_eff_c_, TH2D* h_btag_eff_udsg_, bool isFastsim_) {
     isFastsim = isFastsim_;
     //calib = calib_;
+    char* jecpath;
+    jecpath = getenv ("TOOLSPATH");
     calib = new BTagCalibration("csvv2", "btagsf/CSVv2_ichep_slimmed.csv"); // 25s version of SFs - slimmed version removed mujets and iterativefit from original one
+    //calib = new BTagCalibration("csvv2", Form("%s/btagsf/data/run2_25ns/CSVv2.csv",jecpath)); // 25s version of SFs - slimmed version removed mujets and iterativefit from original one
     reader_heavy = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "comb", "central"); // central
     reader_heavy_UP = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "comb", "up");  // sys up
     reader_heavy_DN = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "comb", "down");  // sys down
@@ -45,6 +48,7 @@ void JetTree::InitBtagSFTool(TH2D* h_btag_eff_b_, TH2D* h_btag_eff_c_, TH2D* h_b
     reader_light_DN = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "incl", "down");  // sys down
     std::cout << "loaded fullsim btag SFs" << std::endl;
     calib_fastsim = new BTagCalibration("CSV", "btagsf/CSV_13TEV_Combined_14_7_2016.csv"); // 25ns fastsim version of SFs
+    //calib_fastsim = new BTagCalibration("CSV", Form("%s/btagsf/data/run2_fastsim/CSV_13TEV_Combined_20_11_2015.csv",jecpath)); // 25ns fastsim version of SFs
     reader_fastsim = new BTagCalibrationReader(calib_fastsim, BTagEntry::OP_MEDIUM, "fastsim", "central"); // central
     reader_fastsim_UP = new BTagCalibrationReader(calib_fastsim, BTagEntry::OP_MEDIUM, "fastsim", "up");  // sys up
     reader_fastsim_DN = new BTagCalibrationReader(calib_fastsim, BTagEntry::OP_MEDIUM, "fastsim", "down");  // sys down
