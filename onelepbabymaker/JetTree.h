@@ -57,6 +57,11 @@ public:
     int ngoodbtags;
     float ak4_HT;
     float ak4_mbb;
+    float ak4_mct;
+    int ngoodjets_jup;
+    int ngoodjets_jdown;
+    int ngoodbtags_jup;
+    int ngoodbtags_jdown;
 
     float ak4_htssm;
     float ak4_htosm;

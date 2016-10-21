@@ -67,6 +67,13 @@ public:
 
     int ngoodleps;
     int nvetoleps;   
+
+    float mbb;
+    float mbb_jup;
+    float mbb_jdown;
+    float mct;
+    float mct_jup;
+    float mct_jdown;
  
     float MT2W;
     float hadronic_top_chi2;
@@ -78,6 +85,15 @@ public:
 
     float MT2W_rl;
     float topnessMod_rl;
+    float MT2W_rl_jup;
+    float topnessMod_rl_jup;
+    float MT2W_rl_jdown;
+    float topnessMod_rl_jdown;
+
+    float MT2W_jup;
+    float topnessMod_jup;
+    float MT2W_jdown;
+    float topnessMod_jdown;
 
     float MT2_lb_b;
     float MT2_lb_b_lep2;
@@ -98,8 +114,16 @@ public:
 
     float pfmet;
     float pfmet_phi;
+    float pfmet_jup;
+    float pfmet_phi_jup;
+    float pfmet_jdown;
+    float pfmet_phi_jdown;
     float pfmet_rl;
     float pfmet_phi_rl;
+    float pfmet_rl_jup;
+    float pfmet_phi_rl_jup;
+    float pfmet_rl_jdown;
+    float pfmet_phi_rl_jdown;
     float calomet;
     float calomet_phi;
 
@@ -128,9 +152,17 @@ public:
     float dR_lep2_leadb;    
     float mindphi_met_j1_j2;
     float mindphi_met_j1_j2_rl;
+    float mindphi_met_j1_j2_rl_jup;
+    float mindphi_met_j1_j2_rl_jdown;
+    float mindphi_met_j1_j2_jup;
+    float mindphi_met_j1_j2_jdown;
     float mt_met_lep;
     float mt_met_lep2;
     float mt_met_lep_rl;
+    float mt_met_lep_rl_jup;
+    float mt_met_lep_rl_jdown;
+    float mt_met_lep_jup;
+    float mt_met_lep_jdown;
 
     float dphi_Wlep;
     float MET_over_sqrtHT;
@@ -181,6 +213,8 @@ public:
     int   NISRjets;
     int   NnonISRjets;
     bool  filt_fastsimjets;
+    bool  filt_fastsimjets_jup;
+    bool  filt_fastsimjets_jdown;
     float hardgenpt;
     //sparms
 //    vecs  sparms_comment;

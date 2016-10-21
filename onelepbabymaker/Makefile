@@ -8,9 +8,9 @@ ROOTGLIBS     = $(shell $(ROOTSYS)/bin/root-config --glibs)
  
 #
 CXX           = g++
-CXXFLAGS      = -g -Wall -fPIC
+CXXFLAGS      = -g -Wall -fPIC -pg
 LD            = g++
-LDFLAGS       = -g
+LDFLAGS       = -g -pg
 SOFLAGS       = -shared
 
 

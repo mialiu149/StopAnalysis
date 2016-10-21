@@ -35,7 +35,7 @@ Path /hadoop/cms/store/group/snt/run2_data/Run2016D_MET_MINIAOD_PromptReco-v2/me
 
 ## Double EG ##
 SAMPLE
-Name data_double_eg_Run2016B_MINIAOD_PromptReco-v2
+Name data_double_eg_Run2016B_MINIAOD_PromptReco-v2re
 Path /hadoop/cms/store/group/snt/run2_data/Run2016B_DoubleEG_MINIAOD_PromptReco-v2/merged/V08-00-06/
 
 SAMPLE
@@ -61,7 +61,7 @@ Path /hadoop/cms/store/group/snt/run2_data/Run2016C_MuonEG_MINIAOD_PromptReco-v2
 
 ## Single Electron ##
 SAMPLE
-Name data_single_electron_Run2016B_MINIAOD_PromptReco-v2
+Name data_single_electron_Run2016B_MINIAOD_PromptReco-v2re
 Path /hadoop/cms/store/group/snt/run2_data/Run2016B_SingleElectron_MINIAOD_PromptReco-v2/merged/V08-00-06/
 
 SAMPLE

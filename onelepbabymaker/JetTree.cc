@@ -23,6 +23,16 @@ float getmbb(LorentzVector jet1,LorentzVector jet2) {
   return mbb;
 }
 
+float getmct(LorentzVector jet1,LorentzVector jet2) {
+   float ptb1 = jet1.pt();
+   float ptb2 = jet2.pt();
+   float phib1 = jet1.phi();
+   float phib2 = jet2.phi();
+   float dPhibb = getdphi(phib1,phib2);
+   float mct = sqrt(2*ptb1*ptb2*(1+cos(dPhibb)));
+  return mct;
+}
+
 void JetTree::InitBtagSFTool(TH2D* h_btag_eff_b_, TH2D* h_btag_eff_c_, TH2D* h_btag_eff_udsg_, bool isFastsim_) {
     isFastsim = isFastsim_;
     //calib = calib_;
@@ -97,6 +107,7 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx,  Factoriz
     float htosm = 0.;
     float htratiom = 0.;
     float mbb = 0.;
+    float mct = 0.;
     
     //apply JEC
     LorentzVector pfjet_p4_cor;
@@ -348,13 +359,20 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx,  Factoriz
    sort( jet_csv_pairs.begin(), jet_csv_pairs.end(), sortIndexbyCSV);
    //cout<<"size1:"<<nGoodJets<<"size2:"<<jet_csv_pairs.size()<<"size3:"<<sortedJets_pt.size()<<endl;
    if( nGoodJets>1){
-   if(nbtags_med>0 && p4sCorrJets.size()>1) mbb = getmbb(p4sCorrJets.at(jet_csv_pairs.at(0).first),p4sCorrJets.at(jet_csv_pairs.at(1).first))  ; // at least one b-tagged, use CSV sorted
-   else mbb = getmbb(ak4pfjets_p4.at(0), ak4pfjets_p4.at(1)) ;  // no btagged use pt sorted.
-   }
+   if(nbtags_med>0 && p4sCorrJets.size()>1) {
+     mbb = getmbb(p4sCorrJets.at(jet_csv_pairs.at(0).first),p4sCorrJets.at(jet_csv_pairs.at(1).first))  ; // at least one b-tagged, use CSV sorted
+     mct = getmct(p4sCorrJets.at(jet_csv_pairs.at(0).first),p4sCorrJets.at(jet_csv_pairs.at(1).first))  ; // at least one b-tagged, use CSV sorted
+  }
+   else {
+     mbb = getmbb(ak4pfjets_p4.at(0), ak4pfjets_p4.at(1)) ;  // no btagged use pt sorted.
+     mct = getmct(ak4pfjets_p4.at(0), ak4pfjets_p4.at(1)) ;  // no btagged use pt sorted.
+   } 
+  }
    ngoodjets = nGoodJets;
    nfailjets = nFailJets;
    ak4_HT = HT;
    ak4_mbb = mbb;
+   ak4_mct = mct;
    HT=0;
    ngoodbtags = nbtags_med;
 
@@ -522,6 +540,7 @@ void JetTree::Reset ()
     nfailjets     = -9999;  
     ak4_HT 	  = -9999.; 
     ak4_mbb 	  = -9999.; 
+    ak4_mct 	  = -9999.; 
     ak8GoodPFJets = -9999;
     nGoodGenJets  = -9999;
     ngoodbtags    = -9999;
@@ -533,6 +552,7 @@ void JetTree::SetAK4Branches (TTree* tree)
     tree->Branch(Form("%sngoodbtags", prefix_.c_str()) , &ngoodbtags);
     tree->Branch(Form("%sak4_HT", prefix_.c_str()) , &ak4_HT);
     tree->Branch(Form("%sak4_mbb", prefix_.c_str()) , &ak4_mbb);
+    tree->Branch(Form("%sak4_mct", prefix_.c_str()) , &ak4_mct);
     tree->Branch(Form("%sak4_htratiom", prefix_.c_str()) , &ak4_htratiom);
     tree->Branch(Form("%sdphi_ak4pfjet_met", prefix_.c_str()) , &dphi_ak4pfjet_met);
 
