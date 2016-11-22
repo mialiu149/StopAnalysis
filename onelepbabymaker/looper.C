@@ -101,11 +101,11 @@ babyMaker::babyMaker(){
    gen_susy = GenParticleTree("susy_");
 }
 
-void babyMaker::setSkimVariables(int nvtx, float met, int nGoodLep, float goodLep_el_pt, float goodLep_el_eta, float goodLep_mu_pt, float goodLep_mu_eta, float looseLep_el_pt, float looseLep_el_eta, float looseLep_mu_pt, float looseLep_mu_eta, float vetoLep_el_pt, float vetoLep_el_eta, float vetoLep_mu_pt, float vetoLep_mu_eta, bool apply2ndlepveto, int njets, float jet_pt, float jet_eta, float jet_ak8_pt, float jet_ak8_eta, int nbjets, int nphs, float phs_pt, float phs_eta, bool applyJEC, int JES_type_central_up_down,   bool applyLeptonSFs, bool applyVetoLeptonSFs, bool applyBtagSFs, bool isFastsim,bool filltaus_, bool filltracks_, bool fillZll_, bool fillPhoton_,bool fillMETfilt_, bool fill2ndlep_, bool fillExtraEvtVar_, bool fillAK4EF_, bool fillAK4_Other_, bool fillOverleps_, bool fillAK4Synch_, bool fillElID_, bool fillIso_, bool fillLepSynch_){
+void babyMaker::setSkimVariables(bool isDataFromFileName ,bool isSignalFromFileName, int nvtx, float met, int nGoodLep, float goodLep_el_pt, float goodLep_el_eta, float goodLep_mu_pt, float goodLep_mu_eta, float looseLep_el_pt, float looseLep_el_eta, float looseLep_mu_pt, float looseLep_mu_eta, float vetoLep_el_pt, float vetoLep_el_eta, float vetoLep_mu_pt, float vetoLep_mu_eta, bool apply2ndlepveto, int njets, float jet_pt, float jet_eta, float jet_ak8_pt, float jet_ak8_eta, int nbjets, int nphs, float phs_pt, float phs_eta, bool applyJEC, int JES_type_central_up_down,   bool applyLeptonSFs, bool applyVetoLeptonSFs, bool applyBtagSFs, bool isFastsim,bool filltaus_, bool filltracks_, bool fillZll_, bool fillPhoton_,bool fillMETfilt_, bool fill2ndlep_, bool fillExtraEvtVar_, bool fillAK4EF_, bool fillAK4_Other_, bool fillOverleps_, bool fillAK4Synch_, bool fillElID_, bool fillIso_, bool fillLepSynch_){
 
   skim_nvtx            = nvtx;
   skim_met             = met;
-  
+   
   skim_nGoodLep        = nGoodLep;
   skim_goodLep_el_pt   = goodLep_el_pt;
   skim_goodLep_el_eta  = goodLep_el_eta;
@@ -141,7 +141,8 @@ void babyMaker::setSkimVariables(int nvtx, float met, int nGoodLep, float goodLe
   skim_applyVetoLeptonSFs  = applyVetoLeptonSFs;
   skim_applyBtagSFs    = applyBtagSFs;
   skim_isFastsim       = isFastsim;
-
+  skim_isDataFromFileName = isDataFromFileName;
+  skim_isSignalFromFileName = isSignalFromFileName;
   filltaus   = filltaus_;
   filltracks   =filltracks_;
   fillZll   =fillZll_;
@@ -160,8 +161,11 @@ void babyMaker::setSkimVariables(int nvtx, float met, int nGoodLep, float goodLe
 }
 
 
-void babyMaker::MakeBabyNtuple(const char* output_name){
-  BabyFile = new TFile(Form("%s/%s", babypath, output_name), "RECREATE");
+void babyMaker::MakeBabyNtuple(std::string output_name){
+  std::string str = babypath+ output+".root";
+  const char *cstr = str.c_str();
+  cout<<cstr<<endl;
+  BabyFile = new TFile(cstr, "RECREATE");
   BabyTree = new TTree("t", "Stop2015 Baby Ntuple");
   StopEvt.SetBranches(BabyTree);
   lep1.SetBranches(BabyTree);
@@ -222,12 +226,13 @@ void babyMaker::InitBabyNtuple(){
 // Main function  //
 //================//
 
-int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path){
+int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::string path){
 
   //
   // Set output file path
   //
   babypath = path;
+  output = output_name;
   
   //
   // Benchmark
@@ -262,26 +267,6 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   //
   // JEC files
   //
-  bool isDataFromFileName;
-  bool isSignalFromFileName;
-  string filestr(output_name);
-  cout<<"output name "<< output_name;
-  if (filestr.find("data") != std::string::npos) {
-    isDataFromFileName = true;
-    isSignalFromFileName = false;
-    cout << ", running on DATA, based on file name: " << output_name<<endl;
-  } 
-  else if((filestr.find("SMS") != std::string::npos) || (filestr.find("Signal") != std::string::npos)){
-    isDataFromFileName = false;
-    isSignalFromFileName = true;
-    cout << ", running on SIGNAL, based on file name: " << output_name<<endl;
-  }
-  else {
-    isDataFromFileName = false;
-    isSignalFromFileName = false;
-    cout << ", running on MC, based on file name: " << output_name<<endl;
-  }
-
   // Fullsim Electron file
   TFile *f_el_SF;
 
@@ -337,7 +322,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   // Matching requirement for gen/reco leptons
   double matched_dr = 0.1;
   
-  if( (skim_applyLeptonSFs || skim_applyVetoLeptonSFs) && !isDataFromFileName){
+  if( (skim_applyLeptonSFs || skim_applyVetoLeptonSFs) && !skim_isDataFromFileName){
 
     cout << "  Grabbing lepton scale factors " << endl;
      // Electron file
@@ -553,7 +538,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
 }
   TFile *fxsec;
   TH1D *hxsec;
-  if(isSignalFromFileName){
+  if(skim_isSignalFromFileName){
     fxsec = new TFile("xsec_susy_13tev.root","READ");
     if(fxsec->IsZombie()) {
       std::cout << "Somehow xsec_stop_13TeV.root is corrupted. Exit..." << std::endl;
@@ -565,7 +550,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   TH1D *hPU;
   TH1D *hPUup;
   TH1D *hPUdown;
-  if(!isDataFromFileName){
+  if(!skim_isDataFromFileName){
     pileupfile = new TFile("puWeights_2015data_2p2fbinv.root","READ");
     if(pileupfile->IsZombie()) {
       std::cout << "Somehow puWeights_2015data_2p2fbinv.root is corrupted. Exit..." << std::endl;
@@ -617,7 +602,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   
   TH3D* counterhistSig;
   TH2F* histNEvts;//count #evts per signal point
-  if(isSignalFromFileName){//create histos only for signals
+  if(skim_isSignalFromFileName){//create histos only for signals
     counterhistSig = new TH3D( "h_counterSMS", "h_counterSMS", 37,99,1024, 19,-1,474, 35, 0.5,35.5);//15000 bins!
     counterhistSig->Sumw2();
     counterhistSig->GetZaxis()->SetBinLabel(1,"nominal,muR=1 muF=1");
@@ -665,8 +650,8 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   //
   // Make Baby Ntuple  
   //
-  MakeBabyNtuple( Form("%s.root", output_name) );
-
+  MakeBabyNtuple( output_name + ".root");
+  
   //
   // Initialize Baby Ntuple Branches
   //
@@ -676,7 +661,9 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   // Set JSON file
   //
   //const char* json_file = "json_files/Cert_271036-276811_13TeV_PromptReco_Collisions16_JSON.txt";// ichep json
-  const char* json_file = "json_files/Cert_271036-280385_13TeV_PromptReco_Collisions16_JSON_NoL1T_v2.txt";
+  ///const char* json_file = "json_files/Cert_271036-280385_13TeV_PromptReco_Collisions16_JSON_NoL1T_v2.txt";
+  //const char* json_file = "json_files/Cert_271036-284044_13TeV_PromptReco_Collisions16_JSON_NoL1T.txt";
+  const char* json_file = "json_files/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt";
   set_goodrun_file_json(json_file);
   
   //
@@ -691,13 +678,13 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
   char* jecpath;
   jecpath = getenv ("TOOLSPATH");
   // files for RunIISpring15 MC
-  if (isDataFromFileName) {
+  if (skim_isDataFromFileName) {
     jetcorr_filenames_pfL1FastJetL2L3.push_back  (Form("%s/jetcorr/data/run2_25ns/Spring16_25nsV6_DATA_L1FastJet_AK4PFchs.txt",jecpath));
     jetcorr_filenames_pfL1FastJetL2L3.push_back  (Form("%s/jetcorr/data/run2_25ns/Spring16_25nsV6_DATA_L2Relative_AK4PFchs.txt",jecpath));
     jetcorr_filenames_pfL1FastJetL2L3.push_back  (Form("%s/jetcorr/data/run2_25ns/Spring16_25nsV6_DATA_L3Absolute_AK4PFchs.txt",jecpath));
     jetcorr_filenames_pfL1FastJetL2L3.push_back  (Form("%s/jetcorr/data/run2_25ns/Spring16_25nsV6_DATA_L2L3Residual_AK4PFchs.txt",jecpath));
     jetcorr_uncertainty_filename = Form("%s/jetcorr/data/run2_25ns/Spring16_25nsV6_DATA_Uncertainty_AK4PFchs.txt",jecpath);
-  } else if(isSignalFromFileName){
+  } else if(skim_isSignalFromFileName){
     jetcorr_filenames_pfL1FastJetL2L3.push_back  (Form("%s/jetcorr/data/run2_25ns/Spring16_FastSimV1_L1FastJet_AK4PFchs.txt",jecpath));
     jetcorr_filenames_pfL1FastJetL2L3.push_back  (Form("%s/jetcorr/data/run2_25ns/Spring16_FastSimV1_L2Relative_AK4PFchs.txt",jecpath));
     jetcorr_filenames_pfL1FastJetL2L3.push_back  (Form("%s/jetcorr/data/run2_25ns/Spring16_FastSimV1_L3Absolute_AK4PFchs.txt",jecpath));
@@ -717,7 +704,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
 
   jet_corrector_pfL1FastJetL2L3  = makeJetCorrector(jetcorr_filenames_pfL1FastJetL2L3);
   
-  if (!isDataFromFileName && applyJECunc != 0) {
+  if (!skim_isDataFromFileName && applyJECunc != 0) {
     cout << "applying JEC uncertainties with weight " << applyJECunc << " from file: " << endl
 	 << "   " << jetcorr_uncertainty_filename << endl;
     jetcorr_uncertainty = new JetCorrectionUncertainty(jetcorr_uncertainty_filename);
@@ -730,19 +717,28 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
     TH2D* h_btag_eff_b_temp = NULL;
     TH2D* h_btag_eff_c_temp = NULL;
     TH2D* h_btag_eff_udsg_temp = NULL;
+    TH2D* h_btag_eff_b_loose_temp = NULL;
+    TH2D* h_btag_eff_c_loose_temp = NULL;
+    TH2D* h_btag_eff_udsg_loose_temp = NULL;
 
     if(!skim_isFastsim){
-      //f_btag_eff = new TFile("$COREPATH/btagsf/btageff__ttbar_powheg_pythia8_25ns.root");
       f_btag_eff = new TFile("$COREPATH/Tools/btagsf/data/run2_25ns/btageff__ttbar_powheg_pythia8_25ns.root");
       h_btag_eff_b_temp = (TH2D*) f_btag_eff->Get("h2_BTaggingEff_csv_med_Eff_b");
       h_btag_eff_c_temp = (TH2D*) f_btag_eff->Get("h2_BTaggingEff_csv_med_Eff_c");
       h_btag_eff_udsg_temp = (TH2D*) f_btag_eff->Get("h2_BTaggingEff_csv_med_Eff_udsg");
+      h_btag_eff_b_loose_temp = (TH2D*) f_btag_eff->Get("h2_BTaggingEff_csv_loose_Eff_b");
+      h_btag_eff_c_loose_temp = (TH2D*) f_btag_eff->Get("h2_BTaggingEff_csv_loose_Eff_c");
+      h_btag_eff_udsg_loose_temp = (TH2D*) f_btag_eff->Get("h2_BTaggingEff_csv_loose_Eff_udsg");
     }
     else{
       f_btag_eff = new TFile("$COREPATH/Tools/btagsf/data/run2_fastsim/btageff__SMS-T1bbbb-T1qqqq_fastsim.root");
       h_btag_eff_b_temp = (TH2D*) f_btag_eff->Get("h2_BTaggingEff_csv_med_Eff_b");
       h_btag_eff_c_temp = (TH2D*) f_btag_eff->Get("h2_BTaggingEff_csv_med_Eff_c");
       h_btag_eff_udsg_temp = (TH2D*) f_btag_eff->Get("h2_BTaggingEff_csv_med_Eff_udsg");
+
+      h_btag_eff_b_loose_temp = (TH2D*) f_btag_eff->Get("h2_BTaggingEff_csv_loose_Eff_b");
+      h_btag_eff_c_loose_temp = (TH2D*) f_btag_eff->Get("h2_BTaggingEff_csv_loose_Eff_c");
+      h_btag_eff_udsg_loose_temp = (TH2D*) f_btag_eff->Get("h2_BTaggingEff_csv_loose_Eff_udsg");
     }
 
     BabyFile->cd();
@@ -750,14 +746,20 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
     h_btag_eff_b = (TH2D*) h_btag_eff_b_temp->Clone("h_btag_eff_b");
     h_btag_eff_c = (TH2D*) h_btag_eff_c_temp->Clone("h_btag_eff_c");
     h_btag_eff_udsg = (TH2D*) h_btag_eff_udsg_temp->Clone("h_btag_eff_udsg");
+
+    h_btag_eff_b_loose = (TH2D*) h_btag_eff_b_loose_temp->Clone("h_btag_eff_b_loose");
+    h_btag_eff_c_loose = (TH2D*) h_btag_eff_c_loose_temp->Clone("h_btag_eff_c_loose");
+    h_btag_eff_udsg_loose = (TH2D*) h_btag_eff_udsg_loose_temp->Clone("h_btag_eff_udsg_loose");
+
     f_btag_eff->Close(); 
     }    
  
-    jets.InitBtagSFTool(h_btag_eff_b,h_btag_eff_c,h_btag_eff_udsg, skim_isFastsim); 
+    jets.InitBtagSFTool(h_btag_eff_b,h_btag_eff_c,h_btag_eff_udsg, h_btag_eff_b_loose,h_btag_eff_c_loose,h_btag_eff_udsg_loose,skim_isFastsim); 
 
   //
   // File Loop
   //
+
   while ( (currentFile = (TFile*)fileIter.Next()) ) { 
     //
     // Get File Content
@@ -807,8 +809,8 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       float sum_of_weights= 0;
       float average_of_weights= 0;
 
-    counterhist->Fill(22,1.);
-    if(!evt_isRealData()){
+     counterhist->Fill(22,1.);
+     if(!evt_isRealData()){
        //error on pdf replicas
       if(genweights().size()>109){ 
         for(int ipdf=9;ipdf<109;ipdf++){
@@ -863,7 +865,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       }
 
       //This must come before any continue affecting signal scans
-      if(isSignalFromFileName){
+      if(skim_isSignalFromFileName){
 	//get stop and lsp mass from sparms
 	for(unsigned int nsparm = 0; nsparm<sparm_names().size(); ++nsparm){
 	  if(sparm_names().at(nsparm).Contains("mCh")) StopEvt.mass_chargino = sparm_values().at(nsparm);
@@ -945,7 +947,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
 	 thisFile.Contains("ST_") || thisFile.Contains("tZq") ||
 	 thisFile.Contains("TTW") || thisFile.Contains("TTZ") )
 	istopevent = true;
-      if(isSignalFromFileName ||
+      if(skim_isSignalFromFileName ||
 	 thisFile.Contains("T2tt") || thisFile.Contains("T2tb") || thisFile.Contains("T2bW") || thisFile.Contains("TChWH") )
 	isstopevent = true;
 
@@ -1034,7 +1036,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
 	counterhist->Fill(20,StopEvt.weight_ISRup);
 	counterhist->Fill(21,StopEvt.weight_ISRdown);
 
-	if(isSignalFromFileName){
+	if(skim_isSignalFromFileName){
 	  counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,19,StopEvt.weight_ISR);
 	  counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,20,StopEvt.weight_ISRup);
 	  counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,21,StopEvt.weight_ISRdown);
@@ -1427,17 +1429,17 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
       }
 
       // Signal
-      if(isSignalFromFileName && !evt_isRealData() && skim_applyLeptonSFs) {
+      if(skim_isSignalFromFileName && !evt_isRealData() && skim_applyLeptonSFs) {
        counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,27,StopEvt.weight_lepSF);
        counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,28,StopEvt.weight_lepSF_up);
        counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,29,StopEvt.weight_lepSF_down);
       }
-      if(isSignalFromFileName && !evt_isRealData() && skim_applyVetoLeptonSFs){
+      if(skim_isSignalFromFileName && !evt_isRealData() && skim_applyVetoLeptonSFs){
 	counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,30,StopEvt.weight_vetoLepSF);
 	counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,31,StopEvt.weight_vetoLepSF_up);
 	counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,32,StopEvt.weight_vetoLepSF_down);
       }
-      if(isSignalFromFileName && !evt_isRealData() && skim_applyLeptonSFs && skim_isFastsim){
+      if(skim_isSignalFromFileName && !evt_isRealData() && skim_applyLeptonSFs && skim_isFastsim){
 	counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,33,StopEvt.weight_lepSF_fastSim);
 	counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,34,StopEvt.weight_lepSF_fastSim_up);
 	counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,35,StopEvt.weight_lepSF_fastSim_down);
@@ -1536,7 +1538,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
 	counterhist->Fill(25,StopEvt.weight_ISRnjets);
 	counterhist->Fill(26,StopEvt.weight_ISRnjets_UP);
 	counterhist->Fill(27,StopEvt.weight_ISRnjets_DN);
-	if(isSignalFromFileName){
+	if(skim_isSignalFromFileName){
 	  counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,24,StopEvt.weight_ISRnjets);
 	  counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,25,StopEvt.weight_ISRnjets_UP);
 	  counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,26,StopEvt.weight_ISRnjets_DN);
@@ -1567,7 +1569,7 @@ int babyMaker::looper(TChain* chain, char* output_name, int nEvents, char* path)
 	 counterhist->Fill(24,StopEvt.weight_btagsf_fastsim_DN);
        }
      }
-     if(isSignalFromFileName && !evt_isRealData() && skim_applyBtagSFs){
+     if(skim_isSignalFromFileName && !evt_isRealData() && skim_applyBtagSFs){
        counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,14,StopEvt.weight_btagsf);
        counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,15,StopEvt.weight_btagsf_heavy_UP);
        counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,16,StopEvt.weight_btagsf_light_UP);
@@ -2277,7 +2279,7 @@ if(debug)      std::cout << "[babymaker::looper]: updating geninfo for recolepto
       //
 if(debug)      std::cout << "[babymaker::looper]: filling HLT vars" << std::endl;
       //////////////// 2015 Run II  //////////////////////
-      if(!isSignalFromFileName){
+      if(!skim_isSignalFromFileName){
 	StopEvt.HLT_MET = passHLTTriggerPattern("HLT_PFMET170_NoiseCleaned_v") || passHLTTriggerPattern("HLT_PFMET170_JetIdCleaned_v") || passHLTTriggerPattern("HLT_PFMET170_HBHECleaned_v") || passHLTTriggerPattern("HLT_PFMET170_NotCleaned_v"); 
 	StopEvt.HLT_MET100_MHT100 = passHLTTriggerPattern("HLT_PFMET100_PFMHT100_IDTight_v");
 	StopEvt.HLT_SingleEl = passHLTTriggerPattern("HLT_Ele25_eta2p1_WPTight_Gsf_v") || passHLTTriggerPattern("HLT_Ele27_WP85_Gsf_v") ||passHLTTriggerPattern("HLT_Ele27_eta2p1_WPLoose_Gsf_v") || passHLTTriggerPattern("HLT_Ele27_eta2p1_WPTight_Gsf_v");
@@ -2322,7 +2324,7 @@ if(debug)      std::cout << "[babymaker::looper]: filling HLT vars" << std::endl
    // save counter histogram
   BabyTree->Write();
   counterhist->Write();
-  if(isSignalFromFileName){
+  if(skim_isSignalFromFileName){
     counterhistSig->Write();
     histNEvts->Write();
   }
@@ -2333,11 +2335,11 @@ if(debug)      std::cout << "[babymaker::looper]: filling HLT vars" << std::endl
   //
   // Some clean up
   //
-  if(isSignalFromFileName) {
+  if(skim_isSignalFromFileName) {
     fxsec->Close();
     delete fxsec;
   }
-  if(!isDataFromFileName){
+  if(!skim_isDataFromFileName){
     pileupfile->Close();
     delete pileupfile;
   }
@@ -2345,7 +2347,7 @@ if(debug)      std::cout << "[babymaker::looper]: filling HLT vars" << std::endl
     jets.deleteBtagSFTool();
   }
 
-  if( !isDataFromFileName && (skim_applyLeptonSFs || skim_applyVetoLeptonSFs) ){
+  if( !skim_isDataFromFileName && (skim_applyLeptonSFs || skim_applyVetoLeptonSFs) ){
     f_el_SF->Close();
     f_mu_SF_id->Close();
     f_mu_SF_iso->Close();

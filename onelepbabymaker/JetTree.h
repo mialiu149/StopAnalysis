@@ -29,7 +29,7 @@ public:
  
     void Reset ();
     void deleteBtagSFTool();
-    void InitBtagSFTool( TH2D* h_btag_eff_b, TH2D* h_btag_eff_c, TH2D* h_btag_eff_udsg, bool isFastsim_);
+    void InitBtagSFTool( TH2D* h_btag_eff_b, TH2D* h_btag_eff_c, TH2D* h_btag_eff_udsg, TH2D* h_btag_eff_b_loose, TH2D* h_btag_eff_c_loose, TH2D* h_btag_eff_udsg_loose,bool isFastsim_);
     void SetBranches (TTree* tree);
     void SetAK4Branches_Other(TTree* tree);
     void SetAK4Branches_EF(TTree* tree);
@@ -39,7 +39,7 @@ public:
     void SetAK4Branches (TTree* tree);
     void SetAliases (TTree* tree);
     void FillCommon(std::vector<unsigned int> alloverlapjets_idx,  FactorizedJetCorrector* corrector, float& btagprob_data, float &btagprob_mc, float &btagprob_heavy_UP, float & btagprob_heavy_DN, float & btagprob_light_UP, float & btagprob_light_DN, float & btagprob_FS_UP, float & btagprob_FS_DN, unsigned int overlep1_idx, unsigned int overlep2_idx, bool applynewcorr,JetCorrectionUncertainty* jetcorr_uncertainty, int JES_type, bool applyBtagSFs, bool isFastsim);
-    float getBtagEffFromFile(float pt, float eta, int mcFlavour, bool isFastsim);
+    float getBtagEffFromFile(float pt, float eta, int mcFlavour, bool isFastsim, bool isloose);
     void SetJetSelection (std::string cone_size, float pt_cut,float eta, bool id);
     void GetJetSelections (std::string cone_size = "");
 protected:
@@ -149,20 +149,41 @@ private:
     bool m_ak4_passid;
     bool m_ak8_passid;
     bool isFastsim;
-    BTagCalibration* calib;
-    BTagCalibrationReader* reader_heavy;
-    BTagCalibrationReader* reader_heavy_UP;
-    BTagCalibrationReader* reader_heavy_DN;
-    BTagCalibrationReader* reader_light;
-    BTagCalibrationReader* reader_light_UP;
-    BTagCalibrationReader* reader_light_DN;
-    BTagCalibration* calib_fastsim;
-    BTagCalibrationReader* reader_fastsim;
-    BTagCalibrationReader* reader_fastsim_UP;
-    BTagCalibrationReader* reader_fastsim_DN;
-    TH2D* h_btag_eff_b;
-    TH2D* h_btag_eff_c;
-    TH2D* h_btag_eff_udsg;
+  BTagCalibrationReader* reader_heavy;
+  BTagCalibrationReader* reader_heavy_UP;
+  BTagCalibrationReader* reader_heavy_DN;
+  BTagCalibrationReader* reader_light;
+  BTagCalibrationReader* reader_light_UP;
+  BTagCalibrationReader* reader_light_DN;
+  BTagCalibrationReader* reader_heavy_loose;
+  BTagCalibrationReader* reader_heavy_loose_UP;
+  BTagCalibrationReader* reader_heavy_loose_DN;
+  BTagCalibrationReader* reader_light_loose;
+  BTagCalibrationReader* reader_light_loose_UP;
+  BTagCalibrationReader* reader_light_loose_DN;
+  BTagCalibration* calib_fastsim;
+  BTagCalibration* calib;
+  BTagCalibrationReader* reader_fastsim;
+  BTagCalibrationReader* reader_fastsim_UP;
+  BTagCalibrationReader* reader_fastsim_DN;
+  BTagCalibrationReader* reader_fastsim_loose;
+  BTagCalibrationReader* reader_fastsim_loose_UP;
+  BTagCalibrationReader* reader_fastsim_loose_DN;
+
+  TH2D* h_btag_eff_b;
+  TH2D* h_btag_eff_c;
+  TH2D* h_btag_eff_udsg;
+  TH2D* h_btag_eff_b_loose;
+  TH2D* h_btag_eff_c_loose;
+  TH2D* h_btag_eff_udsg_loose;
+  
+  TH2D* h_btag_eff_b_fastsim;
+  TH2D* h_btag_eff_c_fastsim;
+  TH2D* h_btag_eff_udsg_fastsim;
+  TH2D* h_btag_eff_b_fastsim_loose;
+  TH2D* h_btag_eff_c_fastsim_loose;
+  TH2D* h_btag_eff_udsg_fastsim_loose;
+  
 };
  
 #endif

@@ -1,16 +1,18 @@
+setup_CMSSW_80X
 #! /bin/bash
 #
 # CONFIGURATION VARS
 #
 ANALYSIS_NAME=onelepbabymaker
 
-BABY_VERSION=27.2.v5
+BABY_VERSION=36.2.v2
+#BABY_VERSION=test.v12
 
 # do not modify this TARBALL_NAME
 TARBALL_NAME=package.$BABY_VERSION
 
-INSTRUCTIONS_FILE=instruction_test.txt
-export INSTRUCTIONS_FILE=instructions_test.txt
+INSTRUCTIONS_FILE=instructions_tmp.txt
+export INSTRUCTIONS_FILE=instructions_tmp.txt
 EXECUTABLE_NAME=condor_executable.sh
 
 BATCH_DIR=`pwd`
@@ -25,7 +27,6 @@ CORE_DIR=$CORE_PATH/$CORE_NAME
 
 
 cd $MAKER_PATH
-
 
 #
 # Checkout NtupleTools from git
@@ -84,6 +85,7 @@ if [ ! -d $TARBALL_NAME ]; then
     cp -r $MAKER_DIR/*.cc $CONDOR_DIR_NAME/$MAKER_NAME/
     cp -r $MAKER_DIR/*.h $CONDOR_DIR_NAME/$MAKER_NAME/
     cp -r $MAKER_DIR/Makefile $CONDOR_DIR_NAME/$MAKER_NAME/
+    cp -r $MAKER_DIR/setupforcondor.sh $CONDOR_DIR_NAME/$MAKER_NAME/
     
     # modify makefile so it knows where CORE is on condor node, 
     #  relative to the untarred directory location.

@@ -1,0 +1,116 @@
+# lines beginning with '#' are ignored
+#
+#########################################################################
+#
+# ARGUMENTS:
+#
+#  BABY ANALYSIS VERSION DATASET TARBALL EXECUTABLE (NEVENTS=-1 OUTPUTNAMES=output.root EXTRA_ARGS="")
+#    BABY - exact name needed, is a flag needed for Autotwopler
+#    ANALYSIS - any string, will be used for paths created for output
+#    VERSION - any string, will be used for paths created for output
+#    DATASET - from twiki, will be used to find CMS3 paths and number
+#    TARBALL - location of tarball of code to be unpacked and used
+#    EXECUTABLE - location of condor executable for the analysis
+#
+#
+#  OPTIONAL ARGS:
+#    NEVENTS - number of events to run over
+#    OUTPUTNAMES - name of output file, ending in .root, ie for a skim, 
+#                  they must be formated as: separated by commas without spaces: 
+#                  ie file1.root,file2.root,file3.root,
+#    EXTRA_ARGS - any extra arguments that may be needed for running condor_executable.sh,
+#    		  all args should be comma sepearated with NO SPACES
+#    		  here, the fist is required and is the name of the sample in sample_2016.dat,
+#                 the second is optional, is a flag if the sample is fastsim (default=0, add ",1" as second arg)
+#
+#########################################################################
+
+
+######################################
+### Collection of 25ns Data Samples ##
+######################################
+
+
+#######################
+## RunB PromptRecoV2 ##
+#######################
+
+## Single Electron - RunB PromptRecoV2 ##
+#BABY ANALYSIS VERSION /SingleElectron/Run2016B-PromptReco-v2/MINIAOD TARBALL.tar.gz EXECUTABLE -1 output.root,skim.root data_single_electron_Run2016B_MINIAOD_PromptReco-v2re
+
+## Single Muon - RunB PromptRecoV2 ##
+#BABY ANALYSIS VERSION /SingleMuon/Run2016B-PromptReco-v2/MINIAOD TARBALL.tar.gz EXECUTABLE -1 output.root,skim.root data_single_muon_Run2016B_MINIAOD_PromptReco-v2re
+
+
+#######################
+## RunC PromptRecoV2 ##
+#######################
+
+
+## Single Electron - RunC PromptRecoV2 ##
+BABY ANALYSIS VERSION /SingleElectron/Run2016C-23Sep2016-v1/MINIAOD TARBALL.tar.gz EXECUTABLE -1 output.root,skim.root data_single_electron_Run2016C_MINIAOD_23Sep2016-v1
+
+## Single Muon - RunC PromptRecoV2 #
+BABY ANALYSIS VERSION /SingleMuon/Run2016C-23Sep2016-v1/MINIAOD TARBALL.tar.gz EXECUTABLE -1 output.root,skim.root data_single_muon_Run2016C_MINIAOD_23Sep2016-v1
+
+
+
+#######################
+## RunD PromptRecoV2 ##
+#######################
+
+
+## Single Electron - RunD PromptRecoV2 ##
+BABY ANALYSIS VERSION /SingleElectron/Run2016D-23Sep2016-v1/MINIAOD TARBALL.tar.gz EXECUTABLE -1 output.root,skim.root data_single_electron_Run2016D_MINIAOD_23Sep2016-v1
+
+## Single Muon - RunD PromptRecoV2 ##
+BABY ANALYSIS VERSION /SingleMuon/Run2016D-23Sep2016-v1/MINIAOD TARBALL.tar.gz EXECUTABLE -1 output.root,skim.root data_single_muon_Run2016D_MINIAOD_23Sep2016-v1
+
+
+
+#######################
+## RunE PromptRecoV2 ##
+#######################
+
+## Single Electron - RunE PromptRecoV2 ##
+BABY ANALYSIS VERSION /SingleElectron/Run2016E-23Sep2016-v1/MINIAOD TARBALL.tar.gz EXECUTABLE -1 output.root,skim.root data_single_electron_Run2016E_MINIAOD_23Sep2016-v1
+
+## Single Muon - RunE PromptRecoV2 ##
+BABY ANALYSIS VERSION /SingleMuon/Run2016E-23Sep2016-v1/MINIAOD TARBALL.tar.gz EXECUTABLE -1 output.root,skim.root data_single_muon_Run2016E_MINIAOD_23Sep2016-v1
+
+
+#######################
+## RunF PromptRecoV1 ##
+#######################
+
+## Single Electron - RunF PromptRecoV1 ##
+BABY ANALYSIS VERSION /SingleElectron/Run2016F-23Sep2016-v1/MINIAOD TARBALL.tar.gz EXECUTABLE -1 output.root,skim.root data_single_electron_Run2016F_MINIAOD_23Sep2016-v1
+
+## Single Muon - RunF PromptRecoV1 ##
+BABY ANALYSIS VERSION /SingleMuon/Run2016F-23Sep2016-v1/MINIAOD TARBALL.tar.gz EXECUTABLE -1 output.root,skim.root data_single_muon_Run2016F_MINIAOD_23Sep2016-v1
+
+
+#######################
+## RunG PromptRecoV1 ##
+#######################
+
+## Single Electron - RunG PromptRecoV1 ##
+BABY ANALYSIS VERSION /SingleElectron/Run2016G-23Sep2016-v1/MINIAOD TARBALL.tar.gz EXECUTABLE -1 output.root,skim.root data_single_electron_Run2016G_MINIAOD_23Sep2016-v1
+
+## Single Muon - RunG PromptRecoV1 ##
+BABY ANALYSIS VERSION /SingleMuon/Run2016G-23Sep2016-v1/MINIAOD TARBALL.tar.gz EXECUTABLE -1 output.root,skim.root data_single_muon_Run2016G_MINIAOD_23Sep2016-v1
+
+
+#######################
+## RunH PromptRecoV1 ##
+#######################
+
+## Single Electron - RunG PromptRecoV1 ##
+BABY ANALYSIS VERSION /SingleElectron/Run2016H-PromptReco-v2/MINIAOD TARBALL.tar.gz EXECUTABLE -1 output.root,skim.root data_single_electron_Run2016H_MINIAOD_PromptReco-v2
+
+## Single Muon - RunG PromptRecoV1 ##
+BABY ANALYSIS VERSION /SingleMuon/Run2016H-PromptReco-v2/MINIAOD TARBALL.tar.gz EXECUTABLE -1 output.root,skim.root data_single_muon_Run2016H_MINIAOD_PromptReco-v2
+
+#####################################
+# Collection of Monte Carlo Samples #
+#####################################

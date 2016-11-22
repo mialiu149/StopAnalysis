@@ -46,9 +46,8 @@ fi
 source setupforcondor.sh    
 echo $PWD
 echo " Running BabyMaker:"
-echo "    ./runBabyMaker $SAMPLE_NAME $NEVENTS $IMERGED ./ sample_2016.dat $ISFASTSIM"
-./runBabyMaker $SAMPLE_NAME $NEVENTS $IMERGED ./ sample_2016.dat $ISFASTSIM
+echo "    ./runBabyMakerCondor $FILENAME"
+./runBabyMakerCondor ${FILENAME} ${NEVENTS}
 
 # Format output for gfal transfer
-mv ${SAMPLE_NAME}_${IMERGED}.root ${OUTPUT_NAMES[0]}
 root -l -b -q skimBaby.C++'("'${OUTPUT_NAMES[0]}'", "'${OUTPUT_NAMES[1]}'")'

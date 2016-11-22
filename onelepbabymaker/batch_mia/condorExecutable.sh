@@ -21,7 +21,6 @@ g++ --version
 which g++
 
 CMSSW_VERSION=CMSSW_7_4_1_patch1
-
 export CMS_PATH=/cvmfs/cms.cern.ch
 echo "[wrapper] setting env"
 export SCRAM_ARCH=slc6_amd64_gcc491
@@ -34,7 +33,6 @@ cd $OLDDIR
 
 
 #Set CMSSW environment
-
 #pushd /cvmfs/cms.cern.ch/slc6_amd64_gcc481/cms/cmssw/CMSSW_7_4_1/src/
 #eval `scramv1 runtime -sh`
 #popd
