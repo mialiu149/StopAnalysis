@@ -35,10 +35,11 @@ class babyMaker {
     babyMaker (const std::string &prefix);
     virtual ~babyMaker (){ delete BabyFile; }
 
-    void MakeBabyNtuple(const char* output_name);
+    void MakeBabyNtuple(std::string output_name="output");
     void InitBabyNtuple();
-    int looper(TChain* chain, char* output_name, int nEvents = -1, char* path = "./");
-    char* babypath;
+    int looper(TChain* chain, std::string output_name="output", int nEvents = -1, std::string path = "./");
+    std::string babypath;
+    std::string output;
     
     // Variables for baby skim
     int skim_nvtx;
@@ -73,8 +74,9 @@ class babyMaker {
 
     bool applyJECfromFile;
     int JES_type;
-
-    int skim_nBJets;
+    bool skim_isDataFromFileName;
+    bool skim_isSignalFromFileName;
+    int  skim_nBJets;
     bool skim_2ndlepveto;
 
     bool skim_applyBtagSFs;
@@ -98,7 +100,7 @@ class babyMaker {
     bool fillIso;
     bool fillLepSynch;
 
-    void setSkimVariables(int nvtx, float met, int nGoodLep, float goodLep_el_pt, float goodLep_el_eta, float goodLep_mu_pt, float goodLep_mu_eta, float looseLep_el_pt, float looseLep_el_eta, float looseLep_mu_pt, float looseLep_mu_eta, float vetoLep_el_pt, float vetoLep_el_eta, float vetoLep_mu_pt, float vetoLep_mu_eta, bool apply2ndlepveto, int njets, float jet_pt, float jet_eta, float jet_ak8_pt, float jet_ak8_eta, int nbjets, int nphs, float phs_pt, float phs_eta, bool applyJEC, int JES_type_central_up_down, bool applyLeptonSFs, bool applyVetoLeptonSFs, bool applyBtagSFs, bool isFastsim,bool filltaus_, bool filltracks_, bool fillZll_, bool fillPhoton_,bool fillMETfilt_, bool fill2ndlep_, bool fillExtraEvtVar_, bool fillAK4EF_, bool fillAK4_Other_, bool fillOverleps_, bool fillAK4Synch_, bool fillElID_, bool fillIso_, bool fillLepSynch_);
+    void setSkimVariables(bool isDataFromFileName, bool isSignalFromFileName,int nvtx, float met, int nGoodLep, float goodLep_el_pt, float goodLep_el_eta, float goodLep_mu_pt, float goodLep_mu_eta, float looseLep_el_pt, float looseLep_el_eta, float looseLep_mu_pt, float looseLep_mu_eta, float vetoLep_el_pt, float vetoLep_el_eta, float vetoLep_mu_pt, float vetoLep_mu_eta, bool apply2ndlepveto, int njets, float jet_pt, float jet_eta, float jet_ak8_pt, float jet_ak8_eta, int nbjets, int nphs, float phs_pt, float phs_eta, bool applyJEC, int JES_type_central_up_down, bool applyLeptonSFs, bool applyVetoLeptonSFs, bool applyBtagSFs, bool isFastsim,bool filltaus_, bool filltracks_, bool fillZll_, bool fillPhoton_,bool fillMETfilt_, bool fill2ndlep_, bool fillExtraEvtVar_, bool fillAK4EF_, bool fillAK4_Other_, bool fillOverleps_, bool fillAK4Synch_, bool fillElID_, bool fillIso_, bool fillLepSynch_);
 
 
   protected:
@@ -139,26 +141,19 @@ class babyMaker {
     GenParticleTree gen_susy;
     
   // for btag SFs
-  BTagCalibration* calib;
-  BTagCalibrationReader* reader_heavy;
-  BTagCalibrationReader* reader_heavy_UP;
-  BTagCalibrationReader* reader_heavy_DN;
-  BTagCalibrationReader* reader_light;
-  BTagCalibrationReader* reader_light_UP;
-  BTagCalibrationReader* reader_light_DN;
-
   TH2D* h_btag_eff_b;
   TH2D* h_btag_eff_c;
   TH2D* h_btag_eff_udsg;
+  TH2D* h_btag_eff_b_loose;
+  TH2D* h_btag_eff_c_loose;
+  TH2D* h_btag_eff_udsg_loose;
   
-  BTagCalibration* calib_fastsim;
-  BTagCalibrationReader* reader_fastsim;
-  BTagCalibrationReader* reader_fastsim_UP;
-  BTagCalibrationReader* reader_fastsim_DN;
-
   TH2D* h_btag_eff_b_fastsim;
   TH2D* h_btag_eff_c_fastsim;
   TH2D* h_btag_eff_udsg_fastsim;
+  TH2D* h_btag_eff_b_fastsim_loose;
+  TH2D* h_btag_eff_c_fastsim_loose;
+  TH2D* h_btag_eff_udsg_fastsim_loose;
   
 };
 
