@@ -1,3 +1,0 @@
-# StopAnalysis
-SNT Stop Analysis
-
