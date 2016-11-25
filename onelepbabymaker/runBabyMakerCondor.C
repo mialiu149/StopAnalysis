@@ -51,8 +51,8 @@ int main(int argc, char **argv){
 
   float met             = 50;
 
-  int nGoodLeptons      = 0;
-  //int nGoodLeptons      = 1;
+//  int nGoodLeptons      = 0;
+  int nGoodLeptons      = 1;
   float goodLep_el_pt   = 20.0;
   float goodLep_el_eta  = 1.4442;
   float goodLep_mu_pt   = 20.0;

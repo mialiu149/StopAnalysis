@@ -5,7 +5,7 @@ setup_CMSSW_80X
 #
 ANALYSIS_NAME=onelepbabymaker
 
-BABY_VERSION=36.2.v2
+BABY_VERSION=36.2.v7
 #BABY_VERSION=test.v12
 
 # do not modify this TARBALL_NAME
