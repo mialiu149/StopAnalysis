@@ -25,17 +25,24 @@ public:
     void SetBranches (TTree* tree);
     void SetAliases (TTree* tree) const;
     void FillCommon (int idx);
-
+    int  nhighPtPFcands;
     vecLorentzVector isoTracks_p4;
     veci isoTracks_charge;
     vecd isoTracks_absIso;
     vecd isoTracks_dz;
     veci isoTracks_pdgId;
-//    veci isoTracks_selectedidx;
-//    int  isoTracks_nselected;
     vecb isoTracks_isVetoTrack;
     vecb isoTracks_isVetoTrack_v2;
     vecb isoTracks_isVetoTrack_v3;
+    vecd highPtPFcands_pt;
+    vecd highPtPFcands_eta;
+    vecd highPtPFcands_phi;
+    vecd highPtPFcands_mass;
+    vecd highPtPFcands_absIso;
+    vecd highPtPFcands_relIsoAn04;
+    vecd highPtPFcands_dz;
+    vecd highPtPFcands_pdgId;
+    vecd highPtPFcands_mcMatchId;
 };
 
 #endif

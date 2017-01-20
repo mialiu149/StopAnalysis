@@ -45,8 +45,8 @@ void EventTree::FillCommon (const std::string &root_file_name)
       if(nvtxs>0) filt_met = true;
       else filt_met = false;
       filt_met = filt_met*filt_ecalTP()*filt_eeBadSc()*filt_hbheNoise()*filt_hbheNoiseIso()*filt_goodVertices()*filt_globalTightHalo2016();
-      if (is_data) filt_badMuonFilter = badMuonFilter(); //still some problems with MC
-      filt_badChargedCandidateFilter = badChargedCandidateFilter();
+      if (is_data) filt_badMuonFilter = badMuonFilterV2(); //still some problems with MC
+      filt_badChargedCandidateFilter = badChargedCandidateFilterV2();
       filt_cscbeamhalo = filt_cscBeamHalo();
       filt_cscbeamhalo2015 = filt_cscBeamHalo2015();
       filt_globaltighthalo2016 = filt_globalTightHalo2016();
@@ -111,42 +111,6 @@ void EventTree::FillCommon (const std::string &root_file_name)
 
     firstGoodVtxIdx = firstGoodVertex();   
  
-/* baby diet -- obsolete branches/////
-    firstGoodVtxIdx = firstGoodVertex();
-    firstVtx_isfake = vtxs_isFake()[0];
-    firstVtx_ndof   = vtxs_ndof()[0];
-    firstVtx_posRho = vtxs_position()[0].Rho();
-    firstVtx_posZ   = vtxs_position()[0].Z();
-    firstVtx_posp4  = vtxs_position()[0];
-
-    filt_eff = evt_filt_eff();
-
-    //////////////
-    //if (evt_isRealData()) {                                                                                                                                                     
-    //filt_badevents = !(metFilterTxt.eventFails(evt_run(), evt_lumiBlock(), evt_event()));
-    //}
-    //else filt_badevents = true;
-    ////////////// 
-
-    pu_nvtxs = puInfo_nPUvertices().at(6);
-
-      if(signal){
-        sparms_filterEfficiency = sparm_filterEfficiency();                                                                                                                       
-        sparms_pdfScale         = sparm_pdfScale();
-        sparms_pdfWeight1       = sparm_pdfWeight1();
-        sparms_pdfWeight2       = sparm_pdfWeight2();
-        sparms_weight           = sparm_weight();
-        sparms_xsec             = sparm_xsec();
-        sparms_subProcessId     = sparm_subProcessId();
-      }
- 
-    //EA rho
-    EA_all_rho                  = evt_fixgrid_all_rho();
-    EA_allcalo_rho              = evt_fixgridfastjet_allcalo_rho();
-    EA_centralcalo_rho          = evt_fixgridfastjet_centralcalo_rho();
-    EA_centralchargedpileup_rho = evt_fixgridfastjet_centralchargedpileup_rho();
-    EA_centralneutral_rho       = evt_fixgridfastjet_centralneutral_rho(); 
-*/
 }
 
 void EventTree::Reset ()
@@ -172,15 +136,7 @@ void EventTree::Reset ()
     is1lepFromTop = -9999;
 
     nvtxs 	=  -9999;
-//    pu_nvtxs 	=  -9999;
-
     firstGoodVtxIdx   = -9999;//not necessarily first vertex
-  /*  firstVtx_isfake   = -9999;
-    firstVtx_ndof     = -9999.;
-    firstVtx_posRho   = -9999.;
-    firstVtx_posZ     = -9999.;
-    firstVtx_posp4    = LorentzVector(0,0, 0,0);
-*/
     pfmet                = -9999.;
     pfmet_phi            = -9999.;
     pfmet_jup            = -9999.;
@@ -292,13 +248,6 @@ void EventTree::Reset ()
     filt_fastsimjets_jdown = false;
     
     sparms_names.clear();
-  /*  sparms_filterEfficiency	= -9999.;
-    sparms_pdfScale		= -9999.;
-    sparms_pdfWeight1		= -9999.;
-    sparms_pdfWeight2		= -9999.;
-    sparms_weight		= -9999.;
-    sparms_xsec			= -9999.;
-*/
     sparms_values.clear();
     sparms_subProcessId 	= -9999;
     mass_stop                   = -9999;
@@ -308,11 +257,9 @@ void EventTree::Reset ()
 
     genmet 	= -9999.;
     genmet_phi 	= -9999.;
-     nupt = -99999.;
+    nupt = -99999.;
     genht = -9999.;
     PassTrackVeto    = false;
-//    PassTrackVeto_v2 = false;
-//    PassTrackVeto_v3 = false;
     PassTauVeto      = false;
 
     HLT_SingleMu           = -9999.; 
@@ -337,75 +284,7 @@ void EventTree::Reset ()
     HLT_Photon175 = -9999.;
     HLT_Photon165_HE10 = -9999.;
 
-   /* HLT_MET170             = -9999.;
-    HLT_SingleMu           = -9999.; 
-    HLT_SingleEl           = -9999.;
-    HLT_MET120Btag         = -9999.;      
-    HLT_MET120Mu5          = -9999.;      
-    HLT_HT350MET120        = -9999.;
-    HLT_DiEl               = -9999.;
-    HLT_DiEl_17_12         = -9999.;
-    HLT_DiMu               = -9999.;
-    HLT_Mu8El17            = -9999.;
-    HLT_Mu8El23            = -9999.;
-    HLT_Mu17El12           = -9999.;
-    HLT_Mu23El12           = -9999.;
-    HLT_SingleEl23         = -9999.;
-    HLT_SingleEl27         = -9999.;
-    HLT_SingleEl27Tight    = -9999.;
-    HLT_SingleElTight      = -9999.;
-    HLT_SingleElHT200      = -9999.;
-    HLT_SingleMuNoEta      = -9999.;
-    HLT_SingleMuNoIsoNoEta = -9999.;
-    HLT_Mu6HT200MET125     = -9999.;
-    HLT_HT350MET100	   = -9999.;
-    HLT_SingleMu17         = -9999.;
-    HLT_SingleMu18         = -9999.;
-    HLT_SingleMu20         = -9999.;
-    HLT_SingleMu24         = -9999.;
-    HLT_MonoCentPFJet80_METNoMu90_MHTNoMu90_IDTight = -9999.;
-    HLT_MET90_MHT90_IDTight                         = -9999.;
-    HLT_METNoMu90_NoiseCleaned_MHTNoMu90_IDTight    = -9999.; 
-    HLT_Photon90_CaloIdL_PFHT500 = -9999.;
-    HLT_Photon22_R9Id90_HE10_IsoM = -9999.;
-    HLT_Photon30_R9Id90_HE10_IsoM = -9999.;
-    HLT_Photon36_R9Id90_HE10_IsoM = -9999.;
-    HLT_Photon50_R9Id90_HE10_IsoM = -9999.;
-    HLT_Photon75_R9Id90_HE10_IsoM = -9999.;
-    HLT_Photon90_R9Id90_HE10_IsoM = -9999.;
-    HLT_Photon120_R9Id90_HE10_IsoM = -9999.;
-    HLT_Photon165_R9Id90_HE10_IsoM = -9999.;
-    HLT_Photon175 = -9999.;
-    HLT_Photon165_HE10 = -9999.;
-    
-    EA_all_rho                  = -9999.;
-    EA_allcalo_rho              = -9999.; 
-    EA_centralcalo_rho          = -9999.; 
-    EA_centralchargedpileup_rho = -9999.; 
-    EA_centralneutral_rho       = -9999.;
-
-    //pu_weight        =  -9999;
-    lep_sf           =  -9999;
-    btag_sf          =  -9999;
-    HLT_SingleMu_eff =  -9999;
-    HLT_SingleEl_eff =  -9999;
-
     filt_cscbeamhalo = false;
-    filt_ecallaser = false;
-    filt_ecaltp = false;
-    filt_eebadsc = false;
-    filt_goodvtx = false;
-    filt_badevents =false;
-    filt_hbhenoise = false;
-    filt_hbheisonoise = false;
-    filt_hcallaser = false;
-    filt_trkfail = false;
-    filt_trkPOG = false;
-    filt_trkPOG_tmc = false;
-    filt_trkPOG_tms = false;
-    filt_eff = -9999.;*/
-
-     filt_cscbeamhalo = false;
      filt_cscbeamhalo2015 = false;
      filt_globaltighthalo2016 = false;
      filt_globalsupertighthalo2016 = false;
@@ -427,6 +306,10 @@ void EventTree::Reset ()
      filt_badChargedCandidateFilter = false;
      filt_badMuonFilter = false;
 
+     filt_jetWithBadMuon        = false;
+     filt_jetWithBadMuon_jup    = false;
+     filt_jetWithBadMuon_jdown  = false;
+     filt_pfovercalomet         = false;
     nPhotons             = -9999;
     ph_selectedidx       = -9999;
     ph_ngoodjets         = -9999;
@@ -582,6 +465,10 @@ void EventTree::SetBranches (TTree* tree)
     tree->Branch("filt_fastsimjets", &filt_fastsimjets);
     tree->Branch("filt_fastsimjets_jup", &filt_fastsimjets_jup);
     tree->Branch("filt_fastsimjets_jdown", &filt_fastsimjets_jdown);
+    tree->Branch("filt_jetWithBadMuon", &filt_jetWithBadMuon);
+    tree->Branch("filt_jetWithBadMuon_jup", &filt_jetWithBadMuon_jup);
+    tree->Branch("filt_jetWithBadMuon_jdown", &filt_jetWithBadMuon_jdown);
+    tree->Branch("filt_pfovercalomet", &filt_pfovercalomet);
     tree->Branch("sparms_names", &sparms_names);
     tree->Branch("sparms_values", &sparms_values);
     tree->Branch("sparms_subProcessId", &sparms_subProcessId);

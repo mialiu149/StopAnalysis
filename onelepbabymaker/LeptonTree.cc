@@ -24,11 +24,9 @@ using namespace tas;
 
 void LeptonTree::FillCommon (int id, int idx)
 {
-    if (idx < 0) return;
+    if (idx < 0) return; // return if index is illegal
     int vtxidx = firstGoodVertex();
    // is_fromw = not evt_isRealData() ? leptonIsFromW(idx, id, true) : -999999;
-
-//general stuff
     p4		= abs(id)==11 ? els_p4().at(idx) : mus_p4().at(idx);
     pdgid	= id;
     pt 		= abs(id)==11 ? els_p4().at(idx).pt() : abs(id)==13 ? mus_p4().at(idx).pt() : -9999.;
@@ -37,7 +35,7 @@ void LeptonTree::FillCommon (int id, int idx)
     mass        = abs(id)==11 ? els_p4().at(idx).mass() : abs(id)==13 ? mus_p4().at(idx).mass() : -9999.;
     charge      = abs(id)==11 ? els_charge().at(idx) : abs(id)==13 ? mus_charge().at(idx) : -9999;
 
-//mc stuff
+   //mc only
     if (!evt_isRealData()) {
           mcp4      = abs(id)==11 ? els_mc_p4().at(idx) : mus_mc_p4().at(idx);
           mc_motherid = abs(id)==11 ? els_mc_motherid().at(idx) : abs(id)==13 ? mus_mc_motherid().at(idx) : -9999;
@@ -51,7 +49,7 @@ void LeptonTree::FillCommon (int id, int idx)
           else production_type = none;
    }
     
-//electrons
+  //electrons
     if (abs(id) == 11)
     {
 	if (vtxidx >= 0) {
@@ -92,14 +90,10 @@ void LeptonTree::FillCommon (int id, int idx)
 	relIso03DB = eleRelIso03(idx, STOP);
         relIso03EA = eleRelIso03EA(idx);
 
-       //elMiniRelIso(unsigned int idx, bool useVetoCones, float ptthresh, bool useDBcor)
-       //miniRelIsoDB = elMiniRelIso(idx, true, 0., true, false);
-       //miniRelIsoEA = elMiniRelIso(idx, true, 0., false, true);
-       //MiniIso      = elMiniRelIso(idx, true, 0., true, false);//copy of miniRelIsoDB - change to precomputed for 74X
-       miniRelIsoDB = elMiniRelIsoCMS3_DB(idx);
-       miniRelIsoEA = elMiniRelIsoCMS3_EA(idx,1);
-       MiniIso      = elMiniRelIsoCMS3_EA(idx,1);
-       relIso       = eleRelIso03EA(idx);
+        miniRelIsoDB = elMiniRelIsoCMS3_DB(idx);
+        miniRelIsoEA = elMiniRelIsoCMS3_EA(idx,1);
+        MiniIso      = elMiniRelIsoCMS3_EA(idx,1);
+        relIso       = eleRelIso03EA(idx);
 
     } // end electron block
 

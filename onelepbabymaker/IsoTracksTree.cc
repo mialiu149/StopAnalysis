@@ -30,23 +30,39 @@ void IsoTracksTree::Reset()
     isoTracks_absIso.clear();
     isoTracks_dz.clear();
     isoTracks_pdgId.clear();
-   // isoTracks_selectedidx.clear();
-  //  isoTracks_nselected = -9999;
     isoTracks_isVetoTrack.clear();
     isoTracks_isVetoTrack_v2.clear();
     isoTracks_isVetoTrack_v3.clear();
+    highPtPFcands_pt.clear(); 
+    highPtPFcands_eta.clear(); 
+    highPtPFcands_phi.clear(); 
+    highPtPFcands_mass.clear(); 
+    highPtPFcands_absIso.clear(); 
+    highPtPFcands_relIsoAn04.clear(); 
+    highPtPFcands_dz.clear(); 
+    highPtPFcands_pdgId.clear(); 
+    highPtPFcands_mcMatchId.clear(); 
 }
 
 void IsoTracksTree::SetBranches(TTree* tree)
 {
-
     tree->Branch("isoTracks_p4", &isoTracks_p4);
     tree->Branch("isoTracks_charge", &isoTracks_charge);
     tree->Branch("isoTracks_absIso", &isoTracks_absIso);
     tree->Branch("isoTracks_dz", &isoTracks_dz);
     tree->Branch("isoTracks_pdgId", &isoTracks_pdgId);
-   // tree->Branch("isoTracks_selectedidx", &isoTracks_selectedidx);
-  //  tree->Branch("isoTracks_nselected", &isoTracks_nselected);
+    tree->Branch("nhighPtPFcands", &nhighPtPFcands);
+    tree->Branch("highPtPFcands_pt", &highPtPFcands_pt);
+    tree->Branch("highPtPFcands_eta", &highPtPFcands_eta);
+    tree->Branch("highPtPFcands_phi", &highPtPFcands_phi);
+    tree->Branch("highPtPFcands_mass", &highPtPFcands_mass);
+    tree->Branch("highPtPFcands_absIso", &highPtPFcands_absIso);
+    tree->Branch("highPtPFcands_relIsoAn04", &highPtPFcands_relIsoAn04);
+    tree->Branch("highPtPFcands_dz", &highPtPFcands_dz);
+    tree->Branch("highPtPFcands_pdgId", &highPtPFcands_pdgId);
+    tree->Branch("highPtPFcands_mcMatchId", &highPtPFcands_mcMatchId);
+    //tree->Branch("", &);
+    //tree->Branch("", &);
     tree->Branch("isoTracks_isVetoTrack", &isoTracks_isVetoTrack);
     tree->Branch("isoTracks_isVetoTrack_v2", &isoTracks_isVetoTrack_v2);
     tree->Branch("isoTracks_isVetoTrack_v3", &isoTracks_isVetoTrack_v3);

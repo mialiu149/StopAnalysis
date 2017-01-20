@@ -25,92 +25,9 @@
 #
 #########################################################################
 
+#############################################
+##                  SIGNALS                ##
+#############################################
 
-######################################
-### Collection of 25ns Data Samples ##
-######################################
-
-
-#######################
-## RunB PromptRecoV2 ##
-#######################
-
-## Single Electron - RunB PromptRecoV2 ##
-#BABY ANALYSIS VERSION /SingleElectron/Run2016B-PromptReco-v2/MINIAOD TARBALL.tar.gz EXECUTABLE -1 output.root,skim.root data_single_electron_Run2016B_MINIAOD_PromptReco-v2re
-
-## Single Muon - RunB PromptRecoV2 ##
-#BABY ANALYSIS VERSION /SingleMuon/Run2016B-PromptReco-v2/MINIAOD TARBALL.tar.gz EXECUTABLE -1 output.root,skim.root data_single_muon_Run2016B_MINIAOD_PromptReco-v2re
-
-
-#######################
-## RunC PromptRecoV2 ##
-#######################
-
-
-## Single Electron - RunC PromptRecoV2 ##
-BABY ANALYSIS VERSION /SingleElectron/Run2016C-23Sep2016-v1/MINIAOD TARBALL.tar.gz EXECUTABLE -1 output.root,skim.root data_single_electron_Run2016C_MINIAOD_23Sep2016-v1
-
-## Single Muon - RunC PromptRecoV2 #
-BABY ANALYSIS VERSION /SingleMuon/Run2016C-23Sep2016-v1/MINIAOD TARBALL.tar.gz EXECUTABLE -1 output.root,skim.root data_single_muon_Run2016C_MINIAOD_23Sep2016-v1
-
-
-
-#######################
-## RunD PromptRecoV2 ##
-#######################
-
-
-## Single Electron - RunD PromptRecoV2 ##
-BABY ANALYSIS VERSION /SingleElectron/Run2016D-23Sep2016-v1/MINIAOD TARBALL.tar.gz EXECUTABLE -1 output.root,skim.root data_single_electron_Run2016D_MINIAOD_23Sep2016-v1
-
-## Single Muon - RunD PromptRecoV2 ##
-BABY ANALYSIS VERSION /SingleMuon/Run2016D-23Sep2016-v1/MINIAOD TARBALL.tar.gz EXECUTABLE -1 output.root,skim.root data_single_muon_Run2016D_MINIAOD_23Sep2016-v1
-
-
-
-#######################
-## RunE PromptRecoV2 ##
-#######################
-
-## Single Electron - RunE PromptRecoV2 ##
-BABY ANALYSIS VERSION /SingleElectron/Run2016E-23Sep2016-v1/MINIAOD TARBALL.tar.gz EXECUTABLE -1 output.root,skim.root data_single_electron_Run2016E_MINIAOD_23Sep2016-v1
-
-## Single Muon - RunE PromptRecoV2 ##
-BABY ANALYSIS VERSION /SingleMuon/Run2016E-23Sep2016-v1/MINIAOD TARBALL.tar.gz EXECUTABLE -1 output.root,skim.root data_single_muon_Run2016E_MINIAOD_23Sep2016-v1
-
-
-#######################
-## RunF PromptRecoV1 ##
-#######################
-
-## Single Electron - RunF PromptRecoV1 ##
-BABY ANALYSIS VERSION /SingleElectron/Run2016F-23Sep2016-v1/MINIAOD TARBALL.tar.gz EXECUTABLE -1 output.root,skim.root data_single_electron_Run2016F_MINIAOD_23Sep2016-v1
-
-## Single Muon - RunF PromptRecoV1 ##
-BABY ANALYSIS VERSION /SingleMuon/Run2016F-23Sep2016-v1/MINIAOD TARBALL.tar.gz EXECUTABLE -1 output.root,skim.root data_single_muon_Run2016F_MINIAOD_23Sep2016-v1
-
-
-#######################
-## RunG PromptRecoV1 ##
-#######################
-
-## Single Electron - RunG PromptRecoV1 ##
-BABY ANALYSIS VERSION /SingleElectron/Run2016G-23Sep2016-v1/MINIAOD TARBALL.tar.gz EXECUTABLE -1 output.root,skim.root data_single_electron_Run2016G_MINIAOD_23Sep2016-v1
-
-## Single Muon - RunG PromptRecoV1 ##
-BABY ANALYSIS VERSION /SingleMuon/Run2016G-23Sep2016-v1/MINIAOD TARBALL.tar.gz EXECUTABLE -1 output.root,skim.root data_single_muon_Run2016G_MINIAOD_23Sep2016-v1
-
-
-#######################
-## RunH PromptRecoV1 ##
-#######################
-
-## Single Electron - RunG PromptRecoV1 ##
-BABY ANALYSIS VERSION /SingleElectron/Run2016H-PromptReco-v2/MINIAOD TARBALL.tar.gz EXECUTABLE -1 output.root,skim.root data_single_electron_Run2016H_MINIAOD_PromptReco-v2
-
-## Single Muon - RunG PromptRecoV1 ##
-BABY ANALYSIS VERSION /SingleMuon/Run2016H-PromptReco-v2/MINIAOD TARBALL.tar.gz EXECUTABLE -1 output.root,skim.root data_single_muon_Run2016H_MINIAOD_PromptReco-v2
-
-#####################################
-# Collection of Monte Carlo Samples #
-#####################################
+## tchwh - Scan - - fastSim ##
+BABY ANALYSIS VERSION /SMS-TChiWH_WToLNu_HToBB_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/MINIAODSIM TARBALL.tar.gz EXECUTABLE -1 output.root,skim.root SMS_tchiwh_250_75,1

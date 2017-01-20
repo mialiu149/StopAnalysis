@@ -88,6 +88,8 @@ float DPhi_W_lep(float MET, float MET_Phi, LorentzVector p4);
 //float TrackIso(int);
 //bool isFromW(Lep lep);
 //bool isFromZ(Lep lep);
+bool CompareIndexValueGreatest(const std::pair<double, int>& firstElem, const std::pair<double, int>& secondElem) ;
+bool CompareIndexValueSmallest(const std::pair<double, int>& firstElem, const std::pair<double, int>& secondElem) ;
 
 void passesBaselineCuts(int njets, int nbtag, float met, float ht, int ngoodlep, int ngoodvertex);
 

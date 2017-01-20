@@ -5,14 +5,14 @@ setup_CMSSW_80X
 #
 ANALYSIS_NAME=onelepbabymaker
 
-BABY_VERSION=36.2.v7
+BABY_VERSION=moriond2017.v2
 #BABY_VERSION=test.v12
 
 # do not modify this TARBALL_NAME
 TARBALL_NAME=package.$BABY_VERSION
 
-INSTRUCTIONS_FILE=instructions_tmp.txt
-export INSTRUCTIONS_FILE=instructions_tmp.txt
+INSTRUCTIONS_FILE=instructions_2017.txt
+export INSTRUCTIONS_FILE=instructions_2017.txt
 EXECUTABLE_NAME=condor_executable.sh
 
 BATCH_DIR=`pwd`

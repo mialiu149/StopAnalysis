@@ -215,6 +215,10 @@ public:
     bool  filt_fastsimjets;
     bool  filt_fastsimjets_jup;
     bool  filt_fastsimjets_jdown;
+    bool  filt_jetWithBadMuon;
+    bool  filt_jetWithBadMuon_jup;
+    bool  filt_jetWithBadMuon_jdown;
+    bool  filt_pfovercalomet;
     float hardgenpt;
     //sparms
 //    vecs  sparms_comment;

@@ -98,7 +98,6 @@ float JetTree::getBtagEffFromFile(float pt, float eta, int mcFlavour, bool isFas
 
 void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx,  FactorizedJetCorrector* corrector, float& btagprob_data, float &btagprob_mc, float &btagprob_heavy_UP, float & btagprob_heavy_DN,float & btagprob_light_UP, float & btagprob_light_DN, float & btagprob_FS_UP, float & btagprob_FS_DN, unsigned int overlep1_idx, unsigned int overlep2_idx, bool applynewcorr, JetCorrectionUncertainty* jetcorr_uncertainty, int JES_type, bool applyBtagSFs, bool isFastsim)
 {
-    
     // fill info for ak4pfjets
     int nGoodJets=0.;
     int nFailJets=0.;
@@ -106,8 +105,8 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx,  Factoriz
     float HT = 0.;
     float JET_PT = 0.;
     int nbtags_med = 0;
-    static const float BTAG_MED = 0.800;
-    static const float BTAG_LOOSE = 0.460;
+    static const float BTAG_MED = 0.8484;
+    static const float BTAG_LOOSE = 0.5426;
     float dPhiM = 0.;
     float btagdisc = 0.;   
     unsigned int leadbtag_idx = 0;
@@ -378,7 +377,7 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx,  Factoriz
 	      BTagEntry::JetFlavor flavor = BTagEntry::FLAV_UDSG;
 	      if (abs(pfjets_hadronFlavour().at(jindex)) == 5) flavor = BTagEntry::FLAV_B;
 	      else if (abs(pfjets_hadronFlavour().at(jindex)) == 4) flavor = BTagEntry::FLAV_C;
-	      float pt_cutoff = std::max(30.,std::min(669.,double(p4sCorrJets[jindex].eta())));
+	      float pt_cutoff = std::max(30.,std::min(669.,double(p4sCorrJets[jindex].pt())));
 	      float eta_cutoff = std::min(2.39,fabs(double(p4sCorrJets[jindex].eta())));
 	      float weight_cent(1.), weight_UP(1.), weight_DN(1.), weight_FS_UP(1.), weight_FS_DN(1.);
 	      if (flavor == BTagEntry::FLAV_UDSG) {
