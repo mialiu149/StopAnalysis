@@ -331,3 +331,16 @@ void doubleSysError(TH2D* hist){
     }
 return;
 }
+
+void setcounterLabel(TH1D* hist, string* labels) {
+     hist->Sumw2();
+     for(int x=1; x<=(int)hist->GetNbinsX(); x++){
+         hist->GetXaxis()->SetBinLabel(x,labels[x].c_str());
+     }
+}
+void setcounterLabel3D(TH3D* hist, string* labels) {
+     hist->Sumw2();
+     for(int x=1; x<=(int)hist->GetNbinsZ(); x++){
+         hist->GetZaxis()->SetBinLabel(x,labels[x].c_str());
+     }
+}

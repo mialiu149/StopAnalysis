@@ -23,7 +23,6 @@
 #include "stop_variables/topness.cc"
 #include "stop_variables/MT2_implementations.cc"
 #include "JetCorrector.h"
-//#include "btagsf/BTagCalibrationStandalone.h"
 #include "IsoTrackVeto.h"
 #include "PhotonSelections.h"
 #include "MuonSelections.h"//93991
@@ -40,8 +39,6 @@ typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > LorentzVector;
 using namespace std;
 using namespace tas;
 using namespace duplicate_removal;
-
-
 
 //==============//
 // object trees //
@@ -91,7 +88,6 @@ void babyMaker::setSkimVariables(bool isDataFromFileName ,bool isSignalFromFileN
   skim_jet_eta         = jet_eta;
 
   skim_nBJets          = nbjets;
-
   skim_jet_ak8_pt      = jet_ak8_pt;
   skim_jet_ak8_eta     = jet_ak8_eta;
 
@@ -124,7 +120,6 @@ void babyMaker::setSkimVariables(bool isDataFromFileName ,bool isSignalFromFileN
   fillLepSynch   =fillLepSynch_;
 }
 
-
 void babyMaker::MakeBabyNtuple(std::string output_name){
   std::string str = babypath+ output+".root";
   const char *cstr = str.c_str();
@@ -147,13 +142,11 @@ void babyMaker::MakeBabyNtuple(std::string output_name){
   //optional, now still computes these variables, does it make sense not to do it when it's false, are we going to save some cpu?
   if(filltaus)  Taus.SetBranches(BabyTree);
   if(filltracks)  Tracks.SetBranches(BabyTree);
-
   if(fillZll)  StopEvt.SetZllBranches(BabyTree);
   if(fillPhoton) StopEvt.SetPhotonBranches(BabyTree);
   if(fillMETfilt) StopEvt.SetMETFilterBranches(BabyTree);
   if(fill2ndlep) StopEvt.SetSecondLepBranches(BabyTree);
   if(fillExtraEvtVar) StopEvt.SetExtraVariablesBranches(BabyTree);
- 
   if(fillAK4EF)   jets.SetAK4Branches_EF(BabyTree);
   if(fillAK4_Other)  jets.SetAK4Branches_Other(BabyTree);
   if(fillOverleps)  jets.SetAK4Branches_Overleps(BabyTree);
@@ -167,7 +160,6 @@ void babyMaker::MakeBabyNtuple(std::string output_name){
 }
 
 void babyMaker::InitBabyNtuple(){
-  
   StopEvt.Reset();
   lep1.Reset();
   lep2.Reset();
@@ -177,19 +169,15 @@ void babyMaker::InitBabyNtuple(){
   ph.Reset();
   Taus.Reset();
   Tracks.Reset();
-  
   gen_leps.Reset();
   gen_nus.Reset();
   gen_qs.Reset();
   gen_bosons.Reset();
   gen_susy.Reset();
 } 
-//----- function to double uncertainties-----//
-
 //================//
 // Main function  //
 //================//
-
 int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::string path){
   // Set output file path
   babypath = path;
@@ -208,9 +196,6 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
   unsigned int nEventsToDo = chain->GetEntries();
   unsigned int jet_overlep1_idx = -9999;  
   unsigned int jet_overlep2_idx = -9999;
-
- //unsigned int track_overlep1_idx = -9999;
-  //unsigned int track_overlep2_idx = -9999;
   
   if( nEvents >= 0 ) nEventsToDo = nEvents;
   TObjArray *listOfFiles = chain->GetListOfFiles();
@@ -219,15 +204,10 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
   bool applyJECunc = false;
   if(JES_type != 0) applyJECunc = true; 
 
-  //
-  // JEC files
-  //
-
   // is there a better way to do the electron sf, not in the looper?! it's so messy.  
 
   // Fullsim Electron file
   TFile *f_el_SF;
-
   TFile *f_el_SF_tracking;
   // Fullsim Muon files
   TFile *f_mu_SF_id;
@@ -237,7 +217,6 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
   TFile *f_mu_SF_veto_id;
   TFile *f_mu_SF_veto_iso;
   TFile *f_mu_SF_veto_ip;
-
   // Fullsim/Fastsim Electron files
   TFile *f_el_FS_ID;
   TFile *f_el_FS_Iso;
@@ -316,53 +295,40 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
     // Veto lepton reco efficiency files
     f_vetoLep_eff = new TFile("lepsf/analysis2016_12p9fb/lepeff__ttbar_diLept_madgraph_pythia8_ext1_25ns__80x.root", "read");
 
-
-    // Grab selected el histos
+    // Grab el histos
     TH2D *h_el_SF_id_temp       = (TH2D*)f_el_SF->Get("GsfElectronToMedium");
     TH2D *h_el_SF_iso_temp      = (TH2D*)f_el_SF->Get("MVAVLooseElectronToMini");
     TH2D *h_el_SF_tracking_temp = (TH2D*)f_el_SF_tracking->Get("EGamma_SF2D");
-
-    // Grab veto el histos
     TH2D *h_el_SF_veto_id_temp  = (TH2D*)f_el_SF->Get("GsfElectronToVeto");
     TH2D *h_el_SF_veto_iso_temp = (TH2D*)f_el_SF->Get("MVAVLooseElectronToMini2");
 
-
-    // Grab selected mu histos
+    // Grab mu histos
     TH2D *h_mu_SF_id_temp  = (TH2D*)f_mu_SF_id->Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0");
     TH2D *h_mu_SF_iso_temp = (TH2D*)f_mu_SF_iso->Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0_&_Medium2016_pass");
     TH2D *h_mu_SF_ip_temp  = (TH2D*)f_mu_SF_ip->Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0_&_Medium2016_pass");
     TGraphAsymmErrors *h_mu_SF_tracking_temp  = (TGraphAsymmErrors*)f_mu_SF_tracking->Get("ratio_eta");
-
-    // Grab veto mu histos
     TH2D *h_mu_SF_veto_id_temp  = (TH2D*)f_mu_SF_veto_id->Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0");
     TH2D *h_mu_SF_veto_iso_temp = (TH2D*)f_mu_SF_veto_iso->Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0_&_PF_pass");
     TH2D *h_mu_SF_veto_ip_temp  = (TH2D*)f_mu_SF_veto_ip->Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0_&_PF_pass");
-    
 
-    // Grab fastsim/fullsim selected el histos
+    // Grab fastsim/fullsim el histos
     TH2D *h_el_FS_ID_temp  = (TH2D*)f_el_FS_ID->Get("histo2D");
     TH2D *h_el_FS_Iso_temp = (TH2D*)f_el_FS_Iso->Get("histo2D");
-
-    // Grab fastsim/fullsim veto el histos
     TH2D *h_el_veto_FS_ID_temp  = (TH2D*)f_el_veto_FS_ID->Get("histo2D");
     TH2D *h_el_veto_FS_Iso_temp = (TH2D*)f_el_veto_FS_Iso->Get("histo2D");
     
-    // Grab fastsim/fullsim selected mu histos
+    // Grab fastsim/fullsim mu histos
     TH2D *h_mu_FS_ID_temp  = (TH2D*)f_mu_FS_ID->Get("histo2D");
     TH2D *h_mu_FS_Iso_temp = (TH2D*)f_mu_FS_Iso->Get("histo2D");
     TH2D *h_mu_FS_Ip_temp  = (TH2D*)f_mu_FS_Ip->Get("histo2D");
-    
-    // Grab fastsim/fullsim veto mu histos
     TH2D *h_mu_veto_FS_ID_temp  = (TH2D*)f_mu_veto_FS_ID->Get("histo2D");
     TH2D *h_mu_veto_FS_Iso_temp = (TH2D*)f_mu_veto_FS_Iso->Get("histo2D");
     TH2D *h_mu_veto_FS_Ip_temp  = (TH2D*)f_mu_veto_FS_Ip->Get("histo2D");
-
     
     // Grab mc eff for veto lepton (for lost lepto SFs) histos
     TH2D *h_el_vetoLepEff_temp = (TH2D*)f_vetoLep_eff->Get("h2_lepEff_vetoSel_Eff_el");
     TH2D *h_mu_vetoLepEff_temp = (TH2D*)f_vetoLep_eff->Get("h2_lepEff_vetoSel_Eff_mu");
    
-
     // Get final fullsim, selected el, sfs
     TH2D *h_el_SF_id  = (TH2D*)h_el_SF_id_temp->Clone("h_el_SF_id");
     TH2D *h_el_SF_iso = (TH2D*)h_el_SF_iso_temp->Clone("h_el_SF_iso");
@@ -377,7 +343,6 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
     TH2D *h_el_SF_veto_iso = (TH2D*)h_el_SF_veto_iso_temp->Clone("h_el_SF_veto_iso");
     h_el_SF_veto = (TH2D*)h_el_SF_veto_id->Clone("h_el_SF_veto");
     h_el_SF_veto->Multiply(h_el_SF_veto_iso);
-    
     
     // Get final fullsim, selected mu, sfs
     TH2D *h_mu_SF_id  = (TH2D*)h_mu_SF_id_temp->Clone("h_mu_SF_id");
@@ -414,7 +379,6 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
     h_mu_SF_veto->Multiply(h_mu_SF_veto_iso);
     h_mu_SF_veto->Multiply(h_mu_SF_veto_ip);
     
-
     // Get final fullsim/fastsim, selected el, sfs
     TH2D* h_el_FS_ID  = (TH2D*)h_el_FS_ID_temp->Clone("h_el_FS_ID");
     TH2D* h_el_FS_Iso = (TH2D*)h_el_FS_Iso_temp->Clone("h_el_FS_Iso");
@@ -457,8 +421,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
     h_mu_vetoLepEff = (TH2D*)h_mu_vetoLepEff_temp->Clone("h_mu_vetoLepEff");
 }
 
-  TFile *fxsec;
-  TH1D *hxsec;
+  TFile *fxsec; TH1D *hxsec;
   if(skim_isSignalFromFileName){
     fxsec = new TFile("xsec_susy_13tev.root","READ");
     if(fxsec->IsZombie()) {
@@ -467,10 +430,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
     }
     hxsec = (TH1D*)fxsec->Get("h_xsec_c1n2");
   }
-  TFile *pileupfile;
-  TH1D *hPU;
-  TH1D *hPUup;
-  TH1D *hPUdown;
+  TFile *pileupfile; TH1D *hPU; TH1D *hPUup; TH1D *hPUdown;
   if(!skim_isDataFromFileName){
     pileupfile = new TFile("puWeights_2015data_2p2fbinv.root","READ");
     if(pileupfile->IsZombie()) {
@@ -481,115 +441,24 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
     hPUup   = (TH1D*)pileupfile->Get("puWeightUp");
     hPUdown = (TH1D*)pileupfile->Get("puWeightDown");
   }
-  
+   string labels [] = {"nominal,muR=1 muF=1", "muR=1 muF=2","muR=1 muF=0.5","muR=1 muF=0.5","muR=2 muF=1","muR=2 muF=2","muR=2 muF=0.5","muR=0.5 muF=1","muR=0.5 muF=2","muR=0.5 muF=0.5","pdf_up","pdf_down","pdf_alphas_var_1","pdf_alphas_var_2","weight_btagsf","weight_btagsf_heavy_UP","weight_btagsf_light_UP","weight_btagsf_heavy_DN","weight_btagsf_light_DN","weight_ISR_nominal","weight_ISR_up","weight_ISR_down","NEvents","weight_btagsf_fastsim_UP","weight_btagsf_fastsim_DN","weight_ISRnjets_nominal","weight_ISRnjets_up","weight_ISRnjets_down","weight_lepSF","weight_lepSF_up","weight_lepSF_down","weight_vetoLepSF","weight_vetoLepSF_up","weight_vetoLepSF_down","weight_lepSF_fastSim","weight_lepSF_fastSim_up","weight_lepSF_fastSim_down"}; 
   TH1D* counterhist = new TH1D( "h_counter", "h_counter", 36, 0.5,36.5);
-  counterhist->Sumw2();
-  counterhist->GetXaxis()->SetBinLabel(1,"nominal,muR=1 muF=1");
-  counterhist->GetXaxis()->SetBinLabel(2,"muR=1 muF=2");
-  counterhist->GetXaxis()->SetBinLabel(3,"muR=1 muF=0.5");
-  counterhist->GetXaxis()->SetBinLabel(4,"muR=2 muF=1");
-  counterhist->GetXaxis()->SetBinLabel(5,"muR=2 muF=2");
-  counterhist->GetXaxis()->SetBinLabel(6,"muR=2 muF=0.5");
-  counterhist->GetXaxis()->SetBinLabel(7,"muR=0.5 muF=1");
-  counterhist->GetXaxis()->SetBinLabel(8,"muR=0.5 muF=2");
-  counterhist->GetXaxis()->SetBinLabel(9,"muR=0.5 muF=0.5");
-  counterhist->GetXaxis()->SetBinLabel(10,"pdf_up");
-  counterhist->GetXaxis()->SetBinLabel(11,"pdf_down");
-  counterhist->GetXaxis()->SetBinLabel(12,"pdf_alphas_var_1");
-  counterhist->GetXaxis()->SetBinLabel(13,"pdf_alphas_var_2");
-  counterhist->GetXaxis()->SetBinLabel(14,"weight_btagsf");
-  counterhist->GetXaxis()->SetBinLabel(15,"weight_btagsf_heavy_UP");
-  counterhist->GetXaxis()->SetBinLabel(16,"weight_btagsf_light_UP");
-  counterhist->GetXaxis()->SetBinLabel(17,"weight_btagsf_heavy_DN");
-  counterhist->GetXaxis()->SetBinLabel(18,"weight_btagsf_light_DN");
-  counterhist->GetXaxis()->SetBinLabel(19,"weight_ISR_nominal");
-  counterhist->GetXaxis()->SetBinLabel(20,"weight_ISR_up");
-  counterhist->GetXaxis()->SetBinLabel(21,"weight_ISR_down");
-  counterhist->GetXaxis()->SetBinLabel(22,"NEvents");
-  counterhist->GetXaxis()->SetBinLabel(23,"weight_btagsf_fastsim_UP");
-  counterhist->GetXaxis()->SetBinLabel(24,"weight_btagsf_fastsim_DN");
-  counterhist->GetXaxis()->SetBinLabel(25,"weight_ISRnjets_nominal");
-  counterhist->GetXaxis()->SetBinLabel(26,"weight_ISRnjets_up");
-  counterhist->GetXaxis()->SetBinLabel(27,"weight_ISRnjets_down");
-  counterhist->GetXaxis()->SetBinLabel(28,"weight_lepSF");
-  counterhist->GetXaxis()->SetBinLabel(29,"weight_lepSF_up");
-  counterhist->GetXaxis()->SetBinLabel(30,"weight_lepSF_down");
-  counterhist->GetXaxis()->SetBinLabel(31,"weight_vetoLepSF");
-  counterhist->GetXaxis()->SetBinLabel(32,"weight_vetoLepSF_up");
-  counterhist->GetXaxis()->SetBinLabel(33,"weight_vetoLepSF_down");
-  counterhist->GetXaxis()->SetBinLabel(34,"weight_lepSF_fastSim");
-  counterhist->GetXaxis()->SetBinLabel(35,"weight_lepSF_fastSim_up");
-  counterhist->GetXaxis()->SetBinLabel(36,"weight_lepSF_fastSim_down");
-  
+  setcounterLabel(counterhist,labels);
   TH3D* counterhistSig;
   TH2F* histNEvts;//count #evts per signal point
   if(skim_isSignalFromFileName){//create histos only for signals
     counterhistSig = new TH3D( "h_counterSMS", "h_counterSMS", 37,99,1024, 19,-1,474, 35, 0.5,35.5);//15000 bins!
-    counterhistSig->Sumw2();
-    counterhistSig->GetZaxis()->SetBinLabel(1,"nominal,muR=1 muF=1");
-    counterhistSig->GetZaxis()->SetBinLabel(2,"muR=1 muF=2");
-    counterhistSig->GetZaxis()->SetBinLabel(3,"muR=1 muF=0.5");
-    counterhistSig->GetZaxis()->SetBinLabel(4,"muR=2 muF=1");
-    counterhistSig->GetZaxis()->SetBinLabel(5,"muR=2 muF=2");
-    counterhistSig->GetZaxis()->SetBinLabel(6,"muR=2 muF=0.5");
-    counterhistSig->GetZaxis()->SetBinLabel(7,"muR=0.5 muF=1");
-    counterhistSig->GetZaxis()->SetBinLabel(8,"muR=0.5 muF=2");
-    counterhistSig->GetZaxis()->SetBinLabel(9,"muR=0.5 muF=0.5");
-    counterhistSig->GetZaxis()->SetBinLabel(10,"pdf_up");
-    counterhistSig->GetZaxis()->SetBinLabel(11,"pdf_down");
-    counterhistSig->GetZaxis()->SetBinLabel(12,"pdf_alphas_var_1");
-    counterhistSig->GetZaxis()->SetBinLabel(13,"pdf_alphas_var_2");
-    counterhistSig->GetZaxis()->SetBinLabel(14,"weight_btagsf");
-    counterhistSig->GetZaxis()->SetBinLabel(15,"weight_btagsf_heavy_UP");
-    counterhistSig->GetZaxis()->SetBinLabel(16,"weight_btagsf_light_UP");
-    counterhistSig->GetZaxis()->SetBinLabel(17,"weight_btagsf_heavy_DN");
-    counterhistSig->GetZaxis()->SetBinLabel(18,"weight_btagsf_light_DN");
-    counterhistSig->GetZaxis()->SetBinLabel(19,"weight_ISR_nominal");
-    counterhistSig->GetZaxis()->SetBinLabel(20,"weight_ISR_up");
-    counterhistSig->GetZaxis()->SetBinLabel(21,"weight_ISR_down");
-    counterhistSig->GetZaxis()->SetBinLabel(22,"weight_btagsf_fastsim_UP");
-    counterhistSig->GetZaxis()->SetBinLabel(23,"weight_btagsf_fastsim_DN");
-    counterhistSig->GetZaxis()->SetBinLabel(24,"weight_ISRnjets_nominal");
-    counterhistSig->GetZaxis()->SetBinLabel(25,"weight_ISRnjets_up");
-    counterhistSig->GetZaxis()->SetBinLabel(26,"weight_ISRnjets_down");
-    counterhistSig->GetZaxis()->SetBinLabel(27,"weight_lepSF");
-    counterhistSig->GetZaxis()->SetBinLabel(28,"weight_lepSF_up");
-    counterhistSig->GetZaxis()->SetBinLabel(29,"weight_lepSF_down");
-    counterhistSig->GetZaxis()->SetBinLabel(30,"weight_vetoLepSF");
-    counterhistSig->GetZaxis()->SetBinLabel(31,"weight_vetoLepSF_up");
-    counterhistSig->GetZaxis()->SetBinLabel(32,"weight_vetoLepSF_down");
-    counterhistSig->GetZaxis()->SetBinLabel(33,"weight_lepSF_fastSim");
-    counterhistSig->GetZaxis()->SetBinLabel(34,"weight_lepSF_fastSim_up");
-    counterhistSig->GetZaxis()->SetBinLabel(35,"weight_lepSF_fastSim_down");
- 
+    setcounterLabel3D(counterhistSig,labels);
     histNEvts = new TH2F( "histNEvts", "h_histNEvts", 37,99,1024, 19,-1,474);//x=mStop, y=mLSP
     histNEvts->Sumw2();
   }
-
-
-  //
-  //
-  // Make Baby Ntuple  
-  //
+  // output Ntuple  and branches
   MakeBabyNtuple( output_name + ".root");
-  
-  //
-  // Initialize Baby Ntuple Branches
-  //
   InitBabyNtuple();
-  
-  //
   // Set JSON file
-  //
-  //const char* json_file = "json_files/Cert_271036-276811_13TeV_PromptReco_Collisions16_JSON.txt";// ichep json
-  ///const char* json_file = "json_files/Cert_271036-280385_13TeV_PromptReco_Collisions16_JSON_NoL1T_v2.txt";
-  //const char* json_file = "json_files/Cert_271036-284044_13TeV_PromptReco_Collisions16_JSON_NoL1T.txt";
   const char* json_file = "json_files/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt";
   set_goodrun_file_json(json_file);
-  
-  //
-  // JEC files
-  //
+  // set JEC files
   std::vector<std::string> jetcorr_filenames_pfL1FastJetL2L3;
   FactorizedJetCorrector *jet_corrector_pfL1FastJetL2L3(0);
   JetCorrectionUncertainty* jetcorr_uncertainty(0);
@@ -618,7 +487,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
     jetcorr_uncertainty_filename = Form("%s/jetcorr/data/run2_25ns/Summer16_25nsV5_MC/Summer16_25nsV5_MC_Uncertainty_AK4PFchs.txt",jecpath);
   }
 
-  cout << "applying JEC from the following files:" << endl;
+  cout << "applying JEC from following files:" << endl;
   for (unsigned int ifile = 0; ifile < jetcorr_filenames_pfL1FastJetL2L3.size(); ++ifile) {
     cout << "   " << jetcorr_filenames_pfL1FastJetL2L3.at(ifile) << endl;
   }
@@ -656,7 +525,6 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
       h_btag_eff_b_temp = (TH2D*) f_btag_eff->Get("h2_BTaggingEff_csv_med_Eff_b");
       h_btag_eff_c_temp = (TH2D*) f_btag_eff->Get("h2_BTaggingEff_csv_med_Eff_c");
       h_btag_eff_udsg_temp = (TH2D*) f_btag_eff->Get("h2_BTaggingEff_csv_med_Eff_udsg");
-
       h_btag_eff_b_loose_temp = (TH2D*) f_btag_eff->Get("h2_BTaggingEff_csv_loose_Eff_b");
       h_btag_eff_c_loose_temp = (TH2D*) f_btag_eff->Get("h2_BTaggingEff_csv_loose_Eff_c");
       h_btag_eff_udsg_loose_temp = (TH2D*) f_btag_eff->Get("h2_BTaggingEff_csv_loose_Eff_udsg");
@@ -678,7 +546,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
     jets.InitBtagSFTool(h_btag_eff_b,h_btag_eff_c,h_btag_eff_udsg, h_btag_eff_b_loose,h_btag_eff_c_loose,h_btag_eff_udsg_loose,skim_isFastsim); 
 
   //
-  // File Loop
+  // Loop over the trees
   //
 
   while ( (currentFile = (TFile*)fileIter.Next()) ) { 
@@ -696,40 +564,29 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
       cout << "This file seems to have a badrawMET, thus MET needs to be recalculated" << endl;
       isbadrawMET = true;
     }
-
     //
     // Loop over Events in current file
     //
     unsigned int nEventsTree = tree->GetEntriesFast();
 
     for(unsigned int evt = 0; evt < nEventsTree; evt++){
-
-      //
       // Get Event Content
-      //
       nEvents_processed++;
       if(nEvents_processed >= nEventsToDo) break;
       cms3.GetEntry(evt);
 
-      //
-      // Progress
-      //
+      // Progress bar
       CMS3::progress(nEvents_processed, nEventsToDo);
 
-      //
       // Intialize Baby NTuple Branches
-      //
       InitBabyNtuple();
 
-      //
       // calculate sum of weights and save them in a hisogram.
-      //      
       float pdf_weight_up = 1;
       float pdf_weight_down = 1;
       float sum_of_weights= 0;
       float average_of_weights= 0;
-
-     counterhist->Fill(22,1.);
+      counterhist->Fill(22,1.);
      if(!evt_isRealData()){
        //error on pdf replicas
       if(genweights().size()>109){ 
@@ -796,7 +653,6 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 	  if(sparm_names().at(nsparm).Contains("mLSP")) StopEvt.mass_lsp = sparm_values().at(nsparm);
           if(sparm_names().at(nsparm).Contains("mGl")) StopEvt.mass_gluino = sparm_values().at(nsparm);
 	}
-        //if(!(StopEvt.mass_chargino-mass_chargino < 0.1) || !(StopEvt.mass_lsp-mass_lsp < 0.1)) continue;
 	if(genps_weight()>0) histNEvts->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,1);
 	else if(genps_weight()<0) histNEvts->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,-1);
 	StopEvt.xsec = hxsec->GetBinContent(hxsec->FindBin(StopEvt.mass_stop));
@@ -847,16 +703,10 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
       int nLepsHardProcess=0;
       int nNusHardProcess=0;
 
-      bool ee0lep=false;
-      bool ee1lep=false;
-      bool ge2lep=false;
-      bool zToNuNu=false;
+      bool ee0lep(false), ee1lep(false), ge2lep(false), zToNuNu(false);
 
       TString thisFile = chain->GetFile()->GetName();
-      bool isstopevent = false;
-      bool istopevent = false;
-      bool isWevent = false;
-      bool isZevent = false;
+      bool isstopevent(false), istopevent(false),isWevent(false),isZevent(false);
       vector<LorentzVector> genpnotISR; genpnotISR.clear();
 
       if(thisFile.Contains("DYJets") || thisFile.Contains("ZJets") ||
@@ -1976,7 +1826,6 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
       // IsoTracks (Charged pfLeptons and pfChargedHadrons)
       //
       if(debug)      std::cout << "[babymaker::laooper]: filling isotrack vars  LINE:" <<__LINE__ << std::endl;
-      int vetotracks = 0;
       int vetotracks_v2 = 0;
       int vetotracks_v3 = 0;
       for (unsigned int ipf = 0; ipf < pfcands_p4().size(); ipf++) {
@@ -2231,7 +2080,6 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
         StopEvt.mindphi_met_j1_j2_rl_jdown = getMinDphi(StopEvt.pfmet_phi_rl_jdown,jets_jdown.ak4pfjets_p4.at(0),jets_jdown.ak4pfjets_p4.at(1));
       }
       if(!(StopEvt.pfmet >= skim_met) && !(StopEvt.pfmet_rl >= skim_met) && !(StopEvt.pfmet_rl_jup >= skim_met) && !(StopEvt.pfmet_rl_jdown >= skim_met) && !(StopEvt.pfmet_jup >= skim_met) && !(StopEvt.pfmet_jdown >= skim_met)) continue;
-      //if(!(StopEvt.pfmet >= skim_met)) continue;
       nEvents_pass_skim_met++;
       //----------------------------------------------//
       // Trigger 				      //
@@ -2259,11 +2107,8 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 	StopEvt.HLT_Photon175 = passHLTTriggerPattern("HLT_Photon175_v");
 	StopEvt.HLT_Photon165_HE10 = passHLTTriggerPattern("HLT_Photon165_HE10_v");
       }
-      //
       // Fill Tree
-      //
       BabyTree->Fill();
-    
     }//close event loop
     file.Close();
   }//close file loop
@@ -2271,25 +2116,12 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
   BabyFile->cd();
   BabyTree->Write();
   counterhist->Write();
-  if(skim_isSignalFromFileName){
-    counterhistSig->Write();
-    histNEvts->Write();
-  }
+  if(skim_isSignalFromFileName){   counterhistSig->Write(); histNEvts->Write(); }
   BabyFile->Close();
-  //
   // clean up
-  //
-  if(skim_isSignalFromFileName) {
-    fxsec->Close();
-    delete fxsec;
-  }
-  if(!skim_isDataFromFileName){
-    pileupfile->Close();
-    delete pileupfile;
-  }
-  if (skim_applyBtagSFs) {
-    jets.deleteBtagSFTool();
-  }
+  if(skim_isSignalFromFileName) { fxsec->Close(); delete fxsec; }
+  if(!skim_isDataFromFileName)  { pileupfile->Close(); delete pileupfile; }
+  if (skim_applyBtagSFs)     jets.deleteBtagSFTool();
 
   if( !skim_isDataFromFileName && (skim_applyLeptonSFs || skim_applyVetoLeptonSFs) ){
     f_el_SF->Close();       f_el_FS_ID->Close();    f_el_FS_Iso->Close();
@@ -2297,9 +2129,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
     f_mu_SF_veto_iso->Close();    f_mu_FS_ID->Close();    f_mu_FS_Iso->Close();
     f_vetoLep_eff->Close();
   }
-  //
   // Benchmarking
-  //
   bmark->Stop("benchmark");
   cout << endl;
   cout << "Wrote babies into file " << BabyFile->GetName() << endl;

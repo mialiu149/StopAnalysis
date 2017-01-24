@@ -9,21 +9,13 @@
 #include <utility>
 #include <assert.h>
 #include "TH2F.h"
+#include "TH3D.h"
 
 #include "JetCorrector.h"
 #include "JetSelections.h"
 #include "jetcorr/FactorizedJetCorrector.h"
 #include "jetcorr/JetCorrectionUncertainty.h"
 #include "btagsf/BTagCalibrationStandalone.h"
-/*
-#ifndef JETCORR_INCL
-#define JETCORR_INCL
-#include "../CORE/Tools/jetcorr/Utilities.icc"
-#include "../CORE/Tools/jetcorr/JetCorrectionUncertainty.icc"
-#include "../CORE/Tools/jetcorr/SimpleJetCorrectionUncertainty.icc"
-#endif
-*/
-
 using namespace std;
 
 typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > LorentzVector;
@@ -84,5 +76,6 @@ bool CompareIndexValueGreatest(const std::pair<double, int>& firstElem, const st
 bool CompareIndexValueSmallest(const std::pair<double, int>& firstElem, const std::pair<double, int>& secondElem) ;
 void passesBaselineCuts(int njets, int nbtag, float met, float ht, int ngoodlep, int ngoodvertex);
 void doubleSysError(TH2D* hist);
-
+void setcounterLabel(TH1D* hist, string* labels);
+void setcounterLabel3D(TH3D* hist, string* labels);
 #endif
