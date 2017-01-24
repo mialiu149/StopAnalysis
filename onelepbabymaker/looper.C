@@ -2089,9 +2089,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 	   Tracks.highPtPFcands_pdgId.push_back ( cms3.pfcands_particleId().at(ipf));
 	   Tracks.highPtPFcands_mcMatchId.push_back ( 0 );
 	   Tracks.nhighPtPFcands++;
-             
 	}  
-	
       }//saveHighPtPFcands
 
       if(debug)      std::cout << "[babymaker::looper]: updating geninfo for recoleptons LINE:" <<__LINE__ << std::endl;
@@ -2180,16 +2178,13 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 	  // if lep2 is still unmatched, fill with closest match, if possible
 	  if( lep2_match_idx<0 && min_dr_lep2_idx>0 ) gen_leps.FillCommon(min_dr_lep2_idx);
 	}
-
       } // end if not data      
 
+      //-----------------------------------------------------------------------------------//
       //////////////// calculate new met variable with the 2nd lepton removed
-      float new_pfmet_x = StopEvt.pfmet * std::cos(StopEvt.pfmet_phi);
-      float new_pfmet_y = StopEvt.pfmet * std::sin(StopEvt.pfmet_phi);
-        
-      //
-      // remove the second lepton, iso track, or tau from the MET
-      //
+      float new_pfmet_x = 0;
+      float new_pfmet_y = 0;
+      // if fail the vetos, sum up second lepton, iso track, or tau 4 momentum
       if (nVetoLeptons > 1) {
         new_pfmet_x += lep2.p4.px();
         new_pfmet_y += lep2.p4.py();
@@ -2226,57 +2221,49 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
       }
       else
         ;
-
+      // add the subtract back to the met.
       float new_pfmet_x_jup = new_pfmet_x + (StopEvt.pfmet_jup * std::cos(StopEvt.pfmet_phi_jup));
       float new_pfmet_y_jup = new_pfmet_y + (StopEvt.pfmet_jup * std::sin(StopEvt.pfmet_phi_jup));
       float new_pfmet_x_jdown = new_pfmet_x + (StopEvt.pfmet_jdown * std::cos(StopEvt.pfmet_phi_jdown));
       float new_pfmet_y_jdown = new_pfmet_y + (StopEvt.pfmet_jdown * std::sin(StopEvt.pfmet_phi_jdown));
-
       new_pfmet_x += StopEvt.pfmet * std::cos(StopEvt.pfmet_phi);
       new_pfmet_y += StopEvt.pfmet * std::sin(StopEvt.pfmet_phi);
-      //
-      // calclate new met quantities
-      //
+       
       StopEvt.pfmet_rl     = std::sqrt(new_pfmet_x*new_pfmet_x + new_pfmet_y*new_pfmet_y);
       StopEvt.pfmet_phi_rl = std::atan2(new_pfmet_y, new_pfmet_x);              
+      StopEvt.pfmet_rl_jup     = std::sqrt(new_pfmet_x_jup*new_pfmet_x_jup + new_pfmet_y_jup*new_pfmet_y_jup);
+      StopEvt.pfmet_phi_rl_jup = std::atan2(new_pfmet_y_jup, new_pfmet_x_jup);
+      StopEvt.pfmet_rl_jdown     = std::sqrt(new_pfmet_x_jdown*new_pfmet_x_jdown + new_pfmet_y_jdown*new_pfmet_y_jdown);
+      StopEvt.pfmet_phi_rl_jdown = std::atan2(new_pfmet_y_jdown, new_pfmet_x_jdown);
+      //
+      // calclate other quantities with new met.
+      //
       if(debug)      std::cout << "[babymaker::looper]: filling reclculated mt etc LINE:" <<__LINE__ << std::endl;
       if (nVetoLeptons > 0) {
         StopEvt.mt_met_lep_rl = calculateMt(lep1.p4, StopEvt.pfmet_rl, StopEvt.pfmet_phi_rl);
         StopEvt.MT2W_rl = CalcMT2W_(mybjets,myaddjets,lep1.p4,StopEvt.pfmet_rl, StopEvt.pfmet_phi_rl);
         StopEvt.topnessMod_rl = CalcTopness_(1,StopEvt.pfmet_rl,StopEvt.pfmet_phi_rl,lep1.p4,mybjets,myaddjets);
-      }
-      
-      if(jets.ngoodjets > 1) StopEvt.mindphi_met_j1_j2_rl = getMinDphi(StopEvt.pfmet_phi_rl,jets.ak4pfjets_p4.at(0),jets.ak4pfjets_p4.at(1));
       //JEC up
-      StopEvt.pfmet_rl_jup     = std::sqrt(new_pfmet_x_jup*new_pfmet_x_jup + new_pfmet_y_jup*new_pfmet_y_jup);
-      StopEvt.pfmet_phi_rl_jup = std::atan2(new_pfmet_y_jup, new_pfmet_x_jup);
-
-      if (nVetoLeptons > 0) {
         StopEvt.mt_met_lep_rl_jup = calculateMt(lep1.p4, StopEvt.pfmet_rl_jup, StopEvt.pfmet_phi_rl_jup);
         StopEvt.MT2W_rl_jup = CalcMT2W_(mybjets_jup,myaddjets_jup,lep1.p4,StopEvt.pfmet_rl_jup, StopEvt.pfmet_phi_rl_jup);
         StopEvt.topnessMod_rl_jup = CalcTopness_(1,StopEvt.pfmet_rl_jup,StopEvt.pfmet_phi_rl_jup,lep1.p4,mybjets_jup,myaddjets_jup);
-      }
-
-      if(jets_jup.ak4pfjets_p4.size()>1) StopEvt.mindphi_met_j1_j2_rl_jup = getMinDphi(StopEvt.pfmet_phi_rl_jup,jets_jup.ak4pfjets_p4.at(0),jets_jup.ak4pfjets_p4.at(1));
-
       //JEC down
-      StopEvt.pfmet_rl_jdown     = std::sqrt(new_pfmet_x_jdown*new_pfmet_x_jdown + new_pfmet_y_jdown*new_pfmet_y_jdown);
-      StopEvt.pfmet_phi_rl_jdown = std::atan2(new_pfmet_y_jdown, new_pfmet_x_jdown);
-      
-      if (nVetoLeptons > 0) {
         StopEvt.mt_met_lep_rl_jdown = calculateMt(lep1.p4, StopEvt.pfmet_rl_jdown, StopEvt.pfmet_phi_rl_jdown);
         StopEvt.MT2W_rl_jdown = CalcMT2W_(mybjets_jdown,myaddjets_jdown,lep1.p4,StopEvt.pfmet_rl_jdown, StopEvt.pfmet_phi_rl_jdown);
         StopEvt.topnessMod_rl_jdown = CalcTopness_(1,StopEvt.pfmet_rl_jdown,StopEvt.pfmet_phi_rl_jdown,lep1.p4,mybjets_jdown,myaddjets_jdown);
       }
-
-      if(jets_jdown.ak4pfjets_p4.size()>1) StopEvt.mindphi_met_j1_j2_rl_jdown = getMinDphi(StopEvt.pfmet_phi_rl_jdown,jets_jdown.ak4pfjets_p4.at(0),jets_jdown.ak4pfjets_p4.at(1));
-
+      
+      if(jets.ngoodjets > 1) {
+        StopEvt.mindphi_met_j1_j2_rl = getMinDphi(StopEvt.pfmet_phi_rl,jets.ak4pfjets_p4.at(0),jets.ak4pfjets_p4.at(1));
+        StopEvt.mindphi_met_j1_j2_rl_jup = getMinDphi(StopEvt.pfmet_phi_rl_jup,jets_jup.ak4pfjets_p4.at(0),jets_jup.ak4pfjets_p4.at(1));
+        StopEvt.mindphi_met_j1_j2_rl_jdown = getMinDphi(StopEvt.pfmet_phi_rl_jdown,jets_jdown.ak4pfjets_p4.at(0),jets_jdown.ak4pfjets_p4.at(1));
+      }
       if(!(StopEvt.pfmet >= skim_met) && !(StopEvt.pfmet_rl >= skim_met) && !(StopEvt.pfmet_rl_jup >= skim_met) && !(StopEvt.pfmet_rl_jdown >= skim_met) && !(StopEvt.pfmet_jup >= skim_met) && !(StopEvt.pfmet_jdown >= skim_met)) continue;
+      //if(!(StopEvt.pfmet >= skim_met)) continue;
       nEvents_pass_skim_met++;
-      ///////////////////////////////////////////////////////// 
-      //
-      // Trigger Information
-      //
+      //----------------------------------------------//
+      // Trigger 				      //
+      //----------------------------------------------//
       if(debug)      std::cout << "[babymaker::looper]: filling HLT vars" << std::endl;
       //////////////// 2015 Run II  //////////////////////
       if(!skim_isSignalFromFileName){
@@ -2309,9 +2296,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
     file.Close();
   }//close file loop
   // Write and Close baby file
-  //
   BabyFile->cd();
-   // save counter histogram
   BabyTree->Write();
   counterhist->Write();
   if(skim_isSignalFromFileName){
@@ -2320,7 +2305,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
   }
   BabyFile->Close();
   //
-  // Some clean up
+  // clean up
   //
   if(skim_isSignalFromFileName) {
     fxsec->Close();
@@ -2335,15 +2320,9 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
   }
 
   if( !skim_isDataFromFileName && (skim_applyLeptonSFs || skim_applyVetoLeptonSFs) ){
-    f_el_SF->Close();
-    f_mu_SF_id->Close();
-    f_mu_SF_iso->Close();
-    f_mu_SF_veto_id->Close();
-    f_mu_SF_veto_iso->Close();
-    f_el_FS_ID->Close();
-    f_el_FS_Iso->Close();
-    f_mu_FS_ID->Close();
-    f_mu_FS_Iso->Close();
+    f_el_SF->Close();       f_el_FS_ID->Close();    f_el_FS_Iso->Close();
+    f_mu_SF_id->Close();    f_mu_SF_iso->Close();   f_mu_SF_veto_id->Close();
+    f_mu_SF_veto_iso->Close();    f_mu_FS_ID->Close();    f_mu_FS_Iso->Close();
     f_vetoLep_eff->Close();
   }
   //
@@ -2358,8 +2337,8 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
   cout << "Events with at least " << skim_nGoodLep << " Good Lepton   " << nEvents_pass_skim_nGoodLep << endl;
   cout << "Events with at least " << skim_nJets << " Good Jets     " << nEvents_pass_skim_nJets << endl;
   cout << "Events with at least " << skim_nBJets << " Good BJets   " << nEvents_pass_skim_nBJets << endl;
-  cout << "Events with MET > " << skim_met << " GeV             " << nEvents_pass_skim_met << endl;
   cout << "Events passing 2nd Lep Veto " << skim_2ndlepveto << "    " << nEvents_pass_skim_2ndlepVeto << endl;
+  cout << "Events with MET > " << skim_met << " GeV             " << nEvents_pass_skim_met << endl;
   cout << "-----------------------------" << endl;
   cout << "CPU  Time:   " << Form( "%.01f", bmark->GetCpuTime("benchmark")  ) << endl;                                                                                          
   cout << "Real Time:   " << Form( "%.01f", bmark->GetRealTime("benchmark") ) << endl;
