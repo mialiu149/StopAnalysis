@@ -545,14 +545,10 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
  
     jets.InitBtagSFTool(h_btag_eff_b,h_btag_eff_c,h_btag_eff_udsg, h_btag_eff_b_loose,h_btag_eff_c_loose,h_btag_eff_udsg_loose,skim_isFastsim); 
 
-  //
   // Loop over the trees
-  //
 
   while ( (currentFile = (TFile*)fileIter.Next()) ) { 
-    //
     // Get File Content
-    //
     TFile file( currentFile->GetTitle() );
     TTree *tree = (TTree*)file.Get("Events");
     cms3.Init(tree);
@@ -565,22 +561,16 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
       isbadrawMET = true;
     }
     //
-    // Loop over Events in current file
+    // Loop over Events 
     //
     unsigned int nEventsTree = tree->GetEntriesFast();
 
     for(unsigned int evt = 0; evt < nEventsTree; evt++){
-      // Get Event Content
       nEvents_processed++;
       if(nEvents_processed >= nEventsToDo) break;
-      cms3.GetEntry(evt);
-
-      // Progress bar
-      CMS3::progress(nEvents_processed, nEventsToDo);
-
-      // Intialize Baby NTuple Branches
-      InitBabyNtuple();
-
+      cms3.GetEntry(evt);  // Get Event Content
+      CMS3::progress(nEvents_processed, nEventsToDo);    // Progress bar
+      InitBabyNtuple(); // Intialize Baby NTuple Branches
       // calculate sum of weights and save them in a hisogram.
       float pdf_weight_up = 1;
       float pdf_weight_down = 1;
@@ -594,11 +584,9 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
            average_of_weights += cms3.genweights().at(ipdf);        
            }// average of weights
          average_of_weights =  average_of_weights/100;
- 
         for(int ipdf=9;ipdf<109;ipdf++){
            sum_of_weights += (cms3.genweights().at(ipdf)- average_of_weights)*(cms3.genweights().at(ipdf)-average_of_weights);          
           }//std of weights.     
-
           pdf_weight_up = (average_of_weights+sqrt(sum_of_weights/99)); 
           pdf_weight_down = (average_of_weights-sqrt(sum_of_weights/99)); 
           StopEvt.pdf_up_weight = pdf_weight_up;
@@ -619,21 +607,17 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
         }
       }
       //////////////////////////////////////////
-      // If data, check against good run list//
-      /////////////////////////////////////////
+      //              good run list           //
+      //////////////////////////////////////////
       if( evt_isRealData() && !goodrun(evt_run(), evt_lumiBlock()) ) continue;
       if( evt_isRealData() ) {
 	DorkyEventIdentifier id(evt_run(), evt_event(), evt_lumiBlock());
 	if (is_duplicate(id) ) continue;
       }
 
-      //
-      // Fill Event Variables
-      //
       if(debug)      std::cout << "[babymaker::looper]: filling event vars LINE:" <<__LINE__ << std::endl;
-      StopEvt.FillCommon(file.GetName()); 
+      StopEvt.FillCommon(file.GetName()); // Fill Event Variables 
       if(debug)      std::cout << "[babymaker::looper]: filling event vars completed LINE:" <<__LINE__ << std::endl; 
-      //dumpDocLines();
 
       if(!StopEvt.is_data){
 	StopEvt.weight_PU     = hPU    ->GetBinContent(hPU    ->FindBin(StopEvt.pu_ntrue));
@@ -645,8 +629,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
       if(skim_isSignalFromFileName){
         float mass_chargino = 250;
         float mass_lsp = 75;
-        
-	//get stop and lsp mass from sparms
+	//get susy particle masses from sparms
 	for(unsigned int nsparm = 0; nsparm<sparm_names().size(); ++nsparm){
 	  if(sparm_names().at(nsparm).Contains("mCh")) StopEvt.mass_chargino = sparm_values().at(nsparm);
           StopEvt.mass_stop = StopEvt.mass_chargino;// modification for whmet
@@ -696,35 +679,20 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
       if(debug) std::cout << "[babymaker::looper]: filling gen particles vars  LINE:" <<__LINE__<< std::endl;
 
       //ttbar counters using neutrinos:
-      int n_nutaufromt=0;
-      int n_nuelfromt=0;
-      int n_numufromt=0;
-
-      int nLepsHardProcess=0;
-      int nNusHardProcess=0;
-
+      int n_nutaufromt(0), n_nuelfromt(0),n_numufromt(0),nLepsHardProcess(0), nNusHardProcess(0);
       bool ee0lep(false), ee1lep(false), ge2lep(false), zToNuNu(false);
+      bool isstopevent(false), istopevent(false),isWevent(false),isZevent(false);
 
       TString thisFile = chain->GetFile()->GetName();
-      bool isstopevent(false), istopevent(false),isWevent(false),isZevent(false);
       vector<LorentzVector> genpnotISR; genpnotISR.clear();
 
-      if(thisFile.Contains("DYJets") || thisFile.Contains("ZJets") ||
-	 thisFile.Contains("ZZ") || thisFile.Contains("WZ") ||
-	 thisFile.Contains("TTZ") || thisFile.Contains("tZq") )
+      if(thisFile.Contains("DYJets") || thisFile.Contains("ZJets") || thisFile.Contains("ZZ") || thisFile.Contains("WZ") || thisFile.Contains("TTZ") || thisFile.Contains("tZq") )
 	isZevent = true;
-      if(thisFile.Contains("WJets") ||
-	 thisFile.Contains("WW") || thisFile.Contains("WZ") ||
-	 thisFile.Contains("TTW") )
-	isWevent = true;
-      if(thisFile.Contains("TTJets") || thisFile.Contains("TTTo2L2Nu") || thisFile.Contains("TT_") ||
-	 thisFile.Contains("ST_") || thisFile.Contains("tZq") ||
-	 thisFile.Contains("TTW") || thisFile.Contains("TTZ") )
-	istopevent = true;
-      if(skim_isSignalFromFileName ||
-	 thisFile.Contains("T2tt") || thisFile.Contains("T2tb") || thisFile.Contains("T2bW") || thisFile.Contains("TChWH") )
+      if(thisFile.Contains("WJets") ||thisFile.Contains("WW") || thisFile.Contains("WZ") || thisFile.Contains("TTW") ) isWevent = true;
+      if(thisFile.Contains("TTJets") || thisFile.Contains("TTTo2L2Nu") || thisFile.Contains("TT_") || thisFile.Contains("ST_") || thisFile.Contains("tZq") ||
+	 thisFile.Contains("TTW") || thisFile.Contains("TTZ") )istopevent = true;
+      if(skim_isSignalFromFileName || thisFile.Contains("T2tt") || thisFile.Contains("T2tb") || thisFile.Contains("T2bW") || thisFile.Contains("TChWH") )
 	isstopevent = true;
-
       //gen particles
       if (!evt_isRealData()){
 	for(unsigned int genx = 0; genx < genps_p4().size() ; genx++){
@@ -2122,7 +2090,6 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
   if(skim_isSignalFromFileName) { fxsec->Close(); delete fxsec; }
   if(!skim_isDataFromFileName)  { pileupfile->Close(); delete pileupfile; }
   if (skim_applyBtagSFs)     jets.deleteBtagSFTool();
-
   if( !skim_isDataFromFileName && (skim_applyLeptonSFs || skim_applyVetoLeptonSFs) ){
     f_el_SF->Close();       f_el_FS_ID->Close();    f_el_FS_Iso->Close();
     f_mu_SF_id->Close();    f_mu_SF_iso->Close();   f_mu_SF_veto_id->Close();
