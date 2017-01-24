@@ -61,7 +61,7 @@ babyMaker::babyMaker(){
    gen_susy = GenParticleTree("susy_");
 }
 
-// I don't like this function
+// I don't like this function, can initialize as the property of the class....
 void babyMaker::setSkimVariables(bool isDataFromFileName ,bool isSignalFromFileName, int nvtx, float met, int nGoodLep, float goodLep_el_pt, float goodLep_el_eta, float goodLep_mu_pt, float goodLep_mu_eta, float looseLep_el_pt, float looseLep_el_eta, float looseLep_mu_pt, float looseLep_mu_eta, float vetoLep_el_pt, float vetoLep_el_eta, float vetoLep_mu_pt, float vetoLep_mu_eta, bool apply2ndlepveto, int njets, float jet_pt, float jet_eta, float jet_ak8_pt, float jet_ak8_eta, int nbjets, int nphs, float phs_pt, float phs_eta, bool applyJEC, int JES_type_central_up_down,   bool applyLeptonSFs, bool applyVetoLeptonSFs, bool applyBtagSFs, bool isFastsim,bool filltaus_, bool filltracks_, bool fillZll_, bool fillPhoton_,bool fillMETfilt_, bool fill2ndlep_, bool fillExtraEvtVar_, bool fillAK4EF_, bool fillAK4_Other_, bool fillOverleps_, bool fillAK4Synch_, bool fillElID_, bool fillIso_, bool fillLepSynch_){
 
   skim_nvtx            = nvtx;
@@ -160,28 +160,13 @@ void babyMaker::MakeBabyNtuple(std::string output_name){
 }
 
 void babyMaker::InitBabyNtuple(){
-  StopEvt.Reset();
-  lep1.Reset();
-  lep2.Reset();
-  jets.Reset();
-  jets_jup.Reset();
-  jets_jdown.Reset();
-  ph.Reset();
-  Taus.Reset();
-  Tracks.Reset();
-  gen_leps.Reset();
-  gen_nus.Reset();
-  gen_qs.Reset();
-  gen_bosons.Reset();
-  gen_susy.Reset();
+  StopEvt.Reset(); lep1.Reset(); lep2.Reset(); jets.Reset();  jets_jup.Reset();  jets_jdown.Reset();  ph.Reset();
+  Taus.Reset();  Tracks.Reset();  gen_leps.Reset();  gen_nus.Reset();  gen_qs.Reset();  gen_bosons.Reset();  gen_susy.Reset();
 } 
-//================//
-// Main function  //
 //================//
 int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::string path){
   // Set output file path
-  babypath = path;
-  output = output_name;
+  babypath = path; output = output_name;
   // Benchmark
   TBenchmark *bmark = new TBenchmark();
   bmark->Start("benchmark");
@@ -1676,11 +1661,8 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 	}//end of Zll filling
       }//end of Zll
     }
- 
+     // Photon Event Variables
     if(fillPhoton){ 
-     //
-      // Photon Event Variables
-      //
       if(StopEvt.ph_selectedidx>=0){
 	int oljind = ph.overlapJetId.at(StopEvt.ph_selectedidx);
 	double phmetpx = ( StopEvt.pfmet * cos(StopEvt.pfmet_phi) ) + ( ph.p4.at(StopEvt.ph_selectedidx).Px() );
@@ -1765,7 +1747,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
       }//end of photon additions
    } 
       //
-      // Tau Selection
+      // Loop over Taus to check tau veto candiates.
       //
       if(debug)      std::cout << "[babymaker::looper]: tau  vars. LINE:" <<__LINE__<< std::endl;
       int vetotaus=0;
@@ -1781,26 +1763,42 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 	
 	Taus.FillCommon(iTau, tau_pt, tau_eta);
 	if(isVetoTau(iTau, lep1.p4, lep1.charge)){
-	  Taus.tau_isVetoTau.push_back(true);
-	  vetotaus++;
+	  Taus.tau_isVetoTau.push_back(true);  vetotaus++;
 	}else Taus.tau_isVetoTau.push_back(false);
       }
 
       if(vetotaus<1) StopEvt.PassTauVeto = true;
       else StopEvt.PassTauVeto = false;
       Taus.ngoodtaus = vetotaus;
-
       //
-      // IsoTracks (Charged pfLeptons and pfChargedHadrons)
+      // Loop over IsoTracks (Charged pfLeptons and pfChargedHadrons)
       //
       if(debug)      std::cout << "[babymaker::laooper]: filling isotrack vars  LINE:" <<__LINE__ << std::endl;
-      int vetotracks_v2 = 0;
-      int vetotracks_v3 = 0;
+      int vetotracks_v2(0), vetotracks_v3(0);
       for (unsigned int ipf = 0; ipf < pfcands_p4().size(); ipf++) {
-	
+	  float cand_pt = cms3.pfcands_p4().at(ipf).pt();
+          if (debug) cout << "before highPtPFcands" << endl;
+          if (saveHighPtPFcands) {
+	  //HIGH-PT PF CANDS
+	   Tracks.nhighPtPFcands = 0;
+	   float absiso  = TrackIso(ipf, 0.3, 0.0, true, false);
+	   float an04 = PFCandRelIsoAn04(ipf);	  
+	   if((cand_pt > 50) || (cand_pt > 300 && abs(cms3.pfcands_particleId().at(ipf)) == 13)){
+	     Tracks.highPtPFcands_pt.push_back    ( cand_pt                          );
+	     Tracks.highPtPFcands_eta.push_back   ( cms3.pfcands_p4().at(ipf).eta()  );
+	     Tracks.highPtPFcands_phi.push_back   ( cms3.pfcands_p4().at(ipf).phi()  );
+	     Tracks.highPtPFcands_mass.push_back  ( cms3.pfcands_mass().at(ipf)      );
+	     Tracks.highPtPFcands_absIso.push_back( absiso                           );
+	     Tracks.highPtPFcands_relIsoAn04.push_back( an04                         );
+	     Tracks.highPtPFcands_dz.push_back    ( cms3.pfcands_dz().at(ipf)        );
+	     Tracks.highPtPFcands_pdgId.push_back ( cms3.pfcands_particleId().at(ipf));
+	     Tracks.highPtPFcands_mcMatchId.push_back ( 0 );
+	     Tracks.nhighPtPFcands++;
+            }
+           }//saveHighPtPFcands
 	//selections of pf candidates
 	if(pfcands_charge().at(ipf) == 0) continue;
-	if(pfcands_p4().at(ipf).pt() < 5) continue;
+	if(cand_pt < 5) continue;
 	if(fabs(pfcands_p4().at(ipf).eta()) > 2.4 ) continue;
 	if(fabs(pfcands_dz().at(ipf)) > 0.1) continue;
 	
@@ -1811,76 +1809,33 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 	if(nVetoLeptons>1){
           if(ROOT::Math::VectorUtil::DeltaR(pfcands_p4().at(ipf), lep2.p4)<0.1) continue;
 	}
-	
 	Tracks.FillCommon(ipf);
-	
+	LorentzVector temp( -99.9, -99.9, -99.9, -99.9 );
 	// 13 TeV Track Isolation Configuration, pfLep and pfCH
 	if(nVetoLeptons>0){
 	  if(isVetoTrack_v2(ipf, lep1.p4, lep1.charge)){
 	    Tracks.isoTracks_isVetoTrack_v2.push_back(true);
 	    vetotracks_v2++;
 	  }else Tracks.isoTracks_isVetoTrack_v2.push_back(false);
-	}
-	else{
-	  LorentzVector temp( -99.9, -99.9, -99.9, -99.9 );
-	  if(isVetoTrack_v2(ipf, temp, 0)){
-	    Tracks.isoTracks_isVetoTrack_v2.push_back(true);
-	    vetotracks_v2++;
-	  }else Tracks.isoTracks_isVetoTrack_v2.push_back(false);
-	}
-	
-	// 13 TeV Track Isolation Configuration, pfCH
-	if(nVetoLeptons>0){
 	  if(isVetoTrack_v3(ipf, lep1.p4, lep1.charge)){
 	    Tracks.isoTracks_isVetoTrack_v3.push_back(true);
 	    vetotracks_v3++;
 	  }else Tracks.isoTracks_isVetoTrack_v3.push_back(false);
 	}
 	else{
-	  LorentzVector temp( -99.9, -99.9, -99.9, -99.9 );
+	  if(isVetoTrack_v2(ipf, temp, 0)){
+	    Tracks.isoTracks_isVetoTrack_v2.push_back(true);
+	    vetotracks_v2++;
+	  }else Tracks.isoTracks_isVetoTrack_v2.push_back(false);
 	  if(isVetoTrack_v3(ipf, temp, 0)){
 	    Tracks.isoTracks_isVetoTrack_v3.push_back(true);
 	    vetotracks_v3++;
 	  }else Tracks.isoTracks_isVetoTrack_v3.push_back(false);
 	}
       } // end loop over pfCands
-      if(vetotracks_v3<1) StopEvt.PassTrackVeto = true;
-      else StopEvt.PassTrackVeto = false;
-    
-      if(skim_2ndlepveto){
-            if(StopEvt.nvetoleps!=1) continue;
-            if(!StopEvt.PassTrackVeto) continue;
-            if(!StopEvt.PassTauVeto) continue;
-      }
+      if(vetotracks_v3<1) StopEvt.PassTrackVeto = true; else StopEvt.PassTrackVeto = false;
+      if(skim_2ndlepveto && !(StopEvt.nvetoleps!=1&& StopEvt.PassTrackVeto&& StopEvt.PassTauVeto)) continue;
       nEvents_pass_skim_2ndlepVeto++;
-
-      if (debug) cout << "before highPtPFcands" << endl;
-
-      if (saveHighPtPFcands) {
-	//HIGH-PT PF CANDS
-	Tracks.nhighPtPFcands = 0;
-	for (unsigned int ipf = 0; ipf < pfcands_p4().size(); ipf++) {
-	  
-	  float cand_pt = cms3.pfcands_p4().at(ipf).pt();
-	  if(cand_pt < 50) continue;
-	  if(cand_pt < 300 && !(abs(cms3.pfcands_particleId().at(ipf)) == 13) ) continue;
-	  
-	  float absiso  = TrackIso(ipf, 0.3, 0.0, true, false);
-	  float an04 = PFCandRelIsoAn04(ipf);
-	  
-	   Tracks.highPtPFcands_pt.push_back    ( cand_pt                          );
-	   Tracks.highPtPFcands_eta.push_back   ( cms3.pfcands_p4().at(ipf).eta()  );
-	   Tracks.highPtPFcands_phi.push_back   ( cms3.pfcands_p4().at(ipf).phi()  );
-	   Tracks.highPtPFcands_mass.push_back  ( cms3.pfcands_mass().at(ipf)      );
-	   Tracks.highPtPFcands_absIso.push_back( absiso                           );
-	   Tracks.highPtPFcands_relIsoAn04.push_back( an04                         );
-	   Tracks.highPtPFcands_dz.push_back    ( cms3.pfcands_dz().at(ipf)        );
-	   Tracks.highPtPFcands_pdgId.push_back ( cms3.pfcands_particleId().at(ipf));
-	   Tracks.highPtPFcands_mcMatchId.push_back ( 0 );
-	   Tracks.nhighPtPFcands++;
-	}  
-      }//saveHighPtPFcands
-
       if(debug)      std::cout << "[babymaker::looper]: updating geninfo for recoleptons LINE:" <<__LINE__ << std::endl;
       // Check that we have the gen leptons matched to reco leptons
       int lep1_match_idx = -99;
@@ -1925,7 +1880,6 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 	    }
 	  }
 	}
-	
 	// If lep1 isn't matched to a lepton already stored, then try to find another match
 	if( (nVetoLeptons>0 && lep1_match_idx<0) ){
 	  for(unsigned int genx = 0; genx < genps_p4().size(); genx++){
@@ -1970,7 +1924,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
       } // end if not data      
 
       //-----------------------------------------------------------------------------------//
-      //////////////// calculate new met variable with the 2nd lepton removed
+      // calculate new met variable with the 2nd lepton removed
       float new_pfmet_x = 0;
       float new_pfmet_y = 0;
       // if fail the vetos, sum up second lepton, iso track, or tau 4 momentum
@@ -2018,11 +1972,11 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
       new_pfmet_x += StopEvt.pfmet * std::cos(StopEvt.pfmet_phi);
       new_pfmet_y += StopEvt.pfmet * std::sin(StopEvt.pfmet_phi);
        
-      StopEvt.pfmet_rl     = std::sqrt(new_pfmet_x*new_pfmet_x + new_pfmet_y*new_pfmet_y);
+      StopEvt.pfmet_rl     = std::sqrt(pow(new_pfmet_x,2) + pow(new_pfmet_y,2));
       StopEvt.pfmet_phi_rl = std::atan2(new_pfmet_y, new_pfmet_x);              
-      StopEvt.pfmet_rl_jup     = std::sqrt(new_pfmet_x_jup*new_pfmet_x_jup + new_pfmet_y_jup*new_pfmet_y_jup);
+      StopEvt.pfmet_rl_jup     = std::sqrt(pow(new_pfmet_x_jup,2) + pow(new_pfmet_y_jup,2));
       StopEvt.pfmet_phi_rl_jup = std::atan2(new_pfmet_y_jup, new_pfmet_x_jup);
-      StopEvt.pfmet_rl_jdown     = std::sqrt(new_pfmet_x_jdown*new_pfmet_x_jdown + new_pfmet_y_jdown*new_pfmet_y_jdown);
+      StopEvt.pfmet_rl_jdown     = std::sqrt(pow(new_pfmet_x_jdown,2) + pow(new_pfmet_y_jdown,2));
       StopEvt.pfmet_phi_rl_jdown = std::atan2(new_pfmet_y_jdown, new_pfmet_x_jdown);
       //
       // calclate other quantities with new met.
@@ -2075,10 +2029,9 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 	StopEvt.HLT_Photon175 = passHLTTriggerPattern("HLT_Photon175_v");
 	StopEvt.HLT_Photon165_HE10 = passHLTTriggerPattern("HLT_Photon165_HE10_v");
       }
-      // Fill Tree
-      BabyTree->Fill();
-    }//close event loop
-    file.Close();
+      BabyTree->Fill();// fill tree
+    }
+    file.Close(); //close event loop
   }//close file loop
   // Write and Close baby file
   BabyFile->cd();
@@ -2089,12 +2042,10 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
   // clean up
   if(skim_isSignalFromFileName) { fxsec->Close(); delete fxsec; }
   if(!skim_isDataFromFileName)  { pileupfile->Close(); delete pileupfile; }
-  if (skim_applyBtagSFs)     jets.deleteBtagSFTool();
-  if( !skim_isDataFromFileName && (skim_applyLeptonSFs || skim_applyVetoLeptonSFs) ){
-    f_el_SF->Close();       f_el_FS_ID->Close();    f_el_FS_Iso->Close();
-    f_mu_SF_id->Close();    f_mu_SF_iso->Close();   f_mu_SF_veto_id->Close();
-    f_mu_SF_veto_iso->Close();    f_mu_FS_ID->Close();    f_mu_FS_Iso->Close();
-    f_vetoLep_eff->Close();
+  if(skim_applyBtagSFs)           jets.deleteBtagSFTool();
+  if(!skim_isDataFromFileName && (skim_applyLeptonSFs || skim_applyVetoLeptonSFs) ){
+    f_el_SF->Close();       f_el_FS_ID->Close();    f_el_FS_Iso->Close(); f_mu_SF_id->Close();    f_mu_SF_iso->Close();   f_mu_SF_veto_id->Close();
+    f_mu_SF_veto_iso->Close();    f_mu_FS_ID->Close();    f_mu_FS_Iso->Close();    f_vetoLep_eff->Close();
   }
   // Benchmarking
   bmark->Stop("benchmark");
