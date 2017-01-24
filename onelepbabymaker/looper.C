@@ -5,8 +5,6 @@
 #include <cmath>
 #include <utility>
 
-#include "looper.h"
-
 #include "TBenchmark.h"
 #include "TChain.h"
 #include "TDirectory.h"
@@ -31,7 +29,7 @@
 #include "MuonSelections.h"//93991
 #include "IsolationTools.h"//93991
 #include "MetSelections.h"
-
+#include "looper.h"
 #include "goodrun.h"
 #include "dorky.cc"
 
@@ -43,33 +41,7 @@ using namespace std;
 using namespace tas;
 using namespace duplicate_removal;
 
-//====================//
-//                    //
-// Utility Structures //
-//                    //
-//====================//
-struct Lepton{
-        int id;
-        int idx;
-        LorentzVector p4;
-        //Lepton(id, idx, p4) {id = id; idx = idx; p4 = p4;}
-};
 
-struct sortbypt{
-  bool operator () (const pair<int, LorentzVector> &v1, const pair<int,LorentzVector> &v2){
-    return v1.second.pt() > v2.second.pt();
-  }
-};
-
-struct sortLepbypt{
-  bool operator () (const Lepton &lep1, const Lepton &lep2){
-    return lep1.p4.pt() > lep2.p4.pt();
-  }
-};
-
-struct sortP4byPt {
-  bool operator () (const LorentzVector &lv1, const LorentzVector &lv2) { return lv1.pt() > lv2.pt(); }
-};
 
 //==============//
 // object trees //

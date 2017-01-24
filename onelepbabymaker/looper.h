@@ -109,7 +109,6 @@ class babyMaker {
     TTree* BabyTree;
     TH1D*  histcounter;
   private:
-
     // Tree Branches
     EventTree StopEvt;
     LeptonTree lep1;
@@ -120,24 +119,11 @@ class babyMaker {
     JetTree jets_jdown;
     TauTree Taus;
     IsoTracksTree Tracks;  
-    //GenParticleTree gen_els;
-    //GenParticleTree gen_mus;
-    //GenParticleTree gen_taus;
     GenParticleTree gen_leps;
     GenParticleTree gen_nus;
-    //GenParticleTree gen_nuels;
-    //GenParticleTree gen_numus;
-    //GenParticleTree gen_nutaus;
     GenParticleTree gen_tops;
-    //GenParticleTree gen_bs;
-    //GenParticleTree gen_cs;
     GenParticleTree gen_qs;
-    //GenParticleTree gen_glus;
     GenParticleTree gen_bosons;
-    //GenParticleTree gen_ws;
-    //GenParticleTree gen_zs;
-    //GenParticleTree gen_phs;
-    //GenParticleTree gen_hs;
     GenParticleTree gen_susy;
     
   // for btag SFs
@@ -157,6 +143,31 @@ class babyMaker {
   
 };
 
+//====================//
+// Utility Structures //
+//====================//
 struct val_err_t { float value; float error; };
 
+struct Lepton{
+        int id;
+        int idx;
+        LorentzVector p4;
+        //Lepton(id, idx, p4) {id = id; idx = idx; p4 = p4;}
+};
+
+struct sortbypt{
+  bool operator () (const pair<int, LorentzVector> &v1, const pair<int,LorentzVector> &v2){
+    return v1.second.pt() > v2.second.pt();
+  }
+};
+
+struct sortLepbypt{
+  bool operator () (const Lepton &lep1, const Lepton &lep2){
+    return lep1.p4.pt() > lep2.p4.pt();
+  }
+};
+
+struct sortP4byPt {
+  bool operator () (const LorentzVector &lv1, const LorentzVector &lv2) { return lv1.pt() > lv2.pt(); }
+};
 #endif
