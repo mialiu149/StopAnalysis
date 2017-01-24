@@ -323,4 +323,11 @@ bool CompareIndexValueSmallest(const std::pair<double, int>& firstElem, const st
   return firstElem.first < secondElem.first;
 }
 
-
+void doubleSysError(TH2D* hist){
+     for(int x=1; x<=(int)hist->GetNbinsX(); x++){
+      for(int y=1; y<=(int)hist->GetNbinsY(); y++){
+          hist->SetBinError(x,y,hist->GetBinError(x,y)*2.0);
+      }
+    }
+return;
+}

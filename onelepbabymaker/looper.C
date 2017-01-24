@@ -212,6 +212,7 @@ void babyMaker::InitBabyNtuple(){
   gen_bosons.Reset();
   gen_susy.Reset();
 } 
+//----- function to double uncertainties-----//
 
 //================//
 // Main function  //
@@ -411,23 +412,10 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
     TH2D *h_mu_SF_iso = (TH2D*)h_mu_SF_iso_temp->Clone("h_mu_SF_iso");
     TH2D *h_mu_SF_ip  = (TH2D*)h_mu_SF_ip_temp->Clone("h_mu_SF_ip");
     // Double unc. on selected muon id sfs, since not for our exact wp
-    for(int x=1; x<=(int)h_mu_SF_id->GetNbinsX(); x++){
-      for(int y=1; y<=(int)h_mu_SF_id->GetNbinsY(); y++){
-	h_mu_SF_id->SetBinError(x,y,h_mu_SF_id->GetBinError(x,y)*2.0);
-      }
-    }
-    // Double unc. on selected muon iso sfs, since not for our exact wp
-    for(int x=1; x<=(int)h_mu_SF_iso->GetNbinsX(); x++){
-      for(int y=1; y<=(int)h_mu_SF_iso->GetNbinsY(); y++){
-	h_mu_SF_iso->SetBinError(x,y,h_mu_SF_iso->GetBinError(x,y)*2.0);
-      }
-    }
-    // Double unc. on selected muon ip sfs, since not for our exact wp
-    for(int x=1; x<=(int)h_mu_SF_ip->GetNbinsX(); x++){
-      for(int y=1; y<=(int)h_mu_SF_ip->GetNbinsY(); y++){
-	h_mu_SF_ip->SetBinError(x,y,h_mu_SF_ip->GetBinError(x,y)*2.0);
-      }
-    }
+    doubleSysError(h_mu_SF_id);
+    doubleSysError(h_mu_SF_iso);
+    doubleSysError(h_mu_SF_ip);
+
     h_mu_SF = (TH2D*)h_mu_SF_id->Clone("h_mu_SF");
     h_mu_SF->Multiply(h_mu_SF_iso);
     h_mu_SF->Multiply(h_mu_SF_ip);
@@ -449,11 +437,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
     TH2D *h_mu_SF_veto_iso = (TH2D*)h_mu_SF_veto_iso_temp->Clone("h_mu_SF_veto_iso");
     TH2D *h_mu_SF_veto_ip  = (TH2D*)h_mu_SF_veto_ip_temp->Clone("h_mu_SF_veto_ip");
     // Double unc. on veto muon ip sfs, since not for our exact wp
-    for(int x=1; x<=(int)h_mu_SF_veto_ip->GetNbinsX(); x++){
-      for(int y=1; y<=(int)h_mu_SF_veto_ip->GetNbinsY(); y++){
-	h_mu_SF_ip->SetBinError(x,y,h_mu_SF_veto_ip->GetBinError(x,y)*2.0);
-      }
-    }
+    doubleSysError(h_mu_SF_veto_ip);
     h_mu_SF_veto = (TH2D*)h_mu_SF_veto_id->Clone("h_mu_SF_veto");
     h_mu_SF_veto->Multiply(h_mu_SF_veto_iso);
     h_mu_SF_veto->Multiply(h_mu_SF_veto_ip);
@@ -476,23 +460,9 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
     TH2D* h_mu_FS_Iso = (TH2D*)h_mu_FS_Iso_temp->Clone("h_mu_FS_Iso");
     TH2D* h_mu_FS_Ip  = (TH2D*)h_mu_FS_Ip_temp->Clone("h_mu_FS_Ip");
     // Double unc. on selected muon FS id sfs, since not for our exact wp
-    for(int x=1; x<=(int)h_mu_FS_ID->GetNbinsX(); x++){
-      for(int y=1; y<=(int)h_mu_FS_ID->GetNbinsY(); y++){
-	h_mu_FS_ID->SetBinError(x,y,h_mu_FS_ID->GetBinError(x,y)*2.0);
-      }
-    }
-    // Double unc. on selected muon FS iso sfs, since not for our exact wp
-    for(int x=1; x<=(int)h_mu_FS_Iso->GetNbinsX(); x++){
-      for(int y=1; y<=(int)h_mu_FS_Iso->GetNbinsY(); y++){
-	h_mu_FS_Iso->SetBinError(x,y,h_mu_FS_Iso->GetBinError(x,y)*2.0);
-      }
-    }
-    // Double unc. on selected muon FS ip sfs, since not for our exact wp
-    for(int x=1; x<=(int)h_mu_FS_Ip->GetNbinsX(); x++){
-      for(int y=1; y<=(int)h_mu_FS_Ip->GetNbinsY(); y++){
-	h_mu_FS_Ip->SetBinError(x,y,h_mu_FS_Ip->GetBinError(x,y)*2.0);
-      }
-    }
+    doubleSysError(h_mu_FS_Iso);
+    doubleSysError(h_mu_FS_ID);
+    doubleSysError(h_mu_FS_Ip);
     h_mu_FS = (TH2D*)h_mu_FS_ID->Clone("h_mu_FS");
     h_mu_FS->Multiply(h_mu_FS_Iso);
     h_mu_FS->Multiply(h_mu_FS_Ip);
@@ -502,25 +472,19 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
     TH2D* h_mu_veto_FS_Iso = (TH2D*)h_mu_veto_FS_Iso_temp->Clone("h_mu_veto_FS_Iso");
     TH2D* h_mu_veto_FS_Ip  = (TH2D*)h_mu_veto_FS_Ip_temp->Clone("h_mu_veto_FS_Ip");
     // Double unc. on selected muon FS ip sfs, since not for our exact wp
-    for(int x=1; x<=(int)h_mu_veto_FS_Ip->GetNbinsX(); x++){
-      for(int y=1; y<=(int)h_mu_veto_FS_Ip->GetNbinsY(); y++){
-	h_mu_veto_FS_Ip->SetBinError(x,y,h_mu_veto_FS_Ip->GetBinError(x,y)*2.0);
-      }
-    }
+    doubleSysError(h_mu_veto_FS_ID);
+    doubleSysError(h_mu_veto_FS_Ip);
+    doubleSysError(h_mu_veto_FS_Iso);
+
     h_mu_veto_FS = (TH2D*)h_mu_veto_FS_ID->Clone("h_mu_veto_FS");
     h_mu_veto_FS->Multiply(h_mu_veto_FS_Iso);
     h_mu_veto_FS->Multiply(h_mu_veto_FS_Ip);
-    
-
 
     // Lepton efficiencies for Lost Leptons
     h_el_vetoLepEff = (TH2D*)h_el_vetoLepEff_temp->Clone("h_el_vetoLepEff");
     h_mu_vetoLepEff = (TH2D*)h_mu_vetoLepEff_temp->Clone("h_mu_vetoLepEff");
-    
-    
-    
-      
 }
+
   TFile *fxsec;
   TH1D *hxsec;
   if(skim_isSignalFromFileName){
@@ -2045,7 +2009,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
       int vetotracks_v3 = 0;
       for (unsigned int ipf = 0; ipf < pfcands_p4().size(); ipf++) {
 	
-	//some selections
+	//selections of pf candidates
 	if(pfcands_charge().at(ipf) == 0) continue;
 	if(pfcands_p4().at(ipf).pt() < 5) continue;
 	if(fabs(pfcands_p4().at(ipf).eta()) > 2.4 ) continue;
@@ -2060,21 +2024,6 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 	}
 	
 	Tracks.FillCommon(ipf);
-	
-	// 8 TeV Track Isolation Configuration
-	if(nVetoLeptons>0){
-	  if(isVetoTrack(ipf, lep1.p4, lep1.charge)){
-	    Tracks.isoTracks_isVetoTrack.push_back(true);
-	    vetotracks++;
-	  }else Tracks.isoTracks_isVetoTrack.push_back(false);
-	}
-	else{
-	  LorentzVector temp( -99.9, -99.9, -99.9, -99.9 );
-	  if(isVetoTrack(ipf, temp, 0)){
-	    Tracks.isoTracks_isVetoTrack.push_back(true);
-	    vetotracks++;
-	  }else Tracks.isoTracks_isVetoTrack.push_back(false);
-	}
 	
 	// 13 TeV Track Isolation Configuration, pfLep and pfCH
 	if(nVetoLeptons>0){
@@ -2105,16 +2054,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 	    vetotracks_v3++;
 	  }else Tracks.isoTracks_isVetoTrack_v3.push_back(false);
 	}
-
       } // end loop over pfCands
-
-     /*obsolete
-      if(vetotracks<1) StopEvt.PassTrackVeto = true;
-      else StopEvt.PassTrackVeto = false;
-    
-      if(vetotracks_v2<1) StopEvt.PassTrackVeto_v2 = true;
-      else StopEvt.PassTrackVeto_v2 = false;
-    */
       if(vetotracks_v3<1) StopEvt.PassTrackVeto = true;
       else StopEvt.PassTrackVeto = false;
     
@@ -2334,7 +2274,6 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
       if(!(StopEvt.pfmet >= skim_met) && !(StopEvt.pfmet_rl >= skim_met) && !(StopEvt.pfmet_rl_jup >= skim_met) && !(StopEvt.pfmet_rl_jdown >= skim_met) && !(StopEvt.pfmet_jup >= skim_met) && !(StopEvt.pfmet_jdown >= skim_met)) continue;
       nEvents_pass_skim_met++;
       ///////////////////////////////////////////////////////// 
-
       //
       // Trigger Information
       //
@@ -2361,24 +2300,14 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 	StopEvt.HLT_Photon175 = passHLTTriggerPattern("HLT_Photon175_v");
 	StopEvt.HLT_Photon165_HE10 = passHLTTriggerPattern("HLT_Photon165_HE10_v");
       }
-
-     ///////////////////////////////////////////////////////////
-
-     //
+      //
       // Fill Tree
       //
       BabyTree->Fill();
     
     }//close event loop
-    //
-    // Close input file
-    //
     file.Close();
-    //delete file;
-
   }//close file loop
-
-  //
   // Write and Close baby file
   //
   BabyFile->cd();
@@ -2390,9 +2319,6 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
     histNEvts->Write();
   }
   BabyFile->Close();
-  //delete BabyFile;
-  //histFile->cd();
-  
   //
   // Some clean up
   //
@@ -2420,19 +2346,12 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
     f_mu_FS_Iso->Close();
     f_vetoLep_eff->Close();
   }
-  
   //
   // Benchmarking
   //
   bmark->Stop("benchmark");
-  
-
-  //
-  // Print Skim Cutflow
-  //
   cout << endl;
   cout << "Wrote babies into file " << BabyFile->GetName() << endl;
-//  cout << "Wrote hists into file " << histFile->GetName() << endl;
   cout << "-----------------------------" << endl;
   cout << "Events Processed                     " << nEvents_processed << endl;
   cout << "Events with " << skim_nvtx << " Good Vertex            " << nEvents_pass_skim_nVtx << endl;
@@ -2446,7 +2365,5 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
   cout << "Real Time:   " << Form( "%.01f", bmark->GetRealTime("benchmark") ) << endl;
   cout << endl;
   delete bmark;
-
   return 0;  
-
 }

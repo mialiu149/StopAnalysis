@@ -8,13 +8,13 @@
 #include <algorithm>
 #include <utility>
 #include <assert.h>
+#include "TH2F.h"
 
 #include "JetCorrector.h"
 #include "JetSelections.h"
 #include "jetcorr/FactorizedJetCorrector.h"
 #include "jetcorr/JetCorrectionUncertainty.h"
 #include "btagsf/BTagCalibrationStandalone.h"
-
 /*
 #ifndef JETCORR_INCL
 #define JETCORR_INCL
@@ -80,17 +80,9 @@ bool isVetoTrack_v2(int ipf, LorentzVector lepp4_, int charge);
 bool isVetoTrack_v3(int ipf, LorentzVector lepp4_, int charge);
 bool isVetoTau(int ipf, LorentzVector lepp4_, int charge);
 float DPhi_W_lep(float MET, float MET_Phi, LorentzVector p4);
-//int leptonIsFromW(int idx, int id, bool alsoSusy);
-//bool idIsCharm(int id);
-//bool idIsBeauty(int id);
-//TString triggerName(TString);
-//bool passHLTTriggerPattern(const char*);
-//float TrackIso(int);
-//bool isFromW(Lep lep);
-//bool isFromZ(Lep lep);
 bool CompareIndexValueGreatest(const std::pair<double, int>& firstElem, const std::pair<double, int>& secondElem) ;
 bool CompareIndexValueSmallest(const std::pair<double, int>& firstElem, const std::pair<double, int>& secondElem) ;
-
 void passesBaselineCuts(int njets, int nbtag, float met, float ht, int ngoodlep, int ngoodvertex);
+void doubleSysError(TH2D* hist);
 
 #endif
