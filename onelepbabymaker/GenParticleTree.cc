@@ -15,17 +15,14 @@ GenParticleTree::GenParticleTree (const std::string &prefix)
 
 using namespace tas;
 
-void GenParticleTree::FillCommon (int idx)
-{
+void GenParticleTree::FillCommon (int idx) {
 	if (idx < 0) return;
-
         if (evt_isRealData()) return;
 
         if(abs(genps_id_mother().at(genps_idx_mother().at(idx))) == pdg_t) isfromt.push_back(true);
         else if(abs(genps_id_mother().at(idx)) == pdg_t) isfromt.push_back(true);
         else isfromt.push_back(false);
         
-	
 	p4.push_back(genps_p4().at(idx));
 	id.push_back(genps_id().at(idx));
 	genpsidx.push_back(idx);
@@ -58,7 +55,6 @@ void GenParticleTree::FillCommon (int idx)
 	  gmotherstatus.push_back(-9999);
 	}
 	
-
 	//if gen taus
 	if(abs(genps_id().at(idx)) != pdg_tau){
 	 gentaudecay.push_back(NoTau); 
@@ -75,7 +71,6 @@ void GenParticleTree::FillCommon (int idx)
 	  }else if(genps_idx_mother().at(genx) != idx) continue;
 	  if(genps_status().at(genx) != 1 && genps_status().at(genx) != 2) continue;
 	  //rhos and pions show up as status 2
-	  //cout<<"Daughter particle  "<<abs(genps_id().at(genx))<<"  status "<<genps_status().at(genx)<<endl;
 	  if(abs(genps_id().at(genx)) ==pdg_nue || abs(genps_id().at(genx)) ==pdg_numu || abs(genps_id().at(genx)) ==pdg_nutau) continue; //skip neutrinos
           //for now no continues in case theres something funky going on
 	  if(abs(genps_id().at(genx)) == pdg_el){
@@ -95,63 +90,10 @@ void GenParticleTree::FillCommon (int idx)
             }else nprongs++;
           }
  	}
-
-	//if(nprongs>0 && leptonic==false){
-	// cout<<"N Prongs = "<<nprongs<<endl;
-	// dumpDocLines();
-	//}
-        
+       
 	if(nprongs == 1) gentaudecay.push_back(Had_1prong);
         if(nprongs == 3) gentaudecay.push_back(Had_3prong);
         if((nprongs != 1 && nprongs != 3) && leptonic==false) gentaudecay.push_back(other);
-
-//obsolete branches//
-        //charge.push_back(genps_charge().at(idx));                                                                                
-        //iso.push_back(genps_iso().at(idx));
-        //mass.push_back(genps_mass().at(idx));
-
-        //fromHardProcessBeforeFSR.push_back(genps_fromHardProcessBeforeFSR().at(idx));
-
-        //isDirectHardProcessTauDecayProductFinalState.push_back(genps_isDirectHardProcessTauDecayProductFinalState().at(idx));
-        //isDirectPromptTauDecayProductFinalState.push_back(genps_isDirectPromptTauDecayProductFinalState().at(idx));
-
-        //isLastCopyBeforeFSR.push_back(genps_isLastCopyBeforeFSR().at(idx));
-        //isMostlyLikePythia6Status3.push_back(genps_isMostlyLikePythia6Status3().at(idx));
-        //isPromptDecayed.push_back(genps_isPromptDecayed().at(idx));
-        //isPromptFinalState.push_back(genps_isPromptFinalState().at(idx));
-        //lepdaughter_id.push_back(genps_lepdaughter_id().at(idx));
-
-
-        //mothercharge.push_back(genps_charge().at(motherindex));
-
-          //gmothercharge.push_back(genps_charge().at(gmindex));
-
-          //gmothercharge.push_back(-9999);
-
-        //int smotherindex = genps_idx_simplemother().at(idx);
-        //simplemotherp4.push_back(genps_p4().at(smotherindex));
-        ////simplemothercharge.push_back(genps_charge().at(smotherindex));
-        //simplemotherid.push_back(genps_id().at(smotherindex));
-        //simplemotheridx.push_back(smotherindex);
-        //simplemotherstatus.push_back(genps_status().at(smotherindex));
-        
-        //int sgmindex = -1;
-        //if(smotherindex>=0) {
-        //sgmindex = genps_idx_simplemother().at(smotherindex);
-        //simplegmotherp4.push_back(genps_p4().at(sgmindex));
-        ////simplegmothercharge.push_back(genps_charge().at(sgmindex));
-        //simplegmotherid.push_back(genps_id().at(sgmindex));
-        //simplegmotheridx.push_back(sgmindex);
-        //simplegmotherstatus.push_back(genps_status().at(sgmindex));
-        //} else {
-        //LorentzVector temp( -99.9, -99.9, -99.9, -99.9 );
-        //simplegmotherp4.push_back(temp);
-        ////simplegmothercharge.push_back(-9999);
-        //simplegmotherid.push_back(-9999.);//to keep the same length as other genparticle vectors
-        //simplegmotheridx.push_back(sgmindex);
-        //simplegmotherstatus.push_back(-9999);
-        //}
-//        
 }
 
 void GenParticleTree::Reset()
@@ -175,33 +117,6 @@ void GenParticleTree::Reset()
   gmotherid.clear();
   gmotheridx.clear();
   gmotherstatus.clear();
-
-//obsolete branches//
-  //charge.clear();
-  //iso.clear();
-  //mass.clear();
-  //fromHardProcessBeforeFSR.clear();
-  //isDirectHardProcessTauDecayProductFinalState.clear();
-  //isDirectPromptTauDecayProductFinalState.clear();
-  //isLastCopyBeforeFSR.clear();
-  //isMostlyLikePythia6Status3.clear();
-  //isPromptDecayed.clear();
-  //isPromptFinalState.clear();
-  //lepdaughter_id.clear();
-  //mothercharge.clear();
-  //gmothercharge.clear();
-
-  //simplemotherp4.clear();
-  //simplemothercharge.clear();
-  //simplemotherid.clear();
-  //simplemotheridx.clear();
-  //simplemotherstatus.clear();
-  //simplegmotherp4.clear();
-  //simplegmothercharge.clear();
-  //simplegmotherid.clear();
-  //simplegmotheridx.clear();
-  //simplegmotherstatus.clear();
-
 }
 
 void GenParticleTree::SetBranches(TTree* tree)
@@ -225,31 +140,4 @@ void GenParticleTree::SetBranches(TTree* tree)
   tree->Branch(Form("gen%sgmotherid", prefix_.c_str()) ,           &gmotherid);
   tree->Branch(Form("gen%sgmotheridx", prefix_.c_str()) ,           &gmotheridx);
   tree->Branch(Form("gen%sgmotherstatus", prefix_.c_str()) ,           &gmotherstatus);
-
-//obsolete branches//
-  //tree->Branch(Form("gen%scharge"  , prefix_.c_str()) ,            &charge          );
-  //tree->Branch(Form("gen%siso"  , prefix_.c_str()) ,           &iso          );
-  //tree->Branch(Form("gen%smass"  , prefix_.c_str()) ,           &mass          );
-  //tree->Branch(Form("gen%sfromHardProcessBeforeFSR"  , prefix_.c_str()) ,           &fromHardProcessBeforeFSR          );
-  //tree->Branch(Form("gen%sisDirectHardProcessTauDecayProductFinalState"  , prefix_.c_str()) ,           &isDirectHardProcessTauDecayProductFinalState          );
-  //tree->Branch(Form("gen%sisDirectPromptTauDecayProductFinalState"  , prefix_.c_str()) ,           &isDirectPromptTauDecayProductFinalState          );
-  //tree->Branch(Form("gen%sisLastCopyBeforeFSR"  , prefix_.c_str()) ,           &isLastCopyBeforeFSR          );
-  //tree->Branch(Form("gen%sisMostlyLikePythia6Status3"  , prefix_.c_str()) ,           &isMostlyLikePythia6Status3          );
-  //tree->Branch(Form("gen%sisPromptDecayed"  , prefix_.c_str()) ,           &isPromptDecayed          );
-  //tree->Branch(Form("gen%sisPromptFinalState"  , prefix_.c_str()) ,           &isPromptFinalState          );
-  //tree->Branch(Form("gen%slepdaughter_id"  , prefix_.c_str()) ,           &lepdaughter_id          );
-  //tree->Branch(Form("gen%smothercharge", prefix_.c_str()) ,           &mothercharge);
-  //tree->Branch(Form("gen%sgmothercharge", prefix_.c_str()) ,           &gmothercharge);
-
-  //tree->Branch(Form("gen%ssimplemotherp4",  prefix_.c_str()) ,           &simplemotherp4);
-  //tree->Branch(Form("gen%ssimplemothercharge", prefix_.c_str()) ,           &simplemothercharge);
-  //tree->Branch(Form("gen%ssimplemotherid", prefix_.c_str()) ,           &simplemotherid);
-  //tree->Branch(Form("gen%ssimplemotheridx", prefix_.c_str()) ,           &simplemotheridx);
-  //tree->Branch(Form("gen%ssimplemotherstatus", prefix_.c_str()) ,           &simplemotherstatus);
-  //tree->Branch(Form("gen%ssimplegmotherp4",  prefix_.c_str()) ,           &simplegmotherp4);
-  ////tree->Branch(Form("gen%ssimplegmothercharge", prefix_.c_str()) ,           &simplegmothercharge);
-  //tree->Branch(Form("gen%ssimplegmotherid", prefix_.c_str()) ,           &simplegmotherid);
-  //tree->Branch(Form("gen%ssimplegmotheridx", prefix_.c_str()) ,           &simplegmotheridx);
-  //tree->Branch(Form("gen%ssimplegmotherstatus", prefix_.c_str()) ,           &simplegmotherstatus);  
-
 }

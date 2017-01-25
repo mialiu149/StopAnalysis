@@ -610,7 +610,6 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 	StopEvt.weight_PUdown = hPUdown->GetBinContent(hPUdown->FindBin(StopEvt.pu_ntrue));
       }
 
-      //This must come before any continue affecting signal scans
       if(skim_isSignalFromFileName){
         float mass_chargino = 250;
         float mass_lsp = 75;
@@ -678,7 +677,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 	 thisFile.Contains("TTW") || thisFile.Contains("TTZ") )istopevent = true;
       if(skim_isSignalFromFileName || thisFile.Contains("T2tt") || thisFile.Contains("T2tb") || thisFile.Contains("T2bW") || thisFile.Contains("TChWH") )
 	isstopevent = true;
-      //gen particles
+      //gen particles, put all these in gen particle tree. sooooo messy.
       if (!evt_isRealData()){
 	for(unsigned int genx = 0; genx < genps_p4().size() ; genx++){
 	  if( genps_id().at(genx)==genps_id_simplemother().at(genx) && !genps_isLastCopy().at(genx) ) continue;
@@ -696,7 +695,6 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 		genpnotISR.push_back(genps_p4().at(genx));
 	      }
 	    }
-     	    
 	    if( abs(genps_id().at(genx)) == pdg_el  ||  abs(genps_id().at(genx)) == pdg_mu || abs(genps_id().at(genx)) == pdg_tau) gen_leps.FillCommon(genx);
 	    if( abs(genps_id().at(genx)) == pdg_numu || abs(genps_id().at(genx)) == pdg_nue || abs(genps_id().at(genx)) == pdg_nutau ) gen_nus.FillCommon(genx);
 	    if( abs(genps_id().at(genx)) == pdg_t || abs(genps_id().at(genx)) == pdg_b || abs(genps_id().at(genx)) == pdg_c || abs(genps_id().at(genx)) == pdg_s || abs(genps_id().at(genx)) == pdg_d ||abs(genps_id().at(genx)) == pdg_u   ) gen_qs.FillCommon(genx);
@@ -725,26 +723,12 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 	//use babies genparticles
 	LorentzVector hardsystem;
 	hardsystem.SetPxPyPzE(0.,0.,0.,0.);
-	if(isstopevent){
 	  for(unsigned int genx = 0; genx < gen_susy.id.size() ; genx++){
-	    if(abs(gen_susy.id.at(genx))==pdg_chi_1plus1&& gen_susy.isLastCopy.at(genx)) hardsystem += gen_susy.p4.at(genx);
+	    if(isstopevent) {if(abs(gen_susy.id.at(genx))==pdg_chi_1plus1&& gen_susy.isLastCopy.at(genx)) hardsystem += gen_susy.p4.at(genx);}
+            if(istopevent)  {if(abs(gen_qs.id.at(genx))==pdg_t && gen_qs.isLastCopy.at(genx)) hardsystem += gen_qs.p4.at(genx);}
+            if(isWevent)    {if(abs(gen_bosons.id.at(genx))==pdg_W && abs(gen_bosons.id.at(genx))!=pdg_t && gen_bosons.isLastCopy.at(genx)) hardsystem +=+ gen_bosons.p4.at(genx);}
+            if(isZevent)    {if(abs(gen_bosons.id.at(genx))==pdg_Z && abs(gen_bosons.id.at(genx))!=pdg_t && gen_bosons.isLastCopy.at(genx)) hardsystem += gen_bosons.p4.at(genx);}
 	  }
-	}
-	if(istopevent){
-	  for(unsigned int genx = 0; genx < gen_qs.id.size() ; genx++){
-	    if(abs(gen_qs.id.at(genx))==pdg_t && gen_qs.isLastCopy.at(genx)) hardsystem += gen_qs.p4.at(genx);
-	  }
-	}
-	if(isWevent){
-	  for(unsigned int genx = 0; genx < gen_bosons.id.size() ; genx++){
-	    if(abs(gen_bosons.id.at(genx))==pdg_W && abs(gen_bosons.id.at(genx))!=pdg_t && gen_bosons.isLastCopy.at(genx)) hardsystem +=+ gen_bosons.p4.at(genx);
-	  }
-	}
-	if(isZevent){
-	  for(unsigned int genx = 0; genx < gen_bosons.id.size() ; genx++){
-	    if(abs(gen_bosons.id.at(genx))==pdg_Z && abs(gen_bosons.id.at(genx))!=pdg_t && gen_bosons.isLastCopy.at(genx)) hardsystem += gen_bosons.p4.at(genx);
-	  }
-	}
 	StopEvt.hardgenpt = hardsystem.Pt();
 	StopEvt.weight_ISR = 1.;
 	//caution - hardcoded
@@ -801,7 +785,6 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 
       if( (ee1lep) && ((StopEvt.genLepsHardProcess-StopEvt.genlepsfromtop)==0) ) StopEvt.is1lepFromTop=1;
       else StopEvt.is1lepFromTop=0;      
-      
       //
       // nVertex Cut
       //
@@ -809,20 +792,13 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
       if(StopEvt.firstGoodVtxIdx!=0) continue; //really check that first vertex is good
       nEvents_pass_skim_nVtx++;
 
-      //save met here beased on JEC
-
+      //recalculate type 1 corrected met using new JEC
       if(applyJECfromFile){
         pair<float,float> newmet;
         pair<float,float> newmet_jup;
         pair<float,float> newmet_jdown;
-        if(!evt_isRealData() && applyJECunc){
-	  if(JES_type > 0)  newmet = getT1CHSMET_fromMINIAOD(jet_corrector_pfL1FastJetL2L3, jetcorr_uncertainty,true,isbadrawMET);
-	  else if(JES_type < 0)  newmet = getT1CHSMET_fromMINIAOD(jet_corrector_pfL1FastJetL2L3, jetcorr_uncertainty,false,isbadrawMET);
-	  else cout << "JES type is not found" << endl;
-        }
-	else if(isbadrawMET) newmet = getT1CHSMET_fromMINIAOD(jet_corrector_pfL1FastJetL2L3,NULL,0,isbadrawMET);
+	if(isbadrawMET) newmet = getT1CHSMET_fromMINIAOD(jet_corrector_pfL1FastJetL2L3,NULL,0,isbadrawMET);
 	else newmet = getT1CHSMET_fromMINIAOD(jet_corrector_pfL1FastJetL2L3);
-
         newmet_jup = getT1CHSMET_fromMINIAOD(jet_corrector_pfL1FastJetL2L3, jetcorr_uncertainty_sys,true,isbadrawMET);
         newmet_jdown = getT1CHSMET_fromMINIAOD(jet_corrector_pfL1FastJetL2L3, jetcorr_uncertainty_sys,false,isbadrawMET);
 	StopEvt.pfmet = newmet.first;
@@ -833,10 +809,10 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
         StopEvt.pfmet_phi_jdown = newmet_jdown.second;
 	if(TMath::IsNaN(StopEvt.pfmet)||(!TMath::Finite(StopEvt.pfmet))||StopEvt.pfmet>14000.) continue;
         }
-        else{
+        else {
 	StopEvt.pfmet = evt_pfmet();
 	StopEvt.pfmet_phi = evt_pfmetPhi();
-      }
+       }
       // pfmet over calomet filter
       StopEvt.filt_pfovercalomet = !(StopEvt.calomet>0&&StopEvt.pfmet/StopEvt.calomet>5);
       //
@@ -1261,15 +1237,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 	  else ++nonISRjets;
 	}
       if(debug) std::cout << "[babymaker::looper]: filling ISRnjets variables LINE:" <<__LINE__ << std::endl;
-        //ichep 2016
-/*	if(NISRjets     ==0){ StopEvt.weight_ISRnjets = 1.0000; StopEvt.weight_ISRnjets_UP = 1.0000; StopEvt.weight_ISRnjets_DN = 1.0000; }
-	else if(NISRjets==1){ StopEvt.weight_ISRnjets = 0.8820; StopEvt.weight_ISRnjets_UP = 0.9410; StopEvt.weight_ISRnjets_DN = 0.8230; }
-	else if(NISRjets==2){ StopEvt.weight_ISRnjets = 0.7920; StopEvt.weight_ISRnjets_UP = 0.8960; StopEvt.weight_ISRnjets_DN = 0.6880; }
-	else if(NISRjets==3){ StopEvt.weight_ISRnjets = 0.7020; StopEvt.weight_ISRnjets_UP = 0.8510; StopEvt.weight_ISRnjets_DN = 0.5530; }
-	else if(NISRjets==4){ StopEvt.weight_ISRnjets = 0.6480; StopEvt.weight_ISRnjets_UP = 0.8240; StopEvt.weight_ISRnjets_DN = 0.4720; }
-	else if(NISRjets==5){ StopEvt.weight_ISRnjets = 0.6010; StopEvt.weight_ISRnjets_UP = 0.8005; StopEvt.weight_ISRnjets_DN = 0.4015; }
-	else {                StopEvt.weight_ISRnjets = 0.5150; StopEvt.weight_ISRnjets_UP = 0.7575; StopEvt.weight_ISRnjets_DN = 0.2725; }
-  */      // moriond 2017
+       // moriond 2017
         if(NISRjets     ==0){ StopEvt.weight_ISRnjets = 1.000; StopEvt.weight_ISRnjets_UP = 1.0000; StopEvt.weight_ISRnjets_DN = 1.0000; }
 	else if(NISRjets==1){ StopEvt.weight_ISRnjets = 0.920; StopEvt.weight_ISRnjets_UP = 0.960; StopEvt.weight_ISRnjets_DN = 0.880; }
 	else if(NISRjets==2){ StopEvt.weight_ISRnjets = 0.821; StopEvt.weight_ISRnjets_UP = 0.911; StopEvt.weight_ISRnjets_DN = 0.731; }
@@ -1290,7 +1258,6 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 	  counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,26,StopEvt.weight_ISRnjets_DN);
 	}
       }
-      
       // SAVE B TAGGING SF 
      if (!evt_isRealData() && skim_applyBtagSFs) {
         StopEvt.weight_btagsf = btagprob_data / btagprob_mc;
@@ -1326,7 +1293,6 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 	 counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,23,StopEvt.weight_btagsf_fastsim_DN);
        }
      }
-
       // 
       // apply skim
       //
@@ -1409,8 +1375,6 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 	break;
       }
       StopEvt.filt_fastsimjets_jdown = fastsimfilt_jdown;
-
-      //
       //
       // Photon Selection
       //
@@ -1430,9 +1394,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
       }
       StopEvt.ph_selectedidx = leadph;
 
-      //
       // Event Variables
-      //
 
       if(debug) std::cout << "[babymaker::looper]: calculate event level variables LINE:" <<__LINE__ << std::endl;
       // MET & Leptons
@@ -1470,9 +1432,6 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
         if(jets_jdown.ak4pfjets_passMEDbtag.at(jetIndexSortedCSV_jdown[idx])==true) mybjets_jdown.push_back(jets_jdown.ak4pfjets_p4.at(jetIndexSortedCSV_jdown[idx]) );
         else if(mybjets_jdown.size()<=1 && (mybjets_jdown.size()+myaddjets_jdown.size())<3) myaddjets_jdown.push_back(jets_jdown.ak4pfjets_p4.at(jetIndexSortedCSV_jdown[idx]) );
       }
-
-     // looks like all the following variables need jets to be calculated. 
-      //   add protection for skim settings of njets<2
      // looks like all the following variables need jets to be calculated. 
       //   add protection for skim settings of njets<2
       vector<float> dummy_sigma; dummy_sigma.clear(); //move outside of if-clause to be able to copy for photon selection
@@ -1481,10 +1440,6 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
       }
  
       if(jets.ak4pfjets_p4.size()>1){
-
-	// DR(lep, leadB) with medium discriminator
-	if(nVetoLeptons>0) StopEvt.dR_lep_leadb = dRbetweenVectors(jets.ak4pfjets_leadMEDbjet_p4, lep1.p4);
-	if(nVetoLeptons>1) StopEvt.dR_lep2_leadb = dRbetweenVectors(jets.ak4pfjets_leadMEDbjet_p4, lep2.p4);
 	// Hadronic Chi2
 	StopEvt.hadronic_top_chi2 = calculateChi2(jets.ak4pfjets_p4, dummy_sigma, jets.ak4pfjets_passMEDbtag);
         StopEvt.mbb = jets.ak4_mbb;
@@ -1495,42 +1450,37 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
         StopEvt.mct_jdown = jets_jdown.ak4_mct;
 	// Jets & MET
 	StopEvt.mindphi_met_j1_j2 =  getMinDphi(StopEvt.pfmet_phi,jets.ak4pfjets_p4.at(0),jets.ak4pfjets_p4.at(1));
-	// MT2W
-	if(nVetoLeptons>0) StopEvt.MT2W = CalcMT2W_(mybjets,myaddjets,lep1.p4,StopEvt.pfmet, StopEvt.pfmet_phi);
-	if(nVetoLeptons>1) StopEvt.MT2W_lep2 = CalcMT2W_(mybjets,myaddjets,lep2.p4,StopEvt.pfmet, StopEvt.pfmet_phi);
-	// Topness
-	if(nVetoLeptons>0) StopEvt.topness = CalcTopness_(0,StopEvt.pfmet,StopEvt.pfmet_phi,lep1.p4,mybjets,myaddjets);
-	if(nVetoLeptons>1) StopEvt.topness_lep2 = CalcTopness_(0,StopEvt.pfmet,StopEvt.pfmet_phi,lep2.p4,mybjets,myaddjets);	
-	if(nVetoLeptons>0) StopEvt.topnessMod = CalcTopness_(1,StopEvt.pfmet,StopEvt.pfmet_phi,lep1.p4,mybjets,myaddjets);
-	if(nVetoLeptons>1) StopEvt.topnessMod_lep2 = CalcTopness_(1,StopEvt.pfmet,StopEvt.pfmet_phi,lep2.p4,mybjets,myaddjets);
-	// MT2(lb,b)
-	if(nVetoLeptons>0) StopEvt.MT2_lb_b_mass = CalcMT2_lb_b_(StopEvt.pfmet,StopEvt.pfmet_phi,lep1.p4,mybjets,myaddjets,0,true);
-	if(nVetoLeptons>0) StopEvt.MT2_lb_b = CalcMT2_lb_b_(StopEvt.pfmet,StopEvt.pfmet_phi,lep1.p4,mybjets,myaddjets,0,false);
-	if(nVetoLeptons>1) StopEvt.MT2_lb_b_mass_lep2 = CalcMT2_lb_b_(StopEvt.pfmet,StopEvt.pfmet_phi,lep2.p4,mybjets,myaddjets,0,true);
-	if(nVetoLeptons>1) StopEvt.MT2_lb_b_lep2 = CalcMT2_lb_b_(StopEvt.pfmet,StopEvt.pfmet_phi,lep2.p4,mybjets,myaddjets,0,false);
-	// MT2(lb,bqq)
-	if(nVetoLeptons>0) StopEvt.MT2_lb_bqq_mass = CalcMT2_lb_bqq_(StopEvt.pfmet,StopEvt.pfmet_phi,lep1.p4,mybjets,myaddjets,jets.ak4pfjets_p4,0,true);
-	if(nVetoLeptons>0) StopEvt.MT2_lb_bqq = CalcMT2_lb_bqq_(StopEvt.pfmet,StopEvt.pfmet_phi,lep1.p4,mybjets,myaddjets,jets.ak4pfjets_p4,0,false);
-	if(nVetoLeptons>1) StopEvt.MT2_lb_bqq_mass_lep2 = CalcMT2_lb_bqq_(StopEvt.pfmet,StopEvt.pfmet_phi,lep2.p4,mybjets,myaddjets,jets.ak4pfjets_p4,0,true);
-	if(nVetoLeptons>1) StopEvt.MT2_lb_bqq_lep2 = CalcMT2_lb_bqq_(StopEvt.pfmet,StopEvt.pfmet_phi,lep2.p4,mybjets,myaddjets,jets.ak4pfjets_p4,0,false);
-        //MT2(l,l)
-        if(nVetoLeptons>1) StopEvt.MT2_l_l = CalcMT2_(StopEvt.pfmet,StopEvt.pfmet_phi,lep1.p4,lep2.p4,false,0); 
+	// DR(lep, leadB) with medium discriminator
+	if(nVetoLeptons>0) {
+           StopEvt.dR_lep_leadb = dRbetweenVectors(jets.ak4pfjets_leadMEDbjet_p4, lep1.p4);
+	   StopEvt.MT2W = CalcMT2W_(mybjets,myaddjets,lep1.p4,StopEvt.pfmet, StopEvt.pfmet_phi);
+	   StopEvt.topness = CalcTopness_(0,StopEvt.pfmet,StopEvt.pfmet_phi,lep1.p4,mybjets,myaddjets);
+	   StopEvt.MT2_lb_b_mass = CalcMT2_lb_b_(StopEvt.pfmet,StopEvt.pfmet_phi,lep1.p4,mybjets,myaddjets,0,true);
+	   StopEvt.MT2_lb_b = CalcMT2_lb_b_(StopEvt.pfmet,StopEvt.pfmet_phi,lep1.p4,mybjets,myaddjets,0,false);
+	   StopEvt.topnessMod = CalcTopness_(1,StopEvt.pfmet,StopEvt.pfmet_phi,lep1.p4,mybjets,myaddjets);
+	   StopEvt.MT2_lb_bqq_mass = CalcMT2_lb_bqq_(StopEvt.pfmet,StopEvt.pfmet_phi,lep1.p4,mybjets,myaddjets,jets.ak4pfjets_p4,0,true);
+	   StopEvt.MT2_lb_bqq = CalcMT2_lb_bqq_(StopEvt.pfmet,StopEvt.pfmet_phi,lep1.p4,mybjets,myaddjets,jets.ak4pfjets_p4,0,false);
+        }
+	if(nVetoLeptons>1) { 
+           StopEvt.dR_lep2_leadb = dRbetweenVectors(jets.ak4pfjets_leadMEDbjet_p4, lep2.p4);
+	   StopEvt.MT2W_lep2 = CalcMT2W_(mybjets,myaddjets,lep2.p4,StopEvt.pfmet, StopEvt.pfmet_phi);
+	   StopEvt.topness_lep2 = CalcTopness_(0,StopEvt.pfmet,StopEvt.pfmet_phi,lep2.p4,mybjets,myaddjets);	
+	   StopEvt.topnessMod_lep2 = CalcTopness_(1,StopEvt.pfmet,StopEvt.pfmet_phi,lep2.p4,mybjets,myaddjets);
+	   StopEvt.MT2_lb_b_mass_lep2 = CalcMT2_lb_b_(StopEvt.pfmet,StopEvt.pfmet_phi,lep2.p4,mybjets,myaddjets,0,true);
+	   StopEvt.MT2_lb_b_lep2 = CalcMT2_lb_b_(StopEvt.pfmet,StopEvt.pfmet_phi,lep2.p4,mybjets,myaddjets,0,false);
+	   StopEvt.MT2_lb_bqq_mass_lep2 = CalcMT2_lb_bqq_(StopEvt.pfmet,StopEvt.pfmet_phi,lep2.p4,mybjets,myaddjets,jets.ak4pfjets_p4,0,true);
+	   StopEvt.MT2_lb_bqq_lep2 = CalcMT2_lb_bqq_(StopEvt.pfmet,StopEvt.pfmet_phi,lep2.p4,mybjets,myaddjets,jets.ak4pfjets_p4,0,false);
+           StopEvt.MT2_l_l = CalcMT2_(StopEvt.pfmet,StopEvt.pfmet_phi,lep1.p4,lep2.p4,false,0); 
+        }
       }
       if(jets_jup.ak4pfjets_p4.size()>1){
-        // Jets & MET
         StopEvt.mindphi_met_j1_j2_jup =  getMinDphi(StopEvt.pfmet_phi_jup,jets_jup.ak4pfjets_p4.at(0),jets_jup.ak4pfjets_p4.at(1));
-        // MT2W
         if(nVetoLeptons>0) StopEvt.MT2W_jup = CalcMT2W_(mybjets_jup,myaddjets_jup,lep1.p4,StopEvt.pfmet_jup, StopEvt.pfmet_phi_jup);
-        // ModTopness
         if(nVetoLeptons>0) StopEvt.topnessMod_jup = CalcTopness_(1,StopEvt.pfmet_jup,StopEvt.pfmet_phi_jup,lep1.p4,mybjets_jup,myaddjets_jup);
       }
-
       if(jets_jdown.ak4pfjets_p4.size()>1){
-        // Jets & MET
         StopEvt.mindphi_met_j1_j2_jdown =  getMinDphi(StopEvt.pfmet_phi_jdown,jets_jdown.ak4pfjets_p4.at(0),jets_jdown.ak4pfjets_p4.at(1));
-        // MT2W
         if(nVetoLeptons>0) StopEvt.MT2W_jdown = CalcMT2W_(mybjets_jdown,myaddjets_jdown,lep1.p4,StopEvt.pfmet_jdown, StopEvt.pfmet_phi_jdown);
-        // ModTopness
         if(nVetoLeptons>0) StopEvt.topnessMod_jdown = CalcTopness_(1,StopEvt.pfmet_jdown,StopEvt.pfmet_phi_jdown,lep1.p4,mybjets_jdown,myaddjets_jdown);
       }
       
@@ -1577,7 +1527,6 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 	}
 	if(rankmaxDPhi_lep2.size()>=3) {
 	  StopEvt.Mjjj_lep2 = (jets.ak4pfjets_p4.at(rankmaxDPhi_lep2[0].second)+jets.ak4pfjets_p4.at(rankmaxDPhi_lep2[1].second)+jets.ak4pfjets_p4.at(rankmaxDPhi_lep2[2].second)).M();
-	  //StopEvt.Mjjj_lep2 = (jets.ak4pfjets_p4.at(jb21)+jets.ak4pfjets_p4.at(jb22)+jets.ak4pfjets_p4.at(jb23)).M();
 	}
 	
       } // end if >0 jets      
