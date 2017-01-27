@@ -78,4 +78,5 @@ void passesBaselineCuts(int njets, int nbtag, float met, float ht, int ngoodlep,
 void doubleSysError(TH2D* hist);
 void setcounterLabel(TH1D* hist, string* labels);
 void setcounterLabel3D(TH3D* hist, string* labels);
+vector<float> getupdownerr( TH2D* hist, float pt, float eta, float pt_cutoff, float pt_min,float eta_cutoff ,bool pteta);
 #endif

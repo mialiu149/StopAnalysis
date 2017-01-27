@@ -344,3 +344,22 @@ void setcounterLabel3D(TH3D* hist, string* labels) {
          hist->GetZaxis()->SetBinLabel(x,labels[x].c_str());
      }
 }
+vector<float> getupdownerr( TH2D* hist, float pt, float eta, float pt_cutoff, float pt_min,float eta_cutoff ,bool pteta){
+     vector<float> updownerr;
+     int binX, binY;
+     if(pteta) {
+       binX = hist->GetXaxis()->FindBin( std::max( std::min(pt_cutoff,pt),pt_min ) );
+       binY = hist->GetYaxis()->FindBin( eta);
+     }
+     else{
+       binX = hist->GetXaxis()->FindBin( max(min(eta_cutoff,eta),-eta_cutoff));
+       binY = hist->GetYaxis()->FindBin( max(min(pt_cutoff,pt),pt_min));
+   }
+     float lepSF    = hist->GetBinContent( binX, binY );
+     float lepSF_Up = lepSF + hist->GetBinError( binX, binY );
+     float lepSF_Dn = lepSF - hist->GetBinError( binX, binY );
+     updownerr.push_back(lepSF);
+     updownerr.push_back(lepSF_Up);
+     updownerr.push_back(lepSF_Dn);
+  return updownerr;
+}

@@ -681,7 +681,6 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
       if (!evt_isRealData()){
 	for(unsigned int genx = 0; genx < genps_p4().size() ; genx++){
 	  if( genps_id().at(genx)==genps_id_simplemother().at(genx) && !genps_isLastCopy().at(genx) ) continue;
-
 	  if( genps_isHardProcess().at(genx) ||
 	      genps_fromHardProcessDecayed().at(genx) ||
 	      genps_fromHardProcessFinalState().at(genx) ||
@@ -701,7 +700,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 	    if( abs(genps_id().at(genx)) == pdg_W || abs(genps_id().at(genx)) == pdg_Z ||(abs(genps_id().at(genx)) == pdg_ph &&
                 genps_p4().at(genx).Pt()>5.0)  || abs(genps_id().at(genx)) == pdg_h  ) gen_bosons.FillCommon(genx);
 
-            //add all SUSY particles
+            //SUSY particles
             if(abs(genps_id().at(genx))>=1000000&&abs(genps_id().at(genx))<=1000040) gen_susy.FillCommon(genx);	    
  
 	    if(abs(genps_id_mother().at(genx)) == pdg_W && abs(genps_id().at(genx)) == pdg_nue && genps_status().at(genx) == 1 && abs(genps_id_mother().at(genps_idx_mother().at(genx))) == pdg_t) n_nuelfromt++;      
@@ -709,7 +708,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 	    if(abs(genps_id_mother().at(genx)) == pdg_W && abs(genps_id().at(genx)) == pdg_numu && genps_status().at(genx) == 1 && abs(genps_id_mother().at(genps_idx_mother().at(genx))) == pdg_t ) n_numufromt++;
 	    
 	    if(abs(genps_id_mother().at(genx)) == pdg_W && abs(genps_id().at(genx)) == pdg_nutau && genps_status().at(genx) == 1 && abs(genps_id_mother().at(genps_idx_mother().at(genx))) == pdg_t ) n_nutaufromt++;
-
+             // count leptons and neutrinos
 	    if( abs(genps_id().at(genx))==pdg_el  && genps_fromHardProcessFinalState().at(genx) && genps_isLastCopy().at(genx) ) nLepsHardProcess++;
 	    if( abs(genps_id().at(genx))==pdg_mu  && genps_fromHardProcessFinalState().at(genx) && genps_isLastCopy().at(genx) ) nLepsHardProcess++;
 	    if( abs(genps_id().at(genx))==pdg_tau && genps_fromHardProcessDecayed().at(genx) && genps_isLastCopy().at(genx) ) nLepsHardProcess++;
@@ -720,7 +719,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 
 	  }	  
 	}
-	//use babies genparticles
+	//calculate system pt
 	LorentzVector hardsystem;
 	hardsystem.SetPxPyPzE(0.,0.,0.,0.);
 	  for(unsigned int genx = 0; genx < gen_susy.id.size() ; genx++){
@@ -731,8 +730,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 	  }
 	StopEvt.hardgenpt = hardsystem.Pt();
 	StopEvt.weight_ISR = 1.;
-	//caution - hardcoded
-	//note - these weights don't contain the renormalization
+	//note - these weights don't contain the renormalization, hardcoded
 	if(StopEvt.hardgenpt>600.) {
 	  StopEvt.weight_ISRup = 1.3;
 	  StopEvt.weight_ISRdown = 0.7;
@@ -785,13 +783,11 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 
       if( (ee1lep) && ((StopEvt.genLepsHardProcess-StopEvt.genlepsfromtop)==0) ) StopEvt.is1lepFromTop=1;
       else StopEvt.is1lepFromTop=0;      
-      //
+
       // nVertex Cut
-      //
       if(StopEvt.nvtxs < skim_nvtx) continue;
       if(StopEvt.firstGoodVtxIdx!=0) continue; //really check that first vertex is good
       nEvents_pass_skim_nVtx++;
-
       //recalculate type 1 corrected met using new JEC
       if(applyJECfromFile){
         pair<float,float> newmet;
@@ -834,7 +830,6 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
       // Electrons
       for (unsigned int eidx = 0; eidx < els_p4().size(); eidx++){
 	if( !PassElectronVetoSelections(eidx, skim_vetoLep_el_pt, skim_vetoLep_el_eta) ) continue;
-	
 	Lepton mylepton;
         mylepton.id  = -11*els_charge().at(eidx);
         mylepton.idx = eidx;
@@ -848,19 +843,14 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 
 	if( ( PassElectronVetoSelections(eidx, skim_vetoLep_el_pt, skim_vetoLep_el_eta) ) &&
 	    (!PassElectronPreSelections(eidx, skim_looseLep_el_pt, skim_looseLep_el_eta) )    ) VetoLeps.push_back(mylepton);
-
 	if( ( PassElectronPreSelections(eidx, skim_looseLep_el_pt, skim_looseLep_el_eta) ) &&
 	    (!PassElectronPreSelections(eidx, skim_goodLep_el_pt, skim_goodLep_el_eta) )      ) LooseLeps.push_back(mylepton);
-
 	if( PassElectronPreSelections(eidx, skim_goodLep_el_pt, skim_goodLep_el_eta)          ) GoodLeps.push_back(mylepton);
-
       }
 
       // Muons
       for (unsigned int midx = 0; midx < mus_p4().size(); midx++){
-
 	if( !PassMuonVetoSelections(midx, skim_vetoLep_mu_pt, skim_vetoLep_mu_eta) ) continue;
-	
 	Lepton mylepton;
         mylepton.id  = -13*mus_charge().at(midx);
         mylepton.idx = midx;
@@ -873,17 +863,16 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
         if( overlapping_jet>=0) idx_alloverlapjets_jdown.push_back(overlapping_jet);  //overlap removal for all jets w.r.t. all leptons	
 	if( ( PassMuonVetoSelections(midx, skim_vetoLep_mu_pt, skim_vetoLep_mu_eta) ) &&
 	    (!PassMuonPreSelections(midx, skim_looseLep_mu_pt, skim_looseLep_mu_eta) )    ) VetoLeps.push_back(mylepton);
-
 	if( ( PassMuonPreSelections(midx, skim_looseLep_mu_pt, skim_looseLep_mu_eta) ) &&
 	    (!PassMuonPreSelections(midx, skim_goodLep_mu_pt, skim_goodLep_mu_eta) )      ) LooseLeps.push_back(mylepton);
-
 	if( PassMuonPreSelections(midx, skim_goodLep_mu_pt, skim_goodLep_mu_eta)          ) GoodLeps.push_back(mylepton);
 
       }
+      //sort by pt
       sort(GoodLeps.begin(),GoodLeps.end(),sortLepbypt());       
       sort(LooseLeps.begin(),LooseLeps.end(),sortLepbypt());       
       sort(VetoLeps.begin(),VetoLeps.end(),sortLepbypt());       
-      
+      // remove overlaps
       if(GoodLeps.size()>0){
       for(unsigned int lep = 1; lep<GoodLeps.size(); lep++){
         if(ROOT::Math::VectorUtil::DeltaR(GoodLeps.at(0).p4,GoodLeps.at(lep).p4)<0.01) GoodLeps.erase(GoodLeps.begin()+lep);
@@ -908,150 +897,83 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
       AllLeps.insert( AllLeps.end(), GoodLeps.begin(),  GoodLeps.end() );
       AllLeps.insert( AllLeps.end(), LooseLeps.begin(), LooseLeps.end() );
       AllLeps.insert( AllLeps.end(), VetoLeps.begin(),  VetoLeps.end() );
-      if( nVetoLeptons > 0 ) lep1.FillCommon( AllLeps.at(0).id, AllLeps.at(0).idx );
-      if( nVetoLeptons > 1 ) lep2.FillCommon( AllLeps.at(1).id, AllLeps.at(1).idx );
+      if( AllLeps.size() > 0 ) lep1.FillCommon( AllLeps.at(0).id, AllLeps.at(0).idx );
+      if( AllLeps.size() > 1 ) lep2.FillCommon( AllLeps.at(1).id, AllLeps.at(1).idx );
       if(debug) std::cout << "[babymaker::looper]: filling lepton variables LINE:" <<__LINE__ << std::endl;
 
       // Lepton SFs
-      float lepSF_pt_cutoff = 99.999;
-      float lepSF_pt_min    = 10.001;
-      
-      double lepSF    = 1.0;
-      double lepSF_Up = 1.0;
-      double lepSF_Dn = 1.0;
-      
-      double vetoLepSF    = 1.0;
-      double vetoLepSF_Up = 1.0;
-      double vetoLepSF_Dn = 1.0;
-
-      float lepSF_FS_pt_cutoff = 199.999;
-      float lepSF_FS_pt_min    = 10.001;
-
-      double lepSF_FS    = 1.0;
-      double lepSF_FS_Up = 1.0;
-      double lepSF_FS_Dn = 1.0;	
+      float lepSF_pt_cutoff(99.999),lepSF_pt_min(10.001);
+      double lepSF(1.0),lepSF_Up(1.0),lepSF_Dn(1.0);
+      double vetoLepSF(1.0), vetoLepSF_Up(1.0), vetoLepSF_Dn(1.0); 
+      float lepSF_FS_pt_cutoff(199.999),lepSF_FS_pt_min(10.001);
+      double lepSF_FS(1.0),lepSF_FS_Up(1.0), lepSF_FS_Dn(1.0);	
       
       // Lep1 SF
       if(skim_applyLeptonSFs && !StopEvt.is_data && nVetoLeptons>0){
-	
 	if(abs(lep1.pdgid) == pdg_el){
-	  int binX = h_el_SF->GetXaxis()->FindBin( std::max( std::min(lepSF_pt_cutoff, (float)lep1.p4.Pt()), lepSF_pt_min ) );
-	  int binY = h_el_SF->GetYaxis()->FindBin( fabs(lep1.p4.Eta()) );
-	  lepSF    = h_el_SF->GetBinContent( binX, binY );
-	  lepSF_Up = lepSF + h_el_SF->GetBinError( binX, binY );
-	  lepSF_Dn = lepSF - h_el_SF->GetBinError( binX, binY );
-	  
-	  binX = h_el_SF_tracking->GetXaxis()->FindBin( std::max( std::min(2.39,(double)lep1.p4.Eta()),-2.39) );
-	  binY = h_el_SF_tracking->GetYaxis()->FindBin( std::max( std::min(199.0,(double)lep1.p4.Pt()), 21.0 ) );
-	  lepSF *= h_el_SF_tracking->GetBinContent( binX, binY );
-	  lepSF_Up *= ( h_el_SF_tracking->GetBinContent(binX,binY) + h_el_SF_tracking->GetBinError(binX,binY) );
-	  lepSF_Dn *= ( h_el_SF_tracking->GetBinContent(binX,binY) - h_el_SF_tracking->GetBinError(binX,binY) );
-	  if(skim_isFastsim){
-	    int bin_FS  = h_el_FS->FindBin( std::max( std::min(lepSF_FS_pt_cutoff, (float)lep1.p4.Pt()), lepSF_FS_pt_min ), fabs(lep1.p4.Eta()), StopEvt.pu_ntrue );
-	    lepSF_FS    = h_el_FS->GetBinContent(bin_FS);
-	    lepSF_FS_Up = lepSF_FS + h_el_FS->GetBinError(bin_FS);
-	    lepSF_FS_Dn = lepSF_FS + h_el_FS->GetBinError(bin_FS);
+           vector<float> updownerr = getupdownerr(h_el_SF,(float)lep1.p4.Pt(),(float)lep1.p4.Eta(),lepSF_pt_cutoff, lepSF_pt_min, 2.39,true);
+           vector<float> updownerr_track = getupdownerr(h_el_SF_tracking,(float)lep1.p4.Pt(),(float)lep1.p4.Eta(),199,21, 2.39,false);
+	   lepSF    = updownerr.at(0); lepSF_Up = updownerr.at(1);lepSF_Dn=updownerr.at(2);  
+           lepSF *= updownerr_track.at(0); lepSF_Up *=updownerr_track.at(1); lepSF_Dn *=updownerr_track.at(2);
+	   if(skim_isFastsim){
+              vector<float> updownerr_fs = getupdownerr(h_el_FS,(float)lep1.p4.Pt(),(float)lep1.p4.Eta(),lepSF_FS_pt_cutoff, lepSF_FS_pt_min, 2.39,true);
+              lepSF *= updownerr_fs.at(0); lepSF_Up *=updownerr_fs.at(1); lepSF_Dn *=updownerr_fs.at(2);
 	  }
-	  
 	}
 	
 	if(abs(lep1.pdgid) == pdg_mu){
-	  int binX = h_mu_SF->GetXaxis()->FindBin( std::max( std::min(lepSF_pt_cutoff, (float)lep1.p4.Pt()), lepSF_pt_min ) );
-	  int binY = h_mu_SF->GetYaxis()->FindBin( fabs(lep1.p4.Eta()) );
-	  lepSF    = h_mu_SF->GetBinContent( binX, binY );
-	  lepSF_Up = lepSF + h_mu_SF->GetBinError( binX, binY );
-	  lepSF_Dn = lepSF - h_mu_SF->GetBinError( binX, binY );
-	  
-	  binX = h_mu_SF_tracking->GetXaxis()->FindBin( std::max(-2.2,(double)lep1.p4.Eta()) );
-	  lepSF *= h_mu_SF_tracking->GetBinContent( binX );
-	  lepSF_Up *= ( h_mu_SF_tracking->GetBinContent(binX) + h_mu_SF_tracking->GetBinError(binX) );
-	  lepSF_Dn *= ( h_mu_SF_tracking->GetBinContent(binX) - h_mu_SF_tracking->GetBinError(binX) );
-	  if(skim_isFastsim){
-	    int bin_FS  = h_mu_FS->FindBin( std::max( std::min(lepSF_FS_pt_cutoff, (float)lep1.p4.Pt()), lepSF_FS_pt_min ), fabs(lep1.p4.Eta()), StopEvt.pu_ntrue );
-	    lepSF_FS    = h_mu_FS->GetBinContent(bin_FS);
-	    lepSF_FS_Up = lepSF_FS + h_mu_FS->GetBinError(bin_FS);
-	    lepSF_FS_Dn = lepSF_FS + h_mu_FS->GetBinError(bin_FS);
+           vector<float> updownerr_mu = getupdownerr(h_mu_SF,(float)lep1.p4.Pt(),(float)lep1.p4.Eta(),lepSF_pt_cutoff, lepSF_pt_min, 2.2,true);
+	   lepSF    = updownerr_mu.at(0); lepSF_Up = updownerr_mu.at(1);lepSF_Dn=updownerr_mu.at(2);  
+	   int binX = h_mu_SF_tracking->GetXaxis()->FindBin( std::max(-2.2,(double)lep1.p4.Eta()) );
+	   lepSF *= h_mu_SF_tracking->GetBinContent( binX );
+	   lepSF_Up *= ( h_mu_SF_tracking->GetBinContent(binX) + h_mu_SF_tracking->GetBinError(binX) );
+	   lepSF_Dn *= ( h_mu_SF_tracking->GetBinContent(binX) - h_mu_SF_tracking->GetBinError(binX) );
+	   if(skim_isFastsim){
+              vector<float> updownerr_fs_mu = getupdownerr(h_mu_FS,(float)lep1.p4.Pt(),(float)lep1.p4.Eta(),lepSF_FS_pt_cutoff, lepSF_FS_pt_min, 2.2,true);
+              lepSF *= updownerr_fs_mu.at(0); lepSF_Up *=updownerr_fs_mu.at(1); lepSF_Dn *=updownerr_fs_mu.at(2);
 	  }
-
 	}
-		    
       }
-      
       // Lep2 SF
       if( skim_applyLeptonSFs && !StopEvt.is_data && nVetoLeptons>1 ){
-	
 	if(abs(lep2.pdgid) == pdg_el){
-
 	  if(nGoodLeptons>1){
-	    int binX = h_el_SF->GetXaxis()->FindBin( std::max( std::min(lepSF_pt_cutoff, (float)lep2.p4.Pt()), lepSF_pt_min ) );
-	    int binY = h_el_SF->GetYaxis()->FindBin( fabs(lep2.p4.Eta()) );
-	    lepSF    *= h_el_SF->GetBinContent( binX, binY );
-	    lepSF_Up *= ( lepSF + h_el_SF->GetBinError( binX, binY ) );
-	    lepSF_Dn *= ( lepSF - h_el_SF->GetBinError( binX, binY ) );
-	    
+            vector<float> updownerr_lep2 = getupdownerr(h_el_SF,(float)lep2.p4.Pt(),(float)lep2.p4.Eta(),lepSF_pt_cutoff, lepSF_pt_min, 2.39,true);
+	    lepSF    *= updownerr_lep2.at(0); lepSF_Up *= updownerr_lep2.at(1);lepSF_Dn *= updownerr_lep2.at(2);  
 	    if(skim_isFastsim){
-	      int bin_FS  = h_el_FS->FindBin( std::max( std::min(lepSF_pt_cutoff, (float)lep2.p4.Pt()), lepSF_pt_min ), fabs(lep2.p4.Eta()) );
-	      lepSF_FS    *= h_el_FS->GetBinContent(bin_FS);
-	      lepSF_FS_Up *= (lepSF_FS + h_el_FS->GetBinError(bin_FS));
-	      lepSF_FS_Dn *= (lepSF_FS + h_el_FS->GetBinError(bin_FS));
+              vector<float> updownerr_fs_lep2 = getupdownerr(h_el_FS,(float)lep2.p4.Pt(),(float)lep2.p4.Eta(),lepSF_FS_pt_cutoff, lepSF_FS_pt_min, 2.39,true);
+              lepSF *= updownerr_fs_lep2.at(0); lepSF_Up *=updownerr_fs_lep2.at(1); lepSF_Dn *=updownerr_fs_lep2.at(2);
 	    }
 	  } // end if 2 good electrons
 	  else{
-	    int binX = h_el_SF_veto->GetXaxis()->FindBin( std::max( std::min(lepSF_pt_cutoff, (float)lep2.p4.Pt()), lepSF_pt_min ) );
-	    int binY = h_el_SF_veto->GetYaxis()->FindBin( fabs(lep2.p4.Eta()) );
-	    lepSF    *= h_el_SF_veto->GetBinContent( binX, binY );
-	    lepSF_Up *= ( lepSF + h_el_SF_veto->GetBinError( binX, binY ) );
-	    lepSF_Dn *= ( lepSF - h_el_SF_veto->GetBinError( binX, binY ) );
-
+            vector<float> updownerr_lep2_veto = getupdownerr(h_el_SF_veto,(float)lep2.p4.Pt(),(float)lep2.p4.Eta(),lepSF_pt_cutoff, lepSF_pt_min, 2.39,true);
+            lepSF    *= updownerr_lep2_veto.at(0); lepSF_Up *= updownerr_lep2_veto.at(1);lepSF_Dn *= updownerr_lep2_veto.at(2); 
 	    if(skim_isFastsim){
-	      int bin_FS  = h_el_veto_FS->FindBin( std::max( std::min(lepSF_FS_pt_cutoff, (float)lep2.p4.Pt()), lepSF_FS_pt_min ), fabs(lep2.p4.Eta()), StopEvt.pu_ntrue );
-	      lepSF_FS    *= h_el_veto_FS->GetBinContent(bin_FS);
-	      lepSF_FS_Up *= (lepSF_FS + h_el_veto_FS->GetBinError(bin_FS));
-	      lepSF_FS_Dn *= (lepSF_FS + h_el_veto_FS->GetBinError(bin_FS));
+              vector<float> updownerr_fs_veto = getupdownerr(h_el_veto_FS,(float)lep2.p4.Pt(),(float)lep2.p4.Eta(),lepSF_FS_pt_cutoff, lepSF_FS_pt_min, 2.39,true);
+              lepSF *= updownerr_fs_veto.at(0); lepSF_Up *=updownerr_fs_veto.at(1); lepSF_Dn *=updownerr_fs_veto.at(2);
 	    }
 	  }
-
-	  int binX = h_el_SF_tracking->GetXaxis()->FindBin( std::max( std::min(2.39, (double)lep2.p4.Eta()), -2.39) );
-	  int binY = h_el_SF_tracking->GetYaxis()->FindBin( std::max( std::min(199.0, (double)lep2.p4.Pt()), 21.0) );
-	  lepSF *= h_el_SF_tracking->GetBinContent( binX, binY );
-	  lepSF_Up *= ( h_el_SF_tracking->GetBinContent(binX,binY) + h_el_SF_tracking->GetBinError(binX,binY) );
-	  lepSF_Dn *= ( h_el_SF_tracking->GetBinContent(binX,binY) - h_el_SF_tracking->GetBinError(binX,binY) );
+           vector<float> updownerr_track_lep2 = getupdownerr(h_el_SF_tracking,(float)lep2.p4.Pt(),(float)lep2.p4.Eta(),199,21, 2.39,false);
+           lepSF *= updownerr_track_lep2.at(0); lepSF_Up *=updownerr_track_lep2.at(1); lepSF_Dn *=updownerr_track_lep2.at(2);
 	} // end if 2nd lep if el
-	
-
 	if(abs(lep2.pdgid) == pdg_mu){
-
 	  if(nGoodLeptons>1){
-	    int binX = h_mu_SF->GetXaxis()->FindBin( std::max( std::min(lepSF_pt_cutoff, (float)lep2.p4.Pt()), lepSF_pt_min ) );
-	    int binY = h_mu_SF->GetYaxis()->FindBin( fabs(lep2.p4.Eta()) );
-	    lepSF    *= h_mu_SF->GetBinContent( binX, binY );
-	    lepSF_Up *= ( lepSF + h_mu_SF->GetBinError( binX, binY ) );
-	    lepSF_Dn *= ( lepSF - h_mu_SF->GetBinError( binX, binY ) );
-	  	
+            vector<float> updownerr_lep2_mu = getupdownerr(h_mu_SF,(float)lep2.p4.Pt(),(float)lep2.p4.Eta(),lepSF_pt_cutoff, lepSF_pt_min, 2.2,true);
+	    lepSF    *= updownerr_lep2_mu.at(0); lepSF_Up *= updownerr_lep2_mu.at(1);lepSF_Dn *= updownerr_lep2_mu.at(2);  
 	    if(skim_isFastsim){
-	      int bin_FS  = h_mu_FS->FindBin( std::max( std::min(lepSF_FS_pt_cutoff, (float)lep2.p4.Pt()), lepSF_FS_pt_min ), fabs(lep2.p4.Eta()), StopEvt.pu_ntrue );
-	      lepSF_FS    *= h_mu_FS->GetBinContent(bin_FS);
-	      lepSF_FS_Up *= lepSF_FS + h_mu_FS->GetBinError(bin_FS);
-	      lepSF_FS_Dn *= lepSF_FS + h_mu_FS->GetBinError(bin_FS);
+              vector<float> updownerr_fs_lep2_mu = getupdownerr(h_mu_FS,(float)lep2.p4.Pt(),(float)lep2.p4.Eta(),lepSF_FS_pt_cutoff, lepSF_FS_pt_min, 2.2,true);
+              lepSF *= updownerr_fs_lep2_mu.at(0); lepSF_Up *=updownerr_fs_lep2_mu.at(1); lepSF_Dn *=updownerr_fs_lep2_mu.at(2);
 	    }
 	  } // end if 2 good leptons
-	  
 	  else{
-	    int binX = h_mu_SF_veto->GetXaxis()->FindBin( std::max( std::min(lepSF_pt_cutoff, (float)lep2.p4.Pt()), lepSF_pt_min ) );
-	    int binY = h_mu_SF_veto->GetYaxis()->FindBin( fabs(lep2.p4.Eta()) );
-	    lepSF    *= h_mu_SF_veto->GetBinContent( binX, binY );
-	    lepSF_Up *= ( lepSF + h_mu_SF_veto->GetBinError( binX, binY ) );
-	    lepSF_Dn *= ( lepSF - h_mu_SF_veto->GetBinError( binX, binY ) );
-	    
+            vector<float> updownerr_veto_mu = getupdownerr(h_mu_SF_veto,(float)lep2.p4.Pt(),(float)lep2.p4.Eta(),lepSF_pt_cutoff, lepSF_pt_min, 2.2,true);
+	    lepSF    *= updownerr_veto_mu.at(0); lepSF_Up *= updownerr_veto_mu.at(1);lepSF_Dn *= updownerr_veto_mu.at(2);  
 	    if(skim_isFastsim){
-	      int bin_FS  = h_mu_veto_FS->FindBin( std::max( std::min(lepSF_pt_cutoff, (float)lep2.p4.Pt()), lepSF_pt_min ), fabs(lep2.p4.Eta()), StopEvt.pu_ntrue );
-	      lepSF_FS    *= h_mu_veto_FS->GetBinContent(bin_FS);
-	      lepSF_FS_Up *= lepSF_FS + h_mu_veto_FS->GetBinError(bin_FS);
-	      lepSF_FS_Dn *= lepSF_FS + h_mu_veto_FS->GetBinError(bin_FS);
+               vector<float> updownerr_veto_mu_fs = getupdownerr(h_mu_veto_FS,(float)lep2.p4.Pt(),(float)lep2.p4.Eta(),lepSF_pt_cutoff, lepSF_pt_min, 2.2,true);
+	       lepSF    *= updownerr_veto_mu_fs.at(0); lepSF_Up *= updownerr_veto_mu_fs.at(1);lepSF_Dn *= updownerr_veto_mu_fs.at(2);  
 	    }
 	  }
 	} // end if 2nd lep is mu
-
 	int binX = h_mu_SF_tracking->GetXaxis()->FindBin( std::max(-2.23,(double)lep2.p4.Eta()) );
 	lepSF *= h_mu_SF_tracking->GetBinContent( binX );
 	lepSF_Up *= ( h_mu_SF_tracking->GetBinContent(binX) + h_mu_SF_tracking->GetBinError(binX) );
@@ -1060,7 +982,6 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 
       // If only 1 reco lepton, and is2lep event, then find lost gen lepton
       if( skim_applyVetoLeptonSFs && !StopEvt.is_data && nVetoLeptons==1 && StopEvt.is2lep ){
-	
 	for(int iGen=0; iGen<(int)gen_leps.p4.size(); iGen++){
 	  if( abs(gen_leps.id.at(iGen))!=11 && abs(gen_leps.id.at(iGen))!=13 ) continue;
 	  if( !gen_leps.fromHardProcessFinalState.at(iGen) ) continue;
@@ -1116,7 +1037,6 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
       StopEvt.weight_lepSF_fastSim_up   = lepSF_FS_Up;
       StopEvt.weight_lepSF_fastSim_down = lepSF_FS_Dn;
       if(debug) std::cout << "[babymaker::looper]: filling got lepton sf variables LINE:" <<__LINE__ << std::endl;
-
       // save the sum of weights for normalization offline to n-babies.
       if(!evt_isRealData() && skim_applyLeptonSFs) {
        counterhist->Fill(28,StopEvt.weight_lepSF);
@@ -1153,33 +1073,9 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
       //
       // Jet Selection
       //
-       float btagprob_data = 1.;
-       float btagprob_mc = 1.;
-       float btagprob_heavy_UP = 1.;
-       float btagprob_heavy_DN = 1.;
-       float btagprob_light_UP = 1.;
-       float btagprob_light_DN = 1.;
-       float btagprob_FS_UP = 1.;
-       float btagprob_FS_DN = 1.;
- 
-       float btagprob_data_jup = 1.;
-       float btagprob_mc_jup  = 1.;
-       float btagprob_heavy_UP_jup  = 1.;
-       float btagprob_heavy_DN_jup  = 1.;
-       float btagprob_light_UP_jup  = 1.;
-       float btagprob_light_DN_jup  = 1.;
-       float btagprob_FS_UP_jup  = 1.;
-       float btagprob_FS_DN_jup  = 1.;
-
-       float btagprob_data_jdown = 1.;
-       float btagprob_mc_jdown = 1.;
-       float btagprob_heavy_UP_jdown = 1.;
-       float btagprob_heavy_DN_jdown = 1.;
-       float btagprob_light_UP_jdown = 1.;
-       float btagprob_light_DN_jdown = 1.;
-       float btagprob_FS_UP_jdown = 1.;
-       float btagprob_FS_DN_jdown = 1.;
-       
+       float btagprob_data(1), btagprob_mc(1),btagprob_heavy_UP(1),btagprob_heavy_DN(1),btagprob_light_UP(1),btagprob_light_DN(1), btagprob_FS_UP(1),btagprob_FS_DN(1);
+       float btagprob_data_jup(1),btagprob_mc_jup(1),btagprob_heavy_UP_jup(1),btagprob_heavy_DN_jup(1),btagprob_light_UP_jup(1),btagprob_light_DN_jup(1),btagprob_FS_UP_jup(1),btagprob_FS_DN_jup(1);
+       float btagprob_data_jdown(1),btagprob_mc_jdown(1), btagprob_heavy_UP_jdown(1), btagprob_heavy_DN_jdown(1), btagprob_light_UP_jdown(1), btagprob_light_DN_jdown(1),btagprob_FS_UP_jdown(1), btagprob_FS_DN_jdown(1);
       //std::cout << "[babymaker::looper]: filling jets vars" << std::endl;         
       // Get the jets overlapping with the selected leptons
       if(debug) std::cout << "[babymaker::looper]: about to fill jet variables variables LINE:" <<__LINE__ << std::endl;
@@ -1219,8 +1115,8 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
         jets_jdown.SetJetSelection("ak8", skim_jet_ak8_pt, skim_jet_ak8_eta, true); //save only jets passing jid
         jets_jdown.FillCommon(idx_alloverlapjets_jdown, jet_corrector_pfL1FastJetL2L3,btagprob_data_jdown,btagprob_mc_jdown,btagprob_heavy_UP_jdown, btagprob_heavy_DN_jdown, btagprob_light_UP_jdown,btagprob_light_DN_jdown,btagprob_FS_UP_jdown,btagprob_FS_DN_jdown,jet_overlep1_idx, jet_overlep2_idx,true,jetcorr_uncertainty_sys,-1, false, skim_isFastsim);
       }
-
-       if(debug) std::cout << "[babymaker::looper]: filling jet variables LINE:" <<__LINE__ << std::endl;
+      
+      if(debug) std::cout << "[babymaker::looper]: filling jet variables LINE:" <<__LINE__ << std::endl;
 	
       if (!evt_isRealData()){
 	int NISRjets = 0;
@@ -1293,25 +1189,20 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 	 counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,23,StopEvt.weight_btagsf_fastsim_DN);
        }
      }
-      // 
       // apply skim
-      //
       if(debug) std::cout << "[babymaker::looper]: going to apply skims LINE:" <<__LINE__ << std::endl;
       if(nGoodLeptons < skim_nGoodLep) continue;      nEvents_pass_skim_nGoodLep++;
-      if(!(jets.ngoodjets >= skim_nJets) && !(jets.ngoodjets_jup >= skim_nJets) && !(jets.ngoodjets_jdown >= skim_nJets)) continue;
+      if(!(jets.ngoodjets >= skim_nJets)) continue;
+       // && !(jets.ngoodjets_jup >= skim_nJets) && !(jets.ngoodjets_jdown >= skim_nJets)) continue;
       nEvents_pass_skim_nJets++;
       if(!(jets.ngoodbtags >= skim_nBJets) && !(jets.ngoodbtags_jup >= skim_nBJets) && !(jets.ngoodbtags_jdown >= skim_nBJets)) continue;
       nEvents_pass_skim_nBJets++;//
       // fastsim filter for bad jets//
-      //
       if(debug) std::cout << "[babymaker::looper]: fastsim filter LINE:" <<__LINE__ << std::endl;
 	bool isbadmuonjet = false;
 	for(unsigned int jdx = 0; jdx<jets.ak4pfjets_p4.size(); ++jdx){
-      if(debug) std::cout << "[babymaker::looper]: fastsim filter LINE:" <<__LINE__ << std::endl;
 	  jets.dphi_ak4pfjet_met.push_back(getdphi(jets.ak4pfjets_p4[jdx].Phi(),StopEvt.pfmet_phi));
-      if(debug) std::cout << "[babymaker::looper]: fastsim filter LINE:" <<__LINE__ << std::endl;
 	  if(jets.ak4pfjets_p4[jdx].Pt()>200 && jets.dphi_ak4pfjet_met[jdx]>(TMath::Pi()-0.4) && jets.ak4pfjets_muf[jdx]>0.5) isbadmuonjet = true;
-      if(debug) std::cout << "[babymaker::looper]: fastsim filter LINE:" <<__LINE__ << std::endl;
 	}
 	StopEvt.filt_jetWithBadMuon = !isbadmuonjet;
        if(debug) std::cout << "[babymaker::looper]: filling jet variables LINE:" <<__LINE__ << std::endl;
@@ -1432,8 +1323,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
         if(jets_jdown.ak4pfjets_passMEDbtag.at(jetIndexSortedCSV_jdown[idx])==true) mybjets_jdown.push_back(jets_jdown.ak4pfjets_p4.at(jetIndexSortedCSV_jdown[idx]) );
         else if(mybjets_jdown.size()<=1 && (mybjets_jdown.size()+myaddjets_jdown.size())<3) myaddjets_jdown.push_back(jets_jdown.ak4pfjets_p4.at(jetIndexSortedCSV_jdown[idx]) );
       }
-     // looks like all the following variables need jets to be calculated. 
-      //   add protection for skim settings of njets<2
+      // the following variables need jets to be calculated. 
       vector<float> dummy_sigma; dummy_sigma.clear(); //move outside of if-clause to be able to copy for photon selection
       for (size_t idx = 0; idx < jets.ak4pfjets_p4.size(); ++idx){
 	dummy_sigma.push_back(0.1);
@@ -1724,9 +1614,9 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
       //
       if(debug)      std::cout << "[babymaker::laooper]: filling isotrack vars  LINE:" <<__LINE__ << std::endl;
       int vetotracks_v2(0), vetotracks_v3(0);
+          if (debug) cout << "before highPtPFcands" << endl;
       for (unsigned int ipf = 0; ipf < pfcands_p4().size(); ipf++) {
 	  float cand_pt = cms3.pfcands_p4().at(ipf).pt();
-          if (debug) cout << "before highPtPFcands" << endl;
           if (saveHighPtPFcands) {
 	  //HIGH-PT PF CANDS
 	   Tracks.nhighPtPFcands = 0;
@@ -1947,8 +1837,8 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
       
       if(jets.ngoodjets > 1) {
         StopEvt.mindphi_met_j1_j2_rl = getMinDphi(StopEvt.pfmet_phi_rl,jets.ak4pfjets_p4.at(0),jets.ak4pfjets_p4.at(1));
-        StopEvt.mindphi_met_j1_j2_rl_jup = getMinDphi(StopEvt.pfmet_phi_rl_jup,jets_jup.ak4pfjets_p4.at(0),jets_jup.ak4pfjets_p4.at(1));
-        StopEvt.mindphi_met_j1_j2_rl_jdown = getMinDphi(StopEvt.pfmet_phi_rl_jdown,jets_jdown.ak4pfjets_p4.at(0),jets_jdown.ak4pfjets_p4.at(1));
+      //  StopEvt.mindphi_met_j1_j2_rl_jup = getMinDphi(StopEvt.pfmet_phi_rl_jup,jets_jup.ak4pfjets_p4.at(0),jets_jup.ak4pfjets_p4.at(1));
+      //  StopEvt.mindphi_met_j1_j2_rl_jdown = getMinDphi(StopEvt.pfmet_phi_rl_jdown,jets_jdown.ak4pfjets_p4.at(0),jets_jdown.ak4pfjets_p4.at(1));
       }
       if(!(StopEvt.pfmet >= skim_met) && !(StopEvt.pfmet_rl >= skim_met) && !(StopEvt.pfmet_rl_jup >= skim_met) && !(StopEvt.pfmet_rl_jdown >= skim_met) && !(StopEvt.pfmet_jup >= skim_met) && !(StopEvt.pfmet_jdown >= skim_met)) continue;
       nEvents_pass_skim_met++;
