@@ -141,6 +141,32 @@ class babyMaker {
   TH2D* h_btag_eff_c_fastsim_loose;
   TH2D* h_btag_eff_udsg_fastsim_loose;
   
+  TFile *f_el_SF;
+  // Fullsim Electron file
+  TFile *f_el_SF_tracking;
+  // Fullsim Muon files
+  TFile *f_mu_SF_id;
+  TFile *f_mu_SF_iso;
+  TFile *f_mu_SF_ip;
+  TFile *f_mu_SF_tracking;
+  TFile *f_mu_SF_veto_id;
+  TFile *f_mu_SF_veto_iso;
+  TFile *f_mu_SF_veto_ip;
+  // Fullsim/Fastsim Electron files
+  TFile *f_el_FS_ID;
+  TFile *f_el_FS_Iso;
+  TFile *f_el_veto_FS_ID;
+  TFile *f_el_veto_FS_Iso;
+
+  // Fullsim/Fastsim Muon files
+  TFile *f_mu_FS_ID;
+  TFile *f_mu_FS_Iso;
+  TFile *f_mu_FS_Ip;
+  TFile *f_mu_veto_FS_ID;
+  TFile *f_mu_veto_FS_Iso;
+  TFile *f_mu_veto_FS_Ip;
+  TFile *f_vetoLep_eff;
+
 };
 
 //====================//

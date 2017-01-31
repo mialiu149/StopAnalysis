@@ -190,34 +190,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
   if(JES_type != 0) applyJECunc = true; 
 
   // is there a better way to do the electron sf, not in the looper?! it's so messy.  
-
-  // Fullsim Electron file
-  TFile *f_el_SF;
-  TFile *f_el_SF_tracking;
-  // Fullsim Muon files
-  TFile *f_mu_SF_id;
-  TFile *f_mu_SF_iso;
-  TFile *f_mu_SF_ip;
-  TFile *f_mu_SF_tracking;
-  TFile *f_mu_SF_veto_id;
-  TFile *f_mu_SF_veto_iso;
-  TFile *f_mu_SF_veto_ip;
-  // Fullsim/Fastsim Electron files
-  TFile *f_el_FS_ID;
-  TFile *f_el_FS_Iso;
-  TFile *f_el_veto_FS_ID;
-  TFile *f_el_veto_FS_Iso;
-
-  // Fullsim/Fastsim Muon files
-  TFile *f_mu_FS_ID;
-  TFile *f_mu_FS_Iso;
-  TFile *f_mu_FS_Ip;
-  TFile *f_mu_veto_FS_ID;
-  TFile *f_mu_veto_FS_Iso;
-  TFile *f_mu_veto_FS_Ip;
-
   // Lepton MC reco efficiency for veto lep IDs
-  TFile *f_vetoLep_eff;
  
   // Final scale factor histograms for selected leptons
   TH2D *h_el_SF = NULL;
@@ -1850,8 +1823,9 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
       if(!skim_isSignalFromFileName){
 	StopEvt.HLT_MET = passHLTTriggerPattern("HLT_PFMET170_NoiseCleaned_v") || passHLTTriggerPattern("HLT_PFMET170_JetIdCleaned_v") || passHLTTriggerPattern("HLT_PFMET170_HBHECleaned_v") || passHLTTriggerPattern("HLT_PFMET170_NotCleaned_v"); 
 	StopEvt.HLT_MET100_MHT100 = passHLTTriggerPattern("HLT_PFMET100_PFMHT100_IDTight_v");
-	StopEvt.HLT_SingleEl = passHLTTriggerPattern("HLT_Ele25_eta2p1_WPTight_Gsf_v") || passHLTTriggerPattern("HLT_Ele27_WP85_Gsf_v") ||passHLTTriggerPattern("HLT_Ele27_eta2p1_WPLoose_Gsf_v") || passHLTTriggerPattern("HLT_Ele27_eta2p1_WPTight_Gsf_v");
-	StopEvt.HLT_SingleMu = passHLTTriggerPattern("HLT_IsoMu20_v") || passHLTTriggerPattern("HLT_IsoTkMu20_v") || passHLTTriggerPattern("HLT_IsoMu22_v") || passHLTTriggerPattern("HLT_IsoTkMu22_v") || passHLTTriggerPattern("HLT_IsoMu24_v") || passHLTTriggerPattern("HLT_IsoTkMu24_v");
+	StopEvt.HLT_SingleEl = passHLTTriggerPattern("HLT_Ele27_eta2p1_WPLoose_Gsf_v") || passHLTTriggerPattern("HLT_Ele27_eta2p1_WPTight_Gsf_v") ||  passHLTTriggerPattern("HLT_Ele105_CaloIdVT_GsfTrkIdT_v") || passHLTTriggerPattern("HLT_Ele115_CaloIdVT_GsfTrkIdT_v");
+	//StopEvt.HLT_SingleMu = passHLTTriggerPattern("HLT_IsoMu20_v") || passHLTTriggerPattern("HLT_IsoTkMu20_v") || passHLTTriggerPattern("HLT_IsoMu22_v") || passHLTTriggerPattern("HLT_IsoTkMu22_v") || passHLTTriggerPattern("HLT_IsoMu24_v") || passHLTTriggerPattern("HLT_IsoTkMu24_v");
+	StopEvt.HLT_SingleMu = passHLTTriggerPattern("HLT_IsoMu24_v") || passHLTTriggerPattern("HLT_IsoTkMu24_v") || passHLTTriggerPattern("HLT_Mu50_v") || passHLTTriggerPattern("HLT_TkMu50_v")|| passHLTTriggerPattern("HLT_Mu55_v");
 	StopEvt.HLT_DiEl =  passHLTTriggerPattern("HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v");
 	StopEvt.HLT_DiMu =  passHLTTriggerPattern("HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v") || passHLTTriggerPattern("HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v");
 	StopEvt.HLT_MuE = passHLTTriggerPattern("HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_v") || passHLTTriggerPattern("HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v"); 
