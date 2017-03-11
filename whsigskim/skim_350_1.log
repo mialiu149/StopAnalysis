@@ -1,0 +1,14 @@
+****************************
+* Welcome to ROOT v6.06/01 *
+****************************
+loading libFWCoreFWLite.so
+Using TDR style file: https://twiki.cern.ch/twiki/pub/CMS/SUSYLimitTools/tdrstyle.C
+
+Processing skim_signal_point_CMS3.C("/hadoop/cms/store/group/snt/run2_moriond17_fastsim/SMS-TChiWH_WToLNu_HToBB_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/V08-00-16/","/nfs-7/userdata/mliu/tupler_babies/merged/onelepbabymaker/whsigncms3_moriond/","merged_ntuple",350,1,"TChiWH_350_1_13TeV_CMS3")...
+Skimming with selection : sparm_values[0] == 350 && sparm_values[1] == 1
+Reading in : /hadoop/cms/store/group/snt/run2_moriond17_fastsim/SMS-TChiWH_WToLNu_HToBB_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/V08-00-16//merged_ntuple*.root
+Writing to : /nfs-7/userdata/mliu/tupler_babies/merged/onelepbabymaker/whsigncms3_moriond//TChiWH_350_1_13TeV_CMS3.root
+Selection : sparm_values[0] == 350 && sparm_values[1] == 1
+Input tree has entries: 8933008
+Output tree has entries: 25806
+Reduction factor of: 346.16

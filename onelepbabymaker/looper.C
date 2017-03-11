@@ -32,7 +32,7 @@
 #include "goodrun.h"
 #include "dorky.cc"
 
-bool debug = false;
+bool debug =false;
 bool saveHighPtPFcands = true;
 typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > LorentzVector;
 
@@ -101,7 +101,6 @@ void babyMaker::setSkimVariables(bool isDataFromFileName ,bool isSignalFromFileN
   skim_applyVetoLeptonSFs  = applyVetoLeptonSFs;
   skim_applyBtagSFs    = applyBtagSFs;
   skim_isFastsim       = isFastsim;
-  skim_isDataFromFileName = isDataFromFileName;
   skim_isSignalFromFileName = isSignalFromFileName;
   filltaus   = filltaus_;
   filltracks   =filltracks_;
@@ -121,7 +120,7 @@ void babyMaker::setSkimVariables(bool isDataFromFileName ,bool isSignalFromFileN
 }
 
 void babyMaker::MakeBabyNtuple(std::string output_name){
-  std::string str = babypath+ output+".root";
+  std::string str = babypath + output+".root";
   const char *cstr = str.c_str();
   cout<<cstr<<endl;
   BabyFile = new TFile(cstr, "RECREATE");
@@ -164,7 +163,7 @@ void babyMaker::InitBabyNtuple(){
   Taus.Reset();  Tracks.Reset();  gen_leps.Reset();  gen_nus.Reset();  gen_qs.Reset();  gen_bosons.Reset();  gen_susy.Reset();
 } 
 //================//
-int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::string path){
+int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::string path, std::string dataperiod){
   // Set output file path
   babypath = path; output = output_name;
   // Benchmark
@@ -221,53 +220,54 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 
     cout << "  Grabbing lepton scale factors " << endl;
      // Electron file
-    f_el_SF          = new TFile("lepsf/analysis2016_12p9fb/scaleFactors.root", "read");
-    f_el_SF_tracking = new TFile("lepsf/analysis2016_12p9fb/egammaEffi.txt_SF2D.root", "read");
+    //f_el_SF          = new TFile("lepsf/analysis2016_12p9fb/scaleFactors.root", "read");
+    //f_el_SF_tracking = new TFile("lepsf/analysis2016_12p9fb/egammaEffi.txt_SF2D.root", "read");
+    f_el_SF          = new TFile("lepsf/analysis2016_36p46fb/scaleFactors.root", "read");
+    f_el_SF_tracking = new TFile("lepsf/analysis2016_36p46fb/egammaEffi.txt_EGM2D.root", "read");
     
     // Muon files
-    f_mu_SF_id       = new TFile("lepsf/analysis2016_12p9fb/TnP_MuonID_NUM_MediumID_DENOM_generalTracks_VAR_map_pt_eta.root", "read"); // double unc
-    f_mu_SF_iso      = new TFile("lepsf/analysis2016_12p9fb/TnP_MuonID_NUM_MiniIsoTight_DENOM_MediumID_VAR_map_pt_eta.root", "read"); // double unc
-    f_mu_SF_ip       = new TFile("lepsf/analysis2016_12p9fb/TnP_MuonID_NUM_TightIP2D_DENOM_MediumID_VAR_map_pt_eta.root", "read"); // double unc
+    f_mu_SF_id       = new TFile("lepsf/analysis2016_36p46fb/TnP_NUM_MediumID_DENOM_generalTracks_VAR_map_pt_eta.root", "read"); 
+    f_mu_SF_iso      = new TFile("lepsf/analysis2016_36p46fb/TnP_NUM_MiniIsoTight_DENOM_MediumID_VAR_map_pt_eta.root", "read"); // double unc
+    f_mu_SF_ip       = new TFile("lepsf/analysis2016_36p46fb/TnP_NUM_TightIP2D_DENOM_MediumID_VAR_map_pt_eta.root", "read"); // double unc
     f_mu_SF_tracking = new TFile("lepsf/analysis2016_12p9fb/muons_tracking_sf.root", "read"); 
     
-    f_mu_SF_veto_id  = new TFile("lepsf/analysis2016_12p9fb/TnP_MuonID_NUM_LooseID_DENOM_generalTracks_VAR_map_pt_eta.root", "read");
-    f_mu_SF_veto_iso = new TFile("lepsf/analysis2016_12p9fb/TnP_MuonID_NUM_MiniIsoTight_DENOM_LooseID_VAR_map_pt_eta.root", "read");
-    f_mu_SF_veto_ip  = new TFile("lepsf/analysis2016_12p9fb/TnP_MuonID_NUM_MediumIP2D_DENOM_LooseID_VAR_map_pt_eta.root", "read"); // double unc for this
+    f_mu_SF_veto_id  = new TFile("lepsf/analysis2016_36p46fb/TnP_NUM_LooseID_DENOM_generalTracks_VAR_map_pt_eta.root", "read");
+    f_mu_SF_veto_iso = new TFile("lepsf/analysis2016_36p46fb/TnP_NUM_MiniIsoTight_DENOM_LooseID_VAR_map_pt_eta.root", "read");
+    f_mu_SF_veto_ip  = new TFile("lepsf/analysis2016_36p46fb/TnP_NUM_MediumIP2D_DENOM_LooseID_VAR_map_pt_eta.root", "read"); // double unc for this
+        // Fastsim/Fullsim el files
+    f_el_FS_ID  = new TFile("lepsf/analysis2016_36p46fb/sf_el_mediumCB.root", "read");
+    f_el_FS_Iso = new TFile("lepsf/analysis2016_36p46fb/sf_el_mini01.root", "read");
     
-    // Fastsim/Fullsim el files
-    f_el_FS_ID  = new TFile("lepsf/analysis2016_12p9fb/sf_el_mediumCB.root", "read");
-    f_el_FS_Iso = new TFile("lepsf/analysis2016_12p9fb/sf_el_mini01.root", "read");
-    
-    f_el_veto_FS_ID  = new TFile("lepsf/analysis2016_12p9fb/sf_el_vetoCB.root", "read");
-    f_el_veto_FS_Iso = new TFile("lepsf/analysis2016_12p9fb/sf_el_mini02.root", "read"); 
+    f_el_veto_FS_ID  = new TFile("lepsf/analysis2016_36p46fb/sf_el_vetoCB.root", "read");
+    f_el_veto_FS_Iso = new TFile("lepsf/analysis2016_36p46fb/sf_el_mini02.root", "read"); 
     
     // Fastsim/Fullsim mu files
-    f_mu_FS_ID  = new TFile("lepsf/analysis2016_12p9fb/sf_mu_medium.root", "read"); // double unc for this
-    f_mu_FS_Iso = new TFile("lepsf/analysis2016_12p9fb/sf_mu_mediumID_mini02.root", "read"); // double unc for this
-    f_mu_FS_Ip  = new TFile("lepsf/analysis2016_12p9fb/sf_mu_tightIP2D.root", "read"); // double unc for this
+    f_mu_FS_ID  = new TFile("lepsf/analysis2016_36p46fb/sf_mu_mediumID.root", "read"); // double unc for this
+    f_mu_FS_Iso = new TFile("lepsf/analysis2016_36p46fb/sf_mu_mediumID_mini02.root", "read"); // double unc for this
+    f_mu_FS_Ip  = new TFile("lepsf/analysis2016_36p46fb/sf_mu_mediumID_tightIP2D.root", "read"); // double unc for this
     
-    f_mu_veto_FS_ID  = new TFile("lepsf/analysis2016_12p9fb/sf_mu_loose.root", "read");
-    f_mu_veto_FS_Iso = new TFile("lepsf/analysis2016_12p9fb/sf_mu_looseID_mini02.root", "read");
-    f_mu_veto_FS_Ip  = new TFile("lepsf/analysis2016_12p9fb/sf_mu_looseIP2D.root", "read"); // double unc for this
+    f_mu_veto_FS_ID  = new TFile("lepsf/analysis2016_36p46fb/sf_mu_looseID.root", "read");
+    f_mu_veto_FS_Iso = new TFile("lepsf/analysis2016_36p46fb/sf_mu_looseID_mini02.root", "read");
+    f_mu_veto_FS_Ip  = new TFile("lepsf/analysis2016_36p46fb/sf_mu_mediumID_looseIP2D.root", "read"); // double unc for this
 
     // Veto lepton reco efficiency files
-    f_vetoLep_eff = new TFile("lepsf/analysis2016_12p9fb/lepeff__ttbar_diLept_madgraph_pythia8_ext1_25ns__80x.root", "read");
+    f_vetoLep_eff = new TFile("lepsf/analysis2016_36p46fb/lepeff__moriond17__ttbar_powheg_pythia8_25ns.root", "read");
 
     // Grab el histos
-    TH2D *h_el_SF_id_temp       = (TH2D*)f_el_SF->Get("GsfElectronToMedium");
+    TH2D *h_el_SF_id_temp       = (TH2D*)f_el_SF->Get("GsfElectronToCutBasedSpring15M");
     TH2D *h_el_SF_iso_temp      = (TH2D*)f_el_SF->Get("MVAVLooseElectronToMini");
     TH2D *h_el_SF_tracking_temp = (TH2D*)f_el_SF_tracking->Get("EGamma_SF2D");
-    TH2D *h_el_SF_veto_id_temp  = (TH2D*)f_el_SF->Get("GsfElectronToVeto");
+    TH2D *h_el_SF_veto_id_temp  = (TH2D*)f_el_SF->Get("GsfElectronToCutBasedSpring15V");
     TH2D *h_el_SF_veto_iso_temp = (TH2D*)f_el_SF->Get("MVAVLooseElectronToMini2");
 
     // Grab mu histos
-    TH2D *h_mu_SF_id_temp  = (TH2D*)f_mu_SF_id->Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0");
-    TH2D *h_mu_SF_iso_temp = (TH2D*)f_mu_SF_iso->Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0_&_Medium2016_pass");
-    TH2D *h_mu_SF_ip_temp  = (TH2D*)f_mu_SF_ip->Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0_&_Medium2016_pass");
+    TH2D *h_mu_SF_id_temp  = (TH2D*)f_mu_SF_id->Get("SF");
+    TH2D *h_mu_SF_iso_temp = (TH2D*)f_mu_SF_iso->Get("SF");
+    TH2D *h_mu_SF_ip_temp  = (TH2D*)f_mu_SF_ip->Get("SF");
     TGraphAsymmErrors *h_mu_SF_tracking_temp  = (TGraphAsymmErrors*)f_mu_SF_tracking->Get("ratio_eta");
-    TH2D *h_mu_SF_veto_id_temp  = (TH2D*)f_mu_SF_veto_id->Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0");
-    TH2D *h_mu_SF_veto_iso_temp = (TH2D*)f_mu_SF_veto_iso->Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0_&_PF_pass");
-    TH2D *h_mu_SF_veto_ip_temp  = (TH2D*)f_mu_SF_veto_ip->Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0_&_PF_pass");
+    TH2D *h_mu_SF_veto_id_temp  = (TH2D*)f_mu_SF_veto_id->Get("SF");
+    TH2D *h_mu_SF_veto_iso_temp = (TH2D*)f_mu_SF_veto_iso->Get("SF");
+    TH2D *h_mu_SF_veto_ip_temp  = (TH2D*)f_mu_SF_veto_ip->Get("SF");
 
     // Grab fastsim/fullsim el histos
     TH2D *h_el_FS_ID_temp  = (TH2D*)f_el_FS_ID->Get("histo2D");
@@ -355,7 +355,6 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
     TH2D* h_mu_FS_Ip  = (TH2D*)h_mu_FS_Ip_temp->Clone("h_mu_FS_Ip");
     // Double unc. on selected muon FS id sfs, since not for our exact wp
     doubleSysError(h_mu_FS_Iso);
-    doubleSysError(h_mu_FS_ID);
     doubleSysError(h_mu_FS_Ip);
     h_mu_FS = (TH2D*)h_mu_FS_ID->Clone("h_mu_FS");
     h_mu_FS->Multiply(h_mu_FS_Iso);
@@ -366,9 +365,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
     TH2D* h_mu_veto_FS_Iso = (TH2D*)h_mu_veto_FS_Iso_temp->Clone("h_mu_veto_FS_Iso");
     TH2D* h_mu_veto_FS_Ip  = (TH2D*)h_mu_veto_FS_Ip_temp->Clone("h_mu_veto_FS_Ip");
     // Double unc. on selected muon FS ip sfs, since not for our exact wp
-    doubleSysError(h_mu_veto_FS_ID);
     doubleSysError(h_mu_veto_FS_Ip);
-    doubleSysError(h_mu_veto_FS_Iso);
 
     h_mu_veto_FS = (TH2D*)h_mu_veto_FS_ID->Clone("h_mu_veto_FS");
     h_mu_veto_FS->Multiply(h_mu_veto_FS_Iso);
@@ -390,9 +387,9 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
   }
   TFile *pileupfile; TH1D *hPU; TH1D *hPUup; TH1D *hPUdown;
   if(!skim_isDataFromFileName){
-    pileupfile = new TFile("puWeights_2015data_2p2fbinv.root","READ");
+    pileupfile = new TFile("puWeights_2016data_36p6fbinv.root","READ");
     if(pileupfile->IsZombie()) {
-      std::cout << "Somehow puWeights_2015data_2p2fbinv.root is corrupted. Exit..." << std::endl;
+      std::cout << "Somehow puWeights_2016data_36p6fbinv.root is corrupted. Exit..." << std::endl;
       exit(0);
     }
     hPU     = (TH1D*)pileupfile->Get("puWeight");
@@ -427,22 +424,51 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
   jecpath = getenv ("TOOLSPATH");
   // files for RunIISpring15 MC
   if (skim_isDataFromFileName) {
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  (Form("%s/jetcorr/data/run2_25ns/Spring16_25nsV6_DATA_L1FastJet_AK4PFchs.txt",jecpath));
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  (Form("%s/jetcorr/data/run2_25ns/Spring16_25nsV6_DATA_L2Relative_AK4PFchs.txt",jecpath));
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  (Form("%s/jetcorr/data/run2_25ns/Spring16_25nsV6_DATA_L3Absolute_AK4PFchs.txt",jecpath));
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  (Form("%s/jetcorr/data/run2_25ns/Spring16_25nsV6_DATA_L2L3Residual_AK4PFchs.txt",jecpath));
-    jetcorr_uncertainty_filename = Form("%s/jetcorr/data/run2_25ns/Spring16_25nsV6_DATA_Uncertainty_AK4PFchs.txt",jecpath);
-  } else if(skim_isSignalFromFileName){
+      if(dataperiod.find("2016B") != std::string::npos ||
+       dataperiod.find("2016C") != std::string::npos ||
+       dataperiod.find("2016D") != std::string::npos    ){
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  (Form("%s/jetcorr/data/run2_25ns/Summer16_23Sep2016BCDV3_DATA/Summer16_23Sep2016BCDV3_DATA_L1FastJet_AK4PFchs.txt",jecpath));
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  (Form("%s/jetcorr/data/run2_25ns/Summer16_23Sep2016BCDV3_DATA/Summer16_23Sep2016BCDV3_DATA_L2Relative_AK4PFchs.txt",jecpath));
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  (Form("%s/jetcorr/data/run2_25ns/Summer16_23Sep2016BCDV3_DATA/Summer16_23Sep2016BCDV3_DATA_L3Absolute_AK4PFchs.txt",jecpath));
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  (Form("%s/jetcorr/data/run2_25ns/Summer16_23Sep2016BCDV3_DATA/Summer16_23Sep2016BCDV3_DATA_L2L3Residual_AK4PFchs.txt",jecpath));
+    jetcorr_uncertainty_filename = Form("%s/jetcorr/data/run2_25ns/Summer16_23Sep2016BCDV3_DATA/Summer16_23Sep2016BCDV3_DATA_Uncertainty_AK4PFchs.txt",jecpath);
+    }
+
+    if(dataperiod.find("2016E") != std::string::npos ||
+       dataperiod.find("2016F") != std::string::npos    ){
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  (Form("%s/jetcorr/data/run2_25ns/Summer16_23Sep2016EFV3_DATA/Summer16_23Sep2016EFV3_DATA_L1FastJet_AK4PFchs.txt",jecpath));
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  (Form("%s/jetcorr/data/run2_25ns/Summer16_23Sep2016EFV3_DATA/Summer16_23Sep2016EFV3_DATA_L2Relative_AK4PFchs.txt",jecpath));
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  (Form("%s/jetcorr/data/run2_25ns/Summer16_23Sep2016EFV3_DATA/Summer16_23Sep2016EFV3_DATA_L3Absolute_AK4PFchs.txt",jecpath));
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  (Form("%s/jetcorr/data/run2_25ns/Summer16_23Sep2016EFV3_DATA/Summer16_23Sep2016EFV3_DATA_L2L3Residual_AK4PFchs.txt",jecpath));
+    jetcorr_uncertainty_filename = Form("%s/jetcorr/data/run2_25ns/Summer16_23Sep2016EFV3_DATA/Summer16_23Sep2016EFV3_DATA_Uncertainty_AK4PFchs.txt",jecpath);
+    }
+
+    if(dataperiod.find("2016G") != std::string::npos){
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  (Form("%s/jetcorr/data/run2_25ns/Summer16_23Sep2016GV3_DATA/Summer16_23Sep2016GV3_DATA_L1FastJet_AK4PFchs.txt",jecpath));
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  (Form("%s/jetcorr/data/run2_25ns/Summer16_23Sep2016GV3_DATA/Summer16_23Sep2016GV3_DATA_L2Relative_AK4PFchs.txt",jecpath));
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  (Form("%s/jetcorr/data/run2_25ns/Summer16_23Sep2016GV3_DATA/Summer16_23Sep2016GV3_DATA_L3Absolute_AK4PFchs.txt",jecpath));
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  (Form("%s/jetcorr/data/run2_25ns/Summer16_23Sep2016GV3_DATA/Summer16_23Sep2016GV3_DATA_L2L3Residual_AK4PFchs.txt",jecpath));
+    jetcorr_uncertainty_filename = Form("%s/jetcorr/data/run2_25ns/Summer16_23Sep2016GV3_DATA/Summer16_23Sep2016GV3_DATA_Uncertainty_AK4PFchs.txt",jecpath);
+    }
+
+    if(dataperiod.find("2016H") != std::string::npos){
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  (Form("%s/jetcorr/data/run2_25ns/Summer16_23Sep2016HV3_DATA/Summer16_23Sep2016HV3_DATA_L1FastJet_AK4PFchs.txt",jecpath));
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  (Form("%s/jetcorr/data/run2_25ns/Summer16_23Sep2016HV3_DATA/Summer16_23Sep2016HV3_DATA_L2Relative_AK4PFchs.txt",jecpath));
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  (Form("%s/jetcorr/data/run2_25ns/Summer16_23Sep2016HV3_DATA/Summer16_23Sep2016HV3_DATA_L3Absolute_AK4PFchs.txt",jecpath));
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  (Form("%s/jetcorr/data/run2_25ns/Summer16_23Sep2016HV3_DATA/Summer16_23Sep2016HV3_DATA_L2L3Residual_AK4PFchs.txt",jecpath));
+    jetcorr_uncertainty_filename = Form("%s/jetcorr/data/run2_25ns/Summer16_23Sep2016HV3_DATA/Summer16_23Sep2016HV3_DATA_Uncertainty_AK4PFchs.txt",jecpath);
+    }
+ } else if(skim_isSignalFromFileName){
     jetcorr_filenames_pfL1FastJetL2L3.push_back  (Form("%s/jetcorr/data/run2_25ns/Spring16_FastSimV1_L1FastJet_AK4PFchs.txt",jecpath));
     jetcorr_filenames_pfL1FastJetL2L3.push_back  (Form("%s/jetcorr/data/run2_25ns/Spring16_FastSimV1_L2Relative_AK4PFchs.txt",jecpath));
     jetcorr_filenames_pfL1FastJetL2L3.push_back  (Form("%s/jetcorr/data/run2_25ns/Spring16_FastSimV1_L3Absolute_AK4PFchs.txt",jecpath));
     jetcorr_uncertainty_filename = Form("%s/jetcorr/data/run2_25ns/Spring16_FastSimV1_Uncertainty_AK4PFchs.txt",jecpath);
   }  
   else {
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  (Form("%s/jetcorr/data/run2_25ns/Summer16_25nsV5_MC/Summer16_25nsV5_MC_L1FastJet_AK4PFchs.txt",jecpath));
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  (Form("%s/jetcorr/data/run2_25ns/Summer16_25nsV5_MC/Summer16_25nsV5_MC_L2Relative_AK4PFchs.txt",jecpath));
-    jetcorr_filenames_pfL1FastJetL2L3.push_back  (Form("%s/jetcorr/data/run2_25ns/Summer16_25nsV5_MC/Summer16_25nsV5_MC_L3Absolute_AK4PFchs.txt",jecpath));
-    jetcorr_uncertainty_filename = Form("%s/jetcorr/data/run2_25ns/Summer16_25nsV5_MC/Summer16_25nsV5_MC_Uncertainty_AK4PFchs.txt",jecpath);
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  (Form("%s/jetcorr/data/run2_25ns/Summer16_23Sep2016V3_MC/Summer16_23Sep2016V3_MC_L1FastJet_AK4PFchs.txt",jecpath));
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  (Form("%s/jetcorr/data/run2_25ns/Summer16_23Sep2016V3_MC/Summer16_23Sep2016V3_MC_L2Relative_AK4PFchs.txt",jecpath));
+    jetcorr_filenames_pfL1FastJetL2L3.push_back  (Form("%s/jetcorr/data/run2_25ns/Summer16_23Sep2016V3_MC/Summer16_23Sep2016V3_MC_L3Absolute_AK4PFchs.txt",jecpath));
+    jetcorr_uncertainty_filename = Form("%s/jetcorr/data/run2_25ns/Summer16_23Sep2016V3_MC/Summer16_23Sep2016V3_MC_Uncertainty_AK4PFchs.txt",jecpath);
   }
 
   cout << "applying JEC from following files:" << endl;
@@ -468,9 +494,8 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
     TH2D* h_btag_eff_b_loose_temp = NULL;
     TH2D* h_btag_eff_c_loose_temp = NULL;
     TH2D* h_btag_eff_udsg_loose_temp = NULL;
-
     if(!skim_isFastsim){
-      f_btag_eff = new TFile("$COREPATH/Tools/btagsf/data/run2_25ns/btageff__ttbar_powheg_pythia8_25ns.root");
+      f_btag_eff = new TFile("$COREPATH/Tools/btagsf/data/run2_25ns/btageff__ttbar_powheg_pythia8_25ns_Moriond17.root");
       h_btag_eff_b_temp = (TH2D*) f_btag_eff->Get("h2_BTaggingEff_csv_med_Eff_b");
       h_btag_eff_c_temp = (TH2D*) f_btag_eff->Get("h2_BTaggingEff_csv_med_Eff_c");
       h_btag_eff_udsg_temp = (TH2D*) f_btag_eff->Get("h2_BTaggingEff_csv_med_Eff_udsg");
@@ -479,7 +504,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
       h_btag_eff_udsg_loose_temp = (TH2D*) f_btag_eff->Get("h2_BTaggingEff_csv_loose_Eff_udsg");
     }
     else{
-      f_btag_eff = new TFile("$COREPATH/Tools/btagsf/data/run2_fastsim/btageff__SMS-T1bbbb-T1qqqq_fastsim.root");
+      f_btag_eff = new TFile("$COREPATH/Tools/btagsf/data/run2_fastsim/btageff__SMS-T1bbbb-T1qqqq_25ns_Moriond17.root");
       h_btag_eff_b_temp = (TH2D*) f_btag_eff->Get("h2_BTaggingEff_csv_med_Eff_b");
       h_btag_eff_c_temp = (TH2D*) f_btag_eff->Get("h2_BTaggingEff_csv_med_Eff_c");
       h_btag_eff_udsg_temp = (TH2D*) f_btag_eff->Get("h2_BTaggingEff_csv_med_Eff_udsg");
@@ -502,6 +527,8 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
     }    
  
     jets.InitBtagSFTool(h_btag_eff_b,h_btag_eff_c,h_btag_eff_udsg, h_btag_eff_b_loose,h_btag_eff_c_loose,h_btag_eff_udsg_loose,skim_isFastsim); 
+    jets_jup.InitBtagSFTool(h_btag_eff_b,h_btag_eff_c,h_btag_eff_udsg, h_btag_eff_b_loose,h_btag_eff_c_loose,h_btag_eff_udsg_loose,skim_isFastsim); 
+    jets_jdown.InitBtagSFTool(h_btag_eff_b,h_btag_eff_c,h_btag_eff_udsg, h_btag_eff_b_loose,h_btag_eff_c_loose,h_btag_eff_udsg_loose,skim_isFastsim); 
 
   // Loop over the trees
 
@@ -524,9 +551,9 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
     unsigned int nEventsTree = tree->GetEntriesFast();
 
     for(unsigned int evt = 0; evt < nEventsTree; evt++){
-      nEvents_processed++;
       if(nEvents_processed >= nEventsToDo) break;
       cms3.GetEntry(evt);  // Get Event Content
+      nEvents_processed++;
       CMS3::progress(nEvents_processed, nEventsToDo);    // Progress bar
       InitBabyNtuple(); // Intialize Baby NTuple Branches
       // calculate sum of weights and save them in a hisogram.
@@ -584,8 +611,6 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
       }
 
       if(skim_isSignalFromFileName){
-        float mass_chargino = 250;
-        float mass_lsp = 75;
 	//get susy particle masses from sparms
 	for(unsigned int nsparm = 0; nsparm<sparm_names().size(); ++nsparm){
 	  if(sparm_names().at(nsparm).Contains("mCh")) StopEvt.mass_chargino = sparm_values().at(nsparm);
@@ -603,31 +628,32 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
         float SMSsum_of_weights= 0;
         float SMSaverage_of_weights= 0;
         //error on pdf replicas
-        if(genweights().size()>109){ //fix segfault
-          for(int ipdf=9;ipdf<109;ipdf++){
+	//fastsim has first genweights bin being ==1
+        if(genweights().size()>111){ //fix segfault
+          for(int ipdf=10;ipdf<110;ipdf++){
             SMSaverage_of_weights += cms3.genweights().at(ipdf);
           }// average of weights
           SMSaverage_of_weights =  average_of_weights/100.;
-          for(int ipdf=9;ipdf<109;ipdf++){
+          for(int ipdf=10;ipdf<110;ipdf++){
             SMSsum_of_weights += pow(cms3.genweights().at(ipdf)- SMSaverage_of_weights,2);
           }//std of weights.
           SMSpdf_weight_up = (average_of_weights+sqrt(SMSsum_of_weights/99.));
           SMSpdf_weight_down = (average_of_weights-sqrt(SMSsum_of_weights/99.));
           StopEvt.pdf_up_weight = SMSpdf_weight_up;//overwrite here, although it should not matter
           StopEvt.pdf_down_weight = SMSpdf_weight_down;//overwrite here, although it should not matter
-          counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,1,genweights()[0]);
-          counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,2,genweights()[1]);
-          counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,3,genweights()[2]);
-          counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,4,genweights()[3]);
-          counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,5,genweights()[4]);
-          counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,6,genweights()[5]);
-          counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,7,genweights()[6]);
-          counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,8,genweights()[7]);
-          counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,9,genweights()[8]);
+          counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,1,genweights()[1]);
+          counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,2,genweights()[2]);
+          counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,3,genweights()[3]);
+          counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,4,genweights()[4]);
+          counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,5,genweights()[5]);
+          counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,6,genweights()[6]);
+          counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,7,genweights()[7]);
+          counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,8,genweights()[8]);
+          counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,9,genweights()[9]);
           counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,10,SMSpdf_weight_up);
           counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,11,SMSpdf_weight_down);
-          counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,12,genweights()[109]); // α_s variation. 
-          counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,13,genweights()[110]); // α_s variation.
+          counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,12,genweights()[110]); // α_s variation. 
+          counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,13,genweights()[111]); // α_s variation.
         }
       }// is signal
       //
@@ -696,7 +722,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 	LorentzVector hardsystem;
 	hardsystem.SetPxPyPzE(0.,0.,0.,0.);
 	  for(unsigned int genx = 0; genx < gen_susy.id.size() ; genx++){
-	    if(isstopevent) {if(abs(gen_susy.id.at(genx))==pdg_chi_1plus1&& gen_susy.isLastCopy.at(genx)) hardsystem += gen_susy.p4.at(genx);}
+	    if(isstopevent) {if((abs(gen_susy.id.at(genx))==pdg_chi_1plus1 || abs(gen_susy.id.at(genx))==pdg_chi_2neutral)&& gen_susy.isLastCopy.at(genx)) hardsystem += gen_susy.p4.at(genx);}
             if(istopevent)  {if(abs(gen_qs.id.at(genx))==pdg_t && gen_qs.isLastCopy.at(genx)) hardsystem += gen_qs.p4.at(genx);}
             if(isWevent)    {if(abs(gen_bosons.id.at(genx))==pdg_W && abs(gen_bosons.id.at(genx))!=pdg_t && gen_bosons.isLastCopy.at(genx)) hardsystem +=+ gen_bosons.p4.at(genx);}
             if(isZevent)    {if(abs(gen_bosons.id.at(genx))==pdg_Z && abs(gen_bosons.id.at(genx))!=pdg_t && gen_bosons.isLastCopy.at(genx)) hardsystem += gen_bosons.p4.at(genx);}
@@ -705,15 +731,25 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 	StopEvt.weight_ISR = 1.;
 	//note - these weights don't contain the renormalization, hardcoded
 	if(StopEvt.hardgenpt>600.) {
-	  StopEvt.weight_ISRup = 1.3;
-	  StopEvt.weight_ISRdown = 0.7;
+	  StopEvt.weight_ISR = .783;
 	} else if(StopEvt.hardgenpt>400.) {
-	  StopEvt.weight_ISRup = 1.15;
-	  StopEvt.weight_ISRdown = 0.85;
+	  StopEvt.weight_ISR = .912;
+	} else if(StopEvt.hardgenpt>300.) {
+	  StopEvt.weight_ISR = 1.;
+	} else if(StopEvt.hardgenpt>200.) {
+	  StopEvt.weight_ISR = 1.057;
+	} else if(StopEvt.hardgenpt>150.) {
+	  StopEvt.weight_ISR = 1.150;
+	} else if(StopEvt.hardgenpt>100.) {
+	  StopEvt.weight_ISR = 1.179;
+	} else if(StopEvt.hardgenpt>50.) {
+	  StopEvt.weight_ISR = 1.052;
 	} else {
-	  StopEvt.weight_ISRup = 1.;
-	  StopEvt.weight_ISRdown = 1.;
+	  StopEvt.weight_ISR = 1.;
 	}
+          float isrweight_unc = fabs(StopEvt.weight_ISR-1);
+	  StopEvt.weight_ISRup = 1.+ isrweight_unc;
+	  StopEvt.weight_ISRdown = 1.-isrweight_unc;
 	counterhist->Fill(19,StopEvt.weight_ISR);
 	counterhist->Fill(20,StopEvt.weight_ISRup);
 	counterhist->Fill(21,StopEvt.weight_ISRdown);
@@ -784,6 +820,10 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
        }
       // pfmet over calomet filter
       StopEvt.filt_pfovercalomet = !(StopEvt.calomet>0&&StopEvt.pfmet/StopEvt.calomet>5);
+      if(evt_isRealData()){
+          StopEvt.pfmet = evt_muegclean_pfmet();
+          StopEvt.pfmet_phi = evt_muegclean_pfmetPhi();
+      }
       //
       //Lepton Variables
       //
@@ -893,16 +933,15 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
               lepSF *= updownerr_fs.at(0); lepSF_Up *=updownerr_fs.at(1); lepSF_Dn *=updownerr_fs.at(2);
 	  }
 	}
-	
 	if(abs(lep1.pdgid) == pdg_mu){
-           vector<float> updownerr_mu = getupdownerr(h_mu_SF,(float)lep1.p4.Pt(),(float)lep1.p4.Eta(),lepSF_pt_cutoff, lepSF_pt_min, 2.2,true);
+           vector<float> updownerr_mu = getupdownerr(h_mu_SF,(float)lep1.p4.Pt(),(float)lep1.p4.Eta(),lepSF_pt_cutoff, lepSF_pt_min, 2.1,true);
 	   lepSF    = updownerr_mu.at(0); lepSF_Up = updownerr_mu.at(1);lepSF_Dn=updownerr_mu.at(2);  
-	   int binX = h_mu_SF_tracking->GetXaxis()->FindBin( std::max(-2.2,(double)lep1.p4.Eta()) );
+	   int binX = h_mu_SF_tracking->GetXaxis()->FindBin( std::max(-2.1,(double)lep1.p4.Eta()) );
 	   lepSF *= h_mu_SF_tracking->GetBinContent( binX );
 	   lepSF_Up *= ( h_mu_SF_tracking->GetBinContent(binX) + h_mu_SF_tracking->GetBinError(binX) );
 	   lepSF_Dn *= ( h_mu_SF_tracking->GetBinContent(binX) - h_mu_SF_tracking->GetBinError(binX) );
 	   if(skim_isFastsim){
-              vector<float> updownerr_fs_mu = getupdownerr(h_mu_FS,(float)lep1.p4.Pt(),(float)lep1.p4.Eta(),lepSF_FS_pt_cutoff, lepSF_FS_pt_min, 2.2,true);
+              vector<float> updownerr_fs_mu = getupdownerr(h_mu_FS,(float)lep1.p4.Pt(),(float)lep1.p4.Eta(),lepSF_FS_pt_cutoff, lepSF_FS_pt_min, 2.1,true);
               lepSF *= updownerr_fs_mu.at(0); lepSF_Up *=updownerr_fs_mu.at(1); lepSF_Dn *=updownerr_fs_mu.at(2);
 	  }
 	}
@@ -918,6 +957,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
               lepSF *= updownerr_fs_lep2.at(0); lepSF_Up *=updownerr_fs_lep2.at(1); lepSF_Dn *=updownerr_fs_lep2.at(2);
 	    }
 	  } // end if 2 good electrons
+
 	  else{
             vector<float> updownerr_lep2_veto = getupdownerr(h_el_SF_veto,(float)lep2.p4.Pt(),(float)lep2.p4.Eta(),lepSF_pt_cutoff, lepSF_pt_min, 2.39,true);
             lepSF    *= updownerr_lep2_veto.at(0); lepSF_Up *= updownerr_lep2_veto.at(1);lepSF_Dn *= updownerr_lep2_veto.at(2); 
@@ -1165,10 +1205,10 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
       // apply skim
       if(debug) std::cout << "[babymaker::looper]: going to apply skims LINE:" <<__LINE__ << std::endl;
       if(nGoodLeptons < skim_nGoodLep) continue;      nEvents_pass_skim_nGoodLep++;
-      if(!(jets.ngoodjets >= skim_nJets)) continue;
-       // && !(jets.ngoodjets_jup >= skim_nJets) && !(jets.ngoodjets_jdown >= skim_nJets)) continue;
+//      if(!(jets.ngoodjets >= skim_nJets)) continue;
+       if(!(jets.ngoodjets >= skim_nJets) && !(jets_jup.ngoodjets >= skim_nJets) && !(jets_jdown.ngoodjets >= skim_nJets)) continue;
       nEvents_pass_skim_nJets++;
-      if(!(jets.ngoodbtags >= skim_nBJets) && !(jets.ngoodbtags_jup >= skim_nBJets) && !(jets.ngoodbtags_jdown >= skim_nBJets)) continue;
+      if(!(jets.ngoodbtags >= skim_nBJets) && !(jets_jup.ngoodbtags_jup >= skim_nBJets) && !(jets_jdown.ngoodbtags_jdown >= skim_nBJets)) continue;
       nEvents_pass_skim_nBJets++;//
       // fastsim filter for bad jets//
       if(debug) std::cout << "[babymaker::looper]: fastsim filter LINE:" <<__LINE__ << std::endl;
@@ -1193,20 +1233,24 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 	}
 	StopEvt.filt_jetWithBadMuon_jdown = !isbadmuonjet;
 
+      if(debug) std::cout << "[babymaker::looper]: filling jet variables LINE:" <<__LINE__ << std::endl;
       bool fastsimfilt = false;
-      for(unsigned int jix = 0; jix<=jets.ak4pfjets_p4.size();++jix){
+      for(unsigned int jix = 0; jix<jets.ak4pfjets_p4.size();++jix){
+      if(debug) std::cout << "[babymaker::looper]: filling jet variables LINE:" <<__LINE__ << std::endl;
 	if(jets.ak4pfjets_p4[jix].Pt()<30) continue;
+      if(debug) std::cout << "[babymaker::looper]: filling jet variables LINE:" <<__LINE__ << std::endl;
 	if(fabs(jets.ak4pfjets_p4[jix].Eta())>2.4) continue;
+      if(debug) std::cout << "[babymaker::looper]: filling jet variables LINE:" <<__LINE__ << std::endl;
 	bool isgenmatch = false;
 	for(unsigned int gix = 0; gix<jets.ak4genjets_p4.size();++gix){
 	  if(dRbetweenVectors(jets.ak4genjets_p4[gix],jets.ak4pfjets_p4[jix])<0.3) { isgenmatch = true; break; }
 	}
 	if(isgenmatch) continue;
 	if(jets.ak4pfjets_chf[jix]>0.1) continue;
-	fastsimfilt = true;
-	break;
+	{fastsimfilt = true;break;}
       }
-      StopEvt.filt_fastsimjets = fastsimfilt;
+      StopEvt.filt_fastsimjets = !fastsimfilt;
+      if(debug) std::cout << "[babymaker::looper]: filling jet variables LINE:" <<__LINE__ << std::endl;
 
       // FastSim filter, JESup Jets
       bool fastsimfilt_jup = false;
@@ -1222,7 +1266,8 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 	fastsimfilt_jup = true;
 	break;
       }
-      StopEvt.filt_fastsimjets_jup = fastsimfilt_jup;
+      StopEvt.filt_fastsimjets_jup = !fastsimfilt_jup;
+      if(debug) std::cout << "[babymaker::looper]: filling jet variables LINE:" <<__LINE__ << std::endl;
 
       // FastSim filter, JESdn Jets
       bool fastsimfilt_jdown = false;
@@ -1238,7 +1283,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 	fastsimfilt_jdown = true;
 	break;
       }
-      StopEvt.filt_fastsimjets_jdown = fastsimfilt_jdown;
+      StopEvt.filt_fastsimjets_jdown = !fastsimfilt_jdown;
       //
       // Photon Selection
       //
@@ -1269,6 +1314,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
       if(nVetoLeptons>0) StopEvt.dphi_Wlep = DPhi_W_lep(StopEvt.pfmet, StopEvt.pfmet_phi, lep1.p4);
       if(jets.ak4pfjets_p4.size()> 0) StopEvt.MET_over_sqrtHT = StopEvt.pfmet/TMath::Sqrt(jets.ak4_HT);
       
+      if(debug) std::cout << "[babymaker::looper]: filling jet variables LINE:" <<__LINE__ << std::endl;
       StopEvt.ak4pfjets_rho = evt_fixgridfastjet_all_rho();
       vector<int> jetIndexSortedCSV;
       if(skim_isFastsim) jetIndexSortedCSV = JetUtil::JetIndexCSVsorted(jets.ak4pfjets_CSV, jets.ak4pfjets_p4, jets.ak4pfjets_loose_pfid, skim_jet_pt, skim_jet_eta, false);
@@ -1279,6 +1325,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 	else if(mybjets.size()<=1 && (mybjets.size()+myaddjets.size())<3) myaddjets.push_back(jets.ak4pfjets_p4.at(jetIndexSortedCSV[idx]) );
       }
 
+      if(debug) std::cout << "[babymaker::looper]: filling jet variables LINE:" <<__LINE__ << std::endl;
       vector<int> jetIndexSortedCSV_jup;
       if(skim_isFastsim) jetIndexSortedCSV_jup = JetUtil::JetIndexCSVsorted(jets_jup.ak4pfjets_CSV, jets_jup.ak4pfjets_p4, jets_jup.ak4pfjets_loose_pfid, skim_jet_pt, skim_jet_eta, false);
       else jetIndexSortedCSV_jup = JetUtil::JetIndexCSVsorted(jets_jup.ak4pfjets_CSV, jets_jup.ak4pfjets_p4, jets_jup.ak4pfjets_loose_pfid, skim_jet_pt, skim_jet_eta, true);
@@ -1288,6 +1335,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
         else if(mybjets_jup.size()<=1 && (mybjets_jup.size()+myaddjets_jup.size())<3) myaddjets_jup.push_back(jets_jup.ak4pfjets_p4.at(jetIndexSortedCSV_jup[idx]) );
       }
 
+      if(debug) std::cout << "[babymaker::looper]: filling jet variables LINE:" <<__LINE__ << std::endl;
       vector<int> jetIndexSortedCSV_jdown;
       if(skim_isFastsim) jetIndexSortedCSV_jdown = JetUtil::JetIndexCSVsorted(jets_jdown.ak4pfjets_CSV, jets_jdown.ak4pfjets_p4, jets_jdown.ak4pfjets_loose_pfid, skim_jet_pt, skim_jet_eta, false);
       else jetIndexSortedCSV_jdown = JetUtil::JetIndexCSVsorted(jets_jdown.ak4pfjets_CSV, jets_jdown.ak4pfjets_p4, jets_jdown.ak4pfjets_loose_pfid, skim_jet_pt, skim_jet_eta, true);
@@ -1306,11 +1354,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 	// Hadronic Chi2
 	StopEvt.hadronic_top_chi2 = calculateChi2(jets.ak4pfjets_p4, dummy_sigma, jets.ak4pfjets_passMEDbtag);
         StopEvt.mbb = jets.ak4_mbb;
-        StopEvt.mbb_jup = jets_jup.ak4_mbb;
-        StopEvt.mbb_jdown = jets_jdown.ak4_mbb;
         StopEvt.mct = jets.ak4_mct;
-        StopEvt.mct_jup = jets_jup.ak4_mct;
-        StopEvt.mct_jdown = jets_jdown.ak4_mct;
 	// Jets & MET
 	StopEvt.mindphi_met_j1_j2 =  getMinDphi(StopEvt.pfmet_phi,jets.ak4pfjets_p4.at(0),jets.ak4pfjets_p4.at(1));
 	// DR(lep, leadB) with medium discriminator
@@ -1338,11 +1382,15 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
       }
       if(jets_jup.ak4pfjets_p4.size()>1){
         StopEvt.mindphi_met_j1_j2_jup =  getMinDphi(StopEvt.pfmet_phi_jup,jets_jup.ak4pfjets_p4.at(0),jets_jup.ak4pfjets_p4.at(1));
+        StopEvt.mbb_jup = jets_jup.ak4_mbb;
+        StopEvt.mct_jup = jets_jup.ak4_mct;
         if(nVetoLeptons>0) StopEvt.MT2W_jup = CalcMT2W_(mybjets_jup,myaddjets_jup,lep1.p4,StopEvt.pfmet_jup, StopEvt.pfmet_phi_jup);
         if(nVetoLeptons>0) StopEvt.topnessMod_jup = CalcTopness_(1,StopEvt.pfmet_jup,StopEvt.pfmet_phi_jup,lep1.p4,mybjets_jup,myaddjets_jup);
       }
       if(jets_jdown.ak4pfjets_p4.size()>1){
         StopEvt.mindphi_met_j1_j2_jdown =  getMinDphi(StopEvt.pfmet_phi_jdown,jets_jdown.ak4pfjets_p4.at(0),jets_jdown.ak4pfjets_p4.at(1));
+        StopEvt.mbb_jdown = jets_jdown.ak4_mbb;
+        StopEvt.mct_jdown = jets_jdown.ak4_mct;
         if(nVetoLeptons>0) StopEvt.MT2W_jdown = CalcMT2W_(mybjets_jdown,myaddjets_jdown,lep1.p4,StopEvt.pfmet_jdown, StopEvt.pfmet_phi_jdown);
         if(nVetoLeptons>0) StopEvt.topnessMod_jdown = CalcTopness_(1,StopEvt.pfmet_jdown,StopEvt.pfmet_phi_jdown,lep1.p4,mybjets_jdown,myaddjets_jdown);
       }
@@ -1564,7 +1612,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
       if(debug)      std::cout << "[babymaker::looper]: tau  vars. LINE:" <<__LINE__<< std::endl;
       int vetotaus=0;
       double tau_pt  = 20.0;
-      double tau_eta = 2.4;  
+      double tau_eta = 2.3;  
       
       Taus.tau_IDnames = taus_pf_IDnames();
       
@@ -1588,9 +1636,10 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
       if(debug)      std::cout << "[babymaker::laooper]: filling isotrack vars  LINE:" <<__LINE__ << std::endl;
       int vetotracks_v2(0), vetotracks_v3(0);
           if (debug) cout << "before highPtPFcands" << endl;
+
+      /*if (saveHighPtPFcands) {
       for (unsigned int ipf = 0; ipf < pfcands_p4().size(); ipf++) {
 	  float cand_pt = cms3.pfcands_p4().at(ipf).pt();
-          if (saveHighPtPFcands) {
 	  //HIGH-PT PF CANDS
 	   Tracks.nhighPtPFcands = 0;
 	   float absiso  = TrackIso(ipf, 0.3, 0.0, true, false);
@@ -1607,8 +1656,14 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 	     Tracks.highPtPFcands_mcMatchId.push_back ( 0 );
 	     Tracks.nhighPtPFcands++;
             }
+           else continue;
            }//saveHighPtPFcands
-	//selections of pf candidates
+      }
+     */
+      for (unsigned int ipf = 0; ipf < pfcands_p4().size(); ipf++) {
+	  float cand_pt = cms3.pfcands_p4().at(ipf).pt();
+/*         
+*/	//selections of pf candidates
 	if(pfcands_charge().at(ipf) == 0) continue;
 	if(cand_pt < 5) continue;
 	if(fabs(pfcands_p4().at(ipf).eta()) > 2.4 ) continue;
@@ -1645,7 +1700,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 	  }else Tracks.isoTracks_isVetoTrack_v3.push_back(false);
 	}
       } // end loop over pfCands
-      if(vetotracks_v3<1) StopEvt.PassTrackVeto = true; else StopEvt.PassTrackVeto = false;
+     if(vetotracks_v3<1) StopEvt.PassTrackVeto = true; else StopEvt.PassTrackVeto = false;
       if(skim_2ndlepveto && !(StopEvt.nvetoleps!=1&& StopEvt.PassTrackVeto&& StopEvt.PassTauVeto)) continue;
       nEvents_pass_skim_2ndlepVeto++;
       if(debug)      std::cout << "[babymaker::looper]: updating geninfo for recoleptons LINE:" <<__LINE__ << std::endl;

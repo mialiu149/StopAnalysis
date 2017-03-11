@@ -5,14 +5,14 @@ setup_CMSSW_80X
 #
 ANALYSIS_NAME=onelepbabymaker
 
-BABY_VERSION=moriond2017.v4
+BABY_VERSION=moriond2017.v14
 #BABY_VERSION=test.v12
 
 # do not modify this TARBALL_NAME
 TARBALL_NAME=package.$BABY_VERSION
 
-INSTRUCTIONS_FILE=instructions_2017.txt
-export INSTRUCTIONS_FILE=instructions_2017.txt
+INSTRUCTIONS_FILE=instructions_03Feb2017.txt
+export INSTRUCTIONS_FILE=instructions_03Feb2017.txt
 EXECUTABLE_NAME=condor_executable.sh
 
 BATCH_DIR=`pwd`
@@ -93,7 +93,7 @@ if [ ! -d $TARBALL_NAME ]; then
     sed -i '1i COREPATH = ../CORE/' $CONDOR_DIR_NAME/$MAKER_NAME/Makefile
     
     cp -r $MAKER_DIR/xsec_susy_13tev.root $CONDOR_DIR_NAME/$MAKER_NAME/
-    cp -r $MAKER_DIR/puWeights_2015data_2p2fbinv.root $CONDOR_DIR_NAME/$MAKER_NAME/
+    cp -r $MAKER_DIR/puWeights_2016data_36p6fbinv.root $CONDOR_DIR_NAME/$MAKER_NAME/
     cp -r $MAKER_DIR/*.dat $CONDOR_DIR_NAME/$MAKER_NAME/
     cp -r $MAKER_DIR/*.C $CONDOR_DIR_NAME/$MAKER_NAME/
     cp -r $MAKER_DIR/stop_variables/ $CONDOR_DIR_NAME/$MAKER_NAME/

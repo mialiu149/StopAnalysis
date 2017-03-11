@@ -1,0 +1,37 @@
+# lines beginning with '#' are ignored
+#
+#########################################################################
+#
+# ARGUMENTS:
+#
+#  BABY ANALYSIS VERSION DATASET TARBALL EXECUTABLE (NEVENTS=-1 OUTPUTNAMES=output.root EXTRA_ARGS="")
+#    BABY - exact name needed, is a flag needed for Autotwopler
+#    ANALYSIS - any string, will be used for paths created for output
+#    VERSION - any string, will be used for paths created for output
+#    DATASET - from twiki, will be used to find CMS3 paths and number
+#    TARBALL - location of tarball of code to be unpacked and used
+#    EXECUTABLE - location of condor executable for the analysis
+#
+#
+#  OPTIONAL ARGS:
+#    NEVENTS - number of events to run over
+#    OUTPUTNAMES - name of output file, ending in .root, ie for a skim, 
+#                  they must be formated as: separated by commas without spaces: 
+#                  ie file1.root,file2.root,file3.root,
+#    EXTRA_ARGS - any extra arguments that may be needed for running condor_executable.sh,
+#    		  all args should be comma sepearated with NO SPACES
+#    		  here, the fist is required and is the name of the sample in sample_2016.dat,
+#                 the second is optional, is a flag if the sample is fastsim (default=0, add ",1" as second arg)
+#
+#########################################################################
+
+
+
+
+##############
+## Examples ##
+##############
+
+BABY ANALYSIS VERSION /SMS-TChiWH_WToLNu_HToBB_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISummer16MiniAODv2-PUSummer16Fast_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM TARBALL.tar.gz EXECUTABLE -1 output.root,skim.root  SMS_tchiwh,1
+## tbar - tW channel - noHadDecays ##
+#BABY ANALYSIS VERSION /ST_tW_antitop_5f_NoFullyHadronicDecays_13TeV-powheg_TuneCUETP8M1/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM TARBALL.tar.gz EXECUTABLE -1 output.root,skim.root t_tbarW_5f_powheg_pythia8_noHadDecays_25ns

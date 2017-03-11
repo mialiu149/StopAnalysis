@@ -348,13 +348,19 @@ vector<float> getupdownerr( TH2D* hist, float pt, float eta, float pt_cutoff, fl
      vector<float> updownerr;
      int binX, binY;
      if(pteta) {
+       pt_min =  hist->GetXaxis()->GetBinLowEdge(1)+0.01;
+       pt_cutoff =  hist->GetXaxis()->GetBinLowEdge(hist->GetNbinsX()+1)-0.01;
+       float eta_min =  hist->GetYaxis()->GetBinLowEdge(1)+0.01;
+       eta_cutoff =  hist->GetYaxis()->GetBinLowEdge(hist->GetNbinsY()+1)-0.01;
        binX = hist->GetXaxis()->FindBin( std::max( std::min(pt_cutoff,pt),pt_min ) );
-       binY = hist->GetYaxis()->FindBin( eta);
+       binY = hist->GetYaxis()->FindBin( std::max( std::min(eta_cutoff,eta),eta_min ) );
      }
      else{
+       pt_min =  hist->GetYaxis()->GetBinLowEdge(1)+0.01;
+       pt_cutoff =  hist->GetYaxis()->GetBinLowEdge(hist->GetNbinsY()+1)-0.01;
        binX = hist->GetXaxis()->FindBin( max(min(eta_cutoff,eta),-eta_cutoff));
        binY = hist->GetYaxis()->FindBin( max(min(pt_cutoff,pt),pt_min));
-   }
+    }
      float lepSF    = hist->GetBinContent( binX, binY );
      float lepSF_Up = lepSF + hist->GetBinError( binX, binY );
      float lepSF_Dn = lepSF - hist->GetBinError( binX, binY );

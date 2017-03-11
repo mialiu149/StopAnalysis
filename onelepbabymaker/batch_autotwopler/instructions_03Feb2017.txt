@@ -1,0 +1,73 @@
+# lines beginning with '#' are ignored
+#
+#########################################################################
+#
+# ARGUMENTS:
+#
+#  BABY ANALYSIS VERSION DATASET TARBALL EXECUTABLE (NEVENTS=-1 OUTPUTNAMES=output.root EXTRA_ARGS="")
+#    BABY - exact name needed, is a flag needed for Autotwopler
+#    ANALYSIS - any string, will be used for paths created for output
+#    VERSION - any string, will be used for paths created for output
+#    DATASET - from twiki, will be used to find CMS3 paths and number
+#    TARBALL - location of tarball of code to be unpacked and used
+#    EXECUTABLE - location of condor executable for the analysis
+#
+#
+#  OPTIONAL ARGS:
+#    NEVENTS - number of events to run over
+#    OUTPUTNAMES - name of output file, ending in .root, ie for a skim, 
+#                  they must be formated as: separated by commas without spaces: 
+#                  ie file1.root,file2.root,file3.root,
+#    EXTRA_ARGS - any extra arguments that may be needed for running condor_executable.sh,
+#    		  all args should be comma sepearated with NO SPACES
+#    		  here, the fist is required and is the name of the sample in sample_2016.dat,
+#                 the second is optional, is a flag if the sample is fastsim (default=0, add ",1" as second arg)
+#
+#########################################################################
+## Single Electron - RunB 23Sep2016 Rereco ##
+BABY ANALYSIS VERSION /SingleElectron/Run2016B-03Feb2017_ver2-v2/CMS3 TARBALL.tar.gz EXECUTABLE -1 output.root,skim.root data_single_electron_Run2016B_MINIAOD_23Sep2016-v3
+
+## Single Electron - RunC 23Sep2016 Rereco ##
+BABY ANALYSIS VERSION /SingleElectron/Run2016C-03Feb2017-v1/CMS3 TARBALL.tar.gz EXECUTABLE -1 output.root,skim.root data_single_electron_Run2016C_MINIAOD_23Sep2016-v1
+
+## Single Electron - RunD 23Sep2016 Rereco ##
+BABY ANALYSIS VERSION /SingleElectron/Run2016D-03Feb2017-v1/CMS3 TARBALL.tar.gz EXECUTABLE -1 output.root,skim.root data_single_electron_Run2016D_MINIAOD_23Sep2016-v1
+
+## Single Electron - RunE 23Sep2016 Rereco ##
+BABY ANALYSIS VERSION /SingleElectron/Run2016E-03Feb2017-v1/CMS3 TARBALL.tar.gz EXECUTABLE -1 output.root,skim.root data_single_electron_Run2016E_MINIAOD_23Sep2016-v1
+
+## Single Electron - RunF 23Sep2016 Rereco ##
+BABY ANALYSIS VERSION /SingleElectron/Run2016F-03Feb2017-v1/CMS3 TARBALL.tar.gz EXECUTABLE -1 output.root,skim.root data_single_electron_Run2016F_MINIAOD_23Sep2016-v1
+
+## Single Electron - RunG 23Sep2016 Rereco ##
+BABY ANALYSIS VERSION /SingleElectron/Run2016G-03Feb2017-v1/CMS3 TARBALL.tar.gz EXECUTABLE -1 output.root,skim.root data_single_electron_Run2016G_MINIAOD_23Sep2016-v1
+
+## Single Electron - RunH PromptRecoV2 ##
+BABY ANALYSIS VERSION /SingleElectron/Run2016H-03Feb2017_ver2-v1/CMS3 TARBALL.tar.gz EXECUTABLE -1 output.root,skim.root data_single_electron_Run2016H_MINIAOD_PromptReco-v2
+
+## Single Electron - RunH PromptRecoV3 ##
+BABY ANALYSIS VERSION /SingleElectron/Run2016H-03Feb2017_ver3-v1/CMS3 TARBALL.tar.gz EXECUTABLE -1 output.root,skim.root data_single_electron_Run2016H_MINIAOD_PromptReco-v3
+
+## Single Muon - RunB 23Sep2016 Rereco ##
+BABY ANALYSIS VERSION /SingleMuon/Run2016B-03Feb2017_ver2-v2/CMS3 TARBALL.tar.gz EXECUTABLE -1 output.root,skim.root data_single_muon_Run2016B_MINIAOD_23Sep2016-v3
+
+## Single Muon - RunC 23Sep2016 Rereco ##
+BABY ANALYSIS VERSION /SingleMuon/Run2016C-03Feb2017-v1/CMS3 TARBALL.tar.gz EXECUTABLE -1 output.root,skim.root data_single_muon_Run2016C_MINIAOD_23Sep2016-v1
+
+## Single Muon - RunD 23Sep2016 Rereco ##
+BABY ANALYSIS VERSION /SingleMuon/Run2016D-03Feb2017-v1/CMS3 TARBALL.tar.gz EXECUTABLE -1 output.root,skim.root data_single_muon_Run2016D_MINIAOD_23Sep2016-v1
+
+## Single Muon - RunE 23Sep2016 Rereco ##
+BABY ANALYSIS VERSION /SingleMuon/Run2016E-03Feb2017-v1/CMS3 TARBALL.tar.gz EXECUTABLE -1 output.root,skim.root data_single_muon_Run2016E_MINIAOD_23Sep2016-v1
+
+## Single Muon - RunF 23Sep2016 Rereco ##
+BABY ANALYSIS VERSION /SingleMuon/Run2016F-03Feb2017-v1/CMS3 TARBALL.tar.gz EXECUTABLE -1 output.root,skim.root data_single_muon_Run2016F_MINIAOD_23Sep2016-v1
+
+## Single Muon - RunG 23Sep2016 Rereco ##
+BABY ANALYSIS VERSION /SingleMuon/Run2016G-03Feb2017-v1/CMS3 TARBALL.tar.gz EXECUTABLE -1 output.root,skim.root data_single_muon_Run2016G_MINIAOD_23Sep2016-v1
+
+## Single Muon - RunH PromptRecoV2 ##
+BABY ANALYSIS VERSION /SingleMuon/Run2016H-03Feb2017_ver2-v1/CMS3 TARBALL.tar.gz EXECUTABLE -1 output.root,skim.root data_single_muon_Run2016H_MINIAOD_PromptReco-v2
+
+## Single Muon - RunH PromptRecoV3 ##
+BABY ANALYSIS VERSION /SingleMuon/Run2016H-03Feb2017_ver3-v1/CMS3 TARBALL.tar.gz EXECUTABLE -1 output.root,skim.root data_single_muon_Run2016H_MINIAOD_PromptReco-v3

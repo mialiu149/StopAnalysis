@@ -126,7 +126,9 @@ public:
     float pfmet_phi_rl_jdown;
     float calomet;
     float calomet_phi;
-
+  bool  filt_badmuons;
+bool  filt_duplicatemuons;
+bool  filt_nobadmuons;
     float filt_cscbeamhalo;
     float filt_cscbeamhalo2015;
     float filt_globaltighthalo2016;

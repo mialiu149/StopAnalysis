@@ -63,6 +63,9 @@ void EventTree::FillCommon (const std::string &root_file_name)
       filt_trkPOG_tms = filt_trkPOG_toomanystripclus53X();
       filt_hbhenoise = filt_hbheNoise(); // hbheNoiseFilter_25ns();
       filt_hbheisonoise = filt_hbheNoiseIso();//hbheIsoNoiseFilter();
+      filt_badmuons = filt_badMuons();
+      filt_duplicatemuons = filt_duplicateMuons();
+      filt_nobadmuons = filt_noBadMuons();
     }
     
     if (!is_data)
@@ -310,6 +313,9 @@ void EventTree::Reset ()
      filt_jetWithBadMuon_jup    = false;
      filt_jetWithBadMuon_jdown  = false;
      filt_pfovercalomet         = false;
+     filt_badmuons              = false;
+     filt_duplicatemuons        = false;
+     filt_nobadmuons            = false; 
     nPhotons             = -9999;
     ph_selectedidx       = -9999;
     ph_ngoodjets         = -9999;
@@ -393,6 +399,9 @@ void EventTree::SetBranches (TTree* tree)
     tree->Branch("is_data", &is_data);
     tree->Branch("dataset", &dataset);
     tree->Branch("filename", &filename);
+    tree->Branch("filt_badmuons", &filt_badmuons);
+    tree->Branch("filt_duplicatemuons", &filt_duplicatemuons);
+    tree->Branch("filt_nobadmuons", &filt_nobadmuons);
     tree->Branch("cms3tag", &cms3tag);
     tree->Branch("nEvents", &nEvents);
     tree->Branch("nEvents_goodvtx", &nEvents_goodvtx);

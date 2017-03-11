@@ -1,0 +1,22 @@
+   ------------------------------------------------------------
+  | Welcome to ROOT 6.06/01                http://root.cern.ch |
+  |                               (c) 1995-2014, The ROOT Team |
+  | Built for linuxx8664gcc                                    |
+  | From tag , 9 December 2015                                 |
+  | Try '.help', '.demo', '.license', '.credits', '.quit'/'.q' |
+   ------------------------------------------------------------
+
+****************************
+* Welcome to ROOT v6.06/01 *
+****************************
+loading libFWCoreFWLite.so
+WARNING: AutoLibraryloader::enable() and AutoLibraryLoader.h are deprecated.
+Use FWLiteEnabler::enable() and FWLiteEnabler.h instead
+Using TDR style file: https://twiki.cern.ch/twiki/pub/CMS/SUSYLimitTools/tdrstyle.C
+
+Processing skim_signal_point_CMS3.C("/hadoop/cms/store/group/snt/run2_25ns_80MiniAODv2_fastsim/SMS-TChiWH_WToLNu_HToBB_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/V08-00-09/","/nfs-7/userdata/mliu/tupler_babies/merged/onelepbabymaker/whsigncms3/","merged_ntuple",225,1,"TChiWH_225_75_13TeV_CMS3.root")...
+Skimming with selection : sparm_values[0] == 225 && sparm_values[1] == 1
+Reading in : /hadoop/cms/store/group/snt/run2_25ns_80MiniAODv2_fastsim/SMS-TChiWH_WToLNu_HToBB_TuneCUETP8M1_13TeV-madgraphMLM-pythia8_RunIISpring16MiniAODv2-PUSpring16Fast_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1/V08-00-09//merged_ntuple*.root
+Writing to : /nfs-7/userdata/mliu/tupler_babies/merged/onelepbabymaker/whsigncms3//TChiWH_225_75_13TeV_CMS3.root.root
+Selection : sparm_values[0] == 225 && sparm_values[1] == 1
+Input tree has entries: 8957723

@@ -37,7 +37,7 @@ class babyMaker {
 
     void MakeBabyNtuple(std::string output_name="output");
     void InitBabyNtuple();
-    int looper(TChain* chain, std::string output_name="output", int nEvents = -1, std::string path = "./");
+    int looper(TChain* chain, std::string output_name="output", int nEvents = -1, std::string path = "./", std::string dataperiod="");
     std::string babypath;
     std::string output;
     
