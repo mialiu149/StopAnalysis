@@ -56,7 +56,7 @@ int main(int argc, char **argv){
   //
   // Skim Parameters 
   //
-  bool noskim = false;
+  bool noskim = true;
   int nVtx              = 1;        
   float met             = 50;      if (noskim) met=-1;
   int  nGoodLeptons      = 1;      if (noskim) nGoodLeptons = -1;
