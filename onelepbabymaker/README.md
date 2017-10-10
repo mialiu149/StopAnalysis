@@ -1,4 +1,8 @@
 #WH Analysis
+check out:
+git clone git@github.com:mialiu149/WHAnalysis.git ${checkoutdir}
+cd ${checkoutdir}
+. checkout.sh
 
 Please check if CORE and Software from common TAS repository are up-to-date,
 and that the directory matches the one in the makefile

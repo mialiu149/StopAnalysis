@@ -5,6 +5,7 @@ setup_CMSSW_80X
 #cd ${dirname}
 git clone git@github.com:cmstas/CORE.git
 cd CORE
+git checkout cms4
 make -j 30
 cd ../onelepbabymaker/
 . setup.sh

@@ -21,7 +21,7 @@ NGLIBS         = $(ROOTGLIBS)
 NGLIBS        += -lMinuit
 GLIBS          = $(filter-out -lNew, $(NGLIBS))
 
-COREPATH       = $(HOME)/CORE
+COREPATH       = ../CORE
 TOOLSPATH      = $(COREPATH)/Tools
 DORKYPATH      = $(TOOLSPATH)/dorky
 
