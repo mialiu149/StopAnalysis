@@ -62,6 +62,12 @@ babyMaker::babyMaker(){
 }
 
 // I don't like this function, can initialize as the property of the class....
+// write a struct to separate flags here.
+// isdata, issignal, isfastsim,
+// lepton cuts, nlep, leppt, eta, applySF
+// jet met cuts, njets,jetpt, eta, met, dobtagSF
+// fillextrabranch flags.
+
 void babyMaker::setSkimVariables(bool isDataFromFileName ,bool isSignalFromFileName, int nvtx, float met, int nGoodLep, float goodLep_el_pt, float goodLep_el_eta, float goodLep_mu_pt, float goodLep_mu_eta, float looseLep_el_pt, float looseLep_el_eta, float looseLep_mu_pt, float looseLep_mu_eta, float vetoLep_el_pt, float vetoLep_el_eta, float vetoLep_mu_pt, float vetoLep_mu_eta, bool apply2ndlepveto, int njets, float jet_pt, float jet_eta, float jet_ak8_pt, float jet_ak8_eta, int nbjets, int nphs, float phs_pt, float phs_eta, bool applyJEC, int JES_type_central_up_down,   bool applyLeptonSFs, bool applyVetoLeptonSFs, bool applyBtagSFs, bool isFastsim,bool filltaus_, bool filltracks_, bool fillZll_, bool fillPhoton_,bool fillMETfilt_, bool fill2ndlep_, bool fillExtraEvtVar_, bool fillAK4EF_, bool fillAK4_Other_, bool fillOverleps_, bool fillAK4Synch_, bool fillElID_, bool fillIso_, bool fillLepSynch_){
 
   skim_nvtx            = nvtx;

@@ -7,6 +7,7 @@
 #include <sstream>
 #include <vector>
 #include <string>
+#include "config.h"
 
 using namespace std;
 
@@ -48,6 +49,12 @@ int main(int argc, char **argv){
   else {
     cout << "running on MC, based on file name: " << infile<<endl;
   } 
+
+  sampleconfig sampleConfig;
+  sampleConfig.isdata = isDataFromFileName;
+  sampleConfig.isfastsim = isFastsim;
+  sampleConfig.issignal = isSignalFromFileName;
+
   //
   // Initialize looper
   //
