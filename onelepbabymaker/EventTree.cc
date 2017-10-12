@@ -24,10 +24,7 @@ void EventTree::FillCommon (const std::string &root_file_name)
     string lspstr ("mLSP");//add those for testing purpose
     string smsstr ("SMS");//add those for testing purpose
     string tchwhstr("TChiWH");
-    if (filestr.find(signalstr) != string::npos) signal = true;
-    if (filestr.find(lspstr)    != string::npos) signal = true;
-    if (filestr.find(smsstr)    != string::npos) signal = true;
-    if (filestr.find(tchwhstr)    != string::npos) signal = true;
+    if (filestr.find(signalstr) != string::npos || filestr.find(lspstr)    != string::npos || filestr.find(smsstr)    != string::npos ||filestr.find(tchwhstr)    != string::npos) signal = true;
 
     run = evt_run();
     ls  = evt_lumiBlock();
@@ -63,9 +60,9 @@ void EventTree::FillCommon (const std::string &root_file_name)
       filt_trkPOG_tms = filt_trkPOG_toomanystripclus53X();
       filt_hbhenoise = filt_hbheNoise(); // hbheNoiseFilter_25ns();
       filt_hbheisonoise = filt_hbheNoiseIso();//hbheIsoNoiseFilter();
-      filt_badmuons = filt_badMuons();
-      filt_duplicatemuons = filt_duplicateMuons();
-      filt_nobadmuons = filt_noBadMuons();
+//      filt_badmuons = filt_badMuons();
+//      filt_duplicatemuons = filt_duplicateMuons();
+//      filt_nobadmuons = filt_noBadMuons();
     }
     
     if (!is_data)

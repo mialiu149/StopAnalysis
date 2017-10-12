@@ -9,3 +9,7 @@ git checkout cms4
 make -j 30
 cd ../onelepbabymaker/
 . setup.sh
+cd stop_variables
+make -j 30
+cd ../
+make -j 30 

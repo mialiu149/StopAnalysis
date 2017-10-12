@@ -8,7 +8,8 @@ ROOTGLIBS     = $(shell $(ROOTSYS)/bin/root-config --glibs)
  
 #
 CXX           = g++
-CXXFLAGS      = -g -Wall -fPIC -pg
+CXXFLAGS      = -g -Wall -fPIC -pg -Wextra -pedantic -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization -Winit-self -Wlogical-op -Wmissing-include-dirs -Wnoexcept -Woverloaded-virtual -Wredundant-decls -Wshadow -Wsign-promo -Wstrict-null-sentinel  -Wno-unused -Wno-variadic-macros -Wno-parentheses -fdiagnostics-show-option 
+#EXTRACFLAGS=-Wall -Wextra -pedantic -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization -Winit-self -Wlogical-op -Wmissing-include-dirs -Wnoexcept -Woverloaded-virtual -Wredundant-decls -Wshadow -Wsign-promo -Wstrict-null-sentinel  -Wno-unused -Wno-variadic-macros -Wno-parentheses -fdiagnostics-show-option 
 LD            = g++
 LDFLAGS       = -g -pg
 SOFLAGS       = -shared

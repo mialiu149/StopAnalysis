@@ -25,7 +25,6 @@ using namespace tas;
 void PhotonTree::FillCommon ()
 {
    for(unsigned int idx = 0; idx < cms3.photons_p4().size(); idx++) {
-    if (idx < 0) return;
     if(cms3.photons_p4().at(idx).pt() < m_ph_pt_cut) continue;
     if(fabs(cms3.photons_p4().at(idx).eta()) > m_ph_eta_cut) continue;
     if ( !isLoosePhoton(idx,analysis_t::HAD,2) ) continue;
@@ -34,7 +33,7 @@ void PhotonTree::FillCommon ()
     pt.push_back(cms3.photons_p4().at(idx).pt());
     eta.push_back(cms3.photons_p4().at(idx).eta());
     phi.push_back(cms3.photons_p4().at(idx).phi());
-    mass.push_back(cms3.photons_mass().at(idx));
+//    mass.push_back(cms3.photons_mass().at(idx));
     //id variables
     sigmaIEtaEta_fill5x5.push_back(photons_full5x5_sigmaIEtaIEta().at(idx));
     hOverE.push_back(photons_full5x5_hOverEtowBC().at(idx));
@@ -85,16 +84,16 @@ void PhotonTree::FillCommon ()
 int  PhotonTree::genbestMatch(int idx)
 {
     int bestMatch = -1;  float bestDr = 0.1; 
-    float pt = cms3.photons_p4().at(idx).pt(); 
-    float eta = cms3.photons_p4().at(idx).eta();
+    float thispt = cms3.photons_p4().at(idx).pt(); 
+    float thiseta = cms3.photons_p4().at(idx).eta();
 
     for(unsigned int iGen = 0; iGen < cms3.genps_p4().size(); iGen++){
        if (cms3.genps_id().at(iGen) != 22) continue; 
        if (cms3.genps_status().at(iGen) != 1) continue; 
        if (fabs(cms3.genps_id_simplemother().at(iGen)) > 22  && cms3.genps_id_simplemother().at(iGen)!=2212) continue; // pions etc // but keep photons from the leading proton
-       if ( fabs(eta - cms3.genps_p4().at(iGen).eta()) > 0.1) continue;
-       if ( pt > 2*cms3.genps_p4().at(iGen).pt() ) continue;
-       if ( pt < 0.5*cms3.genps_p4().at(iGen).pt() ) continue;
+       if ( fabs(thiseta - cms3.genps_p4().at(iGen).eta()) > 0.1) continue;
+       if ( thispt > 2*cms3.genps_p4().at(iGen).pt() ) continue;
+       if ( thispt < 0.5*cms3.genps_p4().at(iGen).pt() ) continue;
        float thisDR = ROOT::Math::VectorUtil::DeltaR( cms3.genps_p4().at(iGen), cms3.photons_p4().at(idx));
        if (thisDR < bestDr) {
 	  bestDr = thisDR;
@@ -104,9 +103,9 @@ int  PhotonTree::genbestMatch(int idx)
    return bestMatch;
 }
 
-void PhotonTree::SetPhotonSelection (float pt_cut,float eta)
+void PhotonTree::SetPhotonSelection (float pt_cut,float eta_cut)
 {
-  m_ph_pt_cut = pt_cut; m_ph_eta_cut = eta;
+  m_ph_pt_cut = pt_cut; m_ph_eta_cut = eta_cut;
    
   return;
 }

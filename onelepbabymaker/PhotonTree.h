@@ -28,7 +28,7 @@ public:
     void SetAliases (TTree* tree) const;
     void FillCommon ();
     int  genbestMatch(int idx);
-    void SetPhotonSelection (float pt_cut,float eta);
+    void SetPhotonSelection (float pt_cut,float eta_cut);
 protected:
 
     std::string prefix_;

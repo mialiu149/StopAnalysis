@@ -16,7 +16,7 @@
 #include "Math/VectorUtil.h"
 #include "TChain.h"
 #include "Math/LorentzVector.h"
-
+#include "config.h"
 // typedefs
 typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > LorentzVector;
 
@@ -30,78 +30,17 @@ using namespace std;
 class babyMaker {
 
   public:
-    // Constructor/destructor
     babyMaker ();
-    babyMaker (const std::string &prefix);
+    babyMaker (const std::string prefix);
     virtual ~babyMaker (){ delete BabyFile; }
 
-    void MakeBabyNtuple(std::string output_name="output");
+    void MakeBabyNtuple(std::string output_name,fillextra fillextraConfig);
     void InitBabyNtuple();
-    int looper(TChain* chain, std::string output_name="output", int nEvents = -1, std::string path = "./", std::string dataperiod="");
+    int looper(TChain* chain, std::string output_name, int nEvents, std::string path, std::string dataperiod, struct sampleconfig,lepconfig lepConfig,jetconfig jetConfig,  gammaconfig gammaConfig, fillextra fillextraConfig,int skim_nvtx, float skim_met);
     std::string babypath;
     std::string output;
     
     // Variables for baby skim
-    int skim_nvtx;
-    float skim_met;
-
-    int   skim_nGoodLep;
-    float skim_goodLep_el_pt;
-    float skim_goodLep_el_eta;
-    float skim_goodLep_mu_pt;
-    float skim_goodLep_mu_eta;
-  
-    float skim_looseLep_el_pt;
-    float skim_looseLep_el_eta;
-    float skim_looseLep_mu_pt;
-    float skim_looseLep_mu_eta;
-    
-    float skim_vetoLep_el_pt;
-    float skim_vetoLep_el_eta;
-    float skim_vetoLep_mu_pt;
-    float skim_vetoLep_mu_eta;
-  
-    int   skim_nJets;
-    float skim_jet_pt;
-    float skim_jet_eta;
-
-    float skim_jet_ak8_pt;
-    float skim_jet_ak8_eta;
-
-    int   skim_nPhotons;
-    float skim_ph_pt;
-    float skim_ph_eta;
-
-    bool applyJECfromFile;
-    int JES_type;
-    bool skim_isDataFromFileName;
-    bool skim_isSignalFromFileName;
-    int  skim_nBJets;
-    bool skim_2ndlepveto;
-
-    bool skim_applyBtagSFs;
-    bool skim_applyLeptonSFs; 
-    bool skim_applyVetoLeptonSFs; 
-    bool skim_isFastsim;
-
-    bool filltaus;
-    bool filltracks;
-    bool fillZll;
-    bool fillPhoton;
-    bool fillMETfilt;
-    bool fill2ndlep;
-    bool fillExtraEvtVar;
-
-    bool fillAK4EF;
-    bool fillAK4_Other;
-    bool fillOverleps;
-    bool fillAK4Synch;
-    bool fillElID;
-    bool fillIso;
-    bool fillLepSynch;
-
-    void setSkimVariables(bool isDataFromFileName, bool isSignalFromFileName,int nvtx, float met, int nGoodLep, float goodLep_el_pt, float goodLep_el_eta, float goodLep_mu_pt, float goodLep_mu_eta, float looseLep_el_pt, float looseLep_el_eta, float looseLep_mu_pt, float looseLep_mu_eta, float vetoLep_el_pt, float vetoLep_el_eta, float vetoLep_mu_pt, float vetoLep_mu_eta, bool apply2ndlepveto, int njets, float jet_pt, float jet_eta, float jet_ak8_pt, float jet_ak8_eta, int nbjets, int nphs, float phs_pt, float phs_eta, bool applyJEC, int JES_type_central_up_down, bool applyLeptonSFs, bool applyVetoLeptonSFs, bool applyBtagSFs, bool isFastsim,bool filltaus_, bool filltracks_, bool fillZll_, bool fillPhoton_,bool fillMETfilt_, bool fill2ndlep_, bool fillExtraEvtVar_, bool fillAK4EF_, bool fillAK4_Other_, bool fillOverleps_, bool fillAK4Synch_, bool fillElID_, bool fillIso_, bool fillLepSynch_);
-
 
   protected:
     TFile* BabyFile;
@@ -186,6 +125,7 @@ struct sortbypt{
     return v1.second.pt() > v2.second.pt();
   }
 };
+
 
 struct sortLepbypt{
   bool operator () (const Lepton &lep1, const Lepton &lep2){

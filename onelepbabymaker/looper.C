@@ -32,7 +32,7 @@
 #include "goodrun.h"
 #include "dorky.cc"
 
-bool debug =false;
+bool debug = false;
 bool saveHighPtPFcands = true;
 typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > LorentzVector;
 
@@ -61,71 +61,7 @@ babyMaker::babyMaker(){
    gen_susy = GenParticleTree("susy_");
 }
 
-// I don't like this function, can initialize as the property of the class....
-// write a struct to separate flags here.
-// isdata, issignal, isfastsim,
-// lepton cuts, nlep, leppt, eta, applySF
-// jet met cuts, njets,jetpt, eta, met, dobtagSF
-// fillextrabranch flags.
-
-void babyMaker::setSkimVariables(bool isDataFromFileName ,bool isSignalFromFileName, int nvtx, float met, int nGoodLep, float goodLep_el_pt, float goodLep_el_eta, float goodLep_mu_pt, float goodLep_mu_eta, float looseLep_el_pt, float looseLep_el_eta, float looseLep_mu_pt, float looseLep_mu_eta, float vetoLep_el_pt, float vetoLep_el_eta, float vetoLep_mu_pt, float vetoLep_mu_eta, bool apply2ndlepveto, int njets, float jet_pt, float jet_eta, float jet_ak8_pt, float jet_ak8_eta, int nbjets, int nphs, float phs_pt, float phs_eta, bool applyJEC, int JES_type_central_up_down,   bool applyLeptonSFs, bool applyVetoLeptonSFs, bool applyBtagSFs, bool isFastsim,bool filltaus_, bool filltracks_, bool fillZll_, bool fillPhoton_,bool fillMETfilt_, bool fill2ndlep_, bool fillExtraEvtVar_, bool fillAK4EF_, bool fillAK4_Other_, bool fillOverleps_, bool fillAK4Synch_, bool fillElID_, bool fillIso_, bool fillLepSynch_){
-
-  skim_nvtx            = nvtx;
-  skim_met             = met;
-   
-  skim_nGoodLep        = nGoodLep;
-  skim_goodLep_el_pt   = goodLep_el_pt;
-  skim_goodLep_el_eta  = goodLep_el_eta;
-  skim_goodLep_mu_pt   = goodLep_mu_pt;
-  skim_goodLep_mu_eta  = goodLep_mu_eta;
-  
-  skim_looseLep_el_pt  = looseLep_el_pt;
-  skim_looseLep_el_eta = looseLep_el_eta;
-  skim_looseLep_mu_pt  = looseLep_mu_pt;
-  skim_looseLep_mu_eta = looseLep_mu_eta;
-  
-  skim_vetoLep_el_pt   = vetoLep_el_pt;
-  skim_vetoLep_el_eta  = vetoLep_el_eta;
-  skim_vetoLep_mu_pt   = vetoLep_mu_pt;
-  skim_vetoLep_mu_eta  = vetoLep_mu_eta;
-  
-  skim_nJets           = njets;
-  skim_jet_pt          = jet_pt;
-  skim_jet_eta         = jet_eta;
-
-  skim_nBJets          = nbjets;
-  skim_jet_ak8_pt      = jet_ak8_pt;
-  skim_jet_ak8_eta     = jet_ak8_eta;
-
-  skim_nPhotons        = nphs;
-  skim_ph_pt           = phs_pt;
-  skim_ph_eta          = phs_eta;
-  skim_2ndlepveto      = apply2ndlepveto; 
-  applyJECfromFile     = applyJEC;
-  JES_type 	       = JES_type_central_up_down;
-  skim_applyLeptonSFs  = applyLeptonSFs;
-  skim_applyVetoLeptonSFs  = applyVetoLeptonSFs;
-  skim_applyBtagSFs    = applyBtagSFs;
-  skim_isFastsim       = isFastsim;
-  skim_isSignalFromFileName = isSignalFromFileName;
-  filltaus   = filltaus_;
-  filltracks   =filltracks_;
-  fillZll   =fillZll_;
-  fillPhoton   =fillPhoton_;
-  fillMETfilt   =fillMETfilt_;
-  fill2ndlep   =fill2ndlep_;
-  fillExtraEvtVar   =fillExtraEvtVar_;
-
-  fillAK4EF   =fillAK4EF_;
-  fillAK4_Other   =fillAK4_Other_;
-  fillOverleps   =fillOverleps_;
-  fillAK4Synch   =fillAK4Synch_;
-  fillElID   =fillElID_;
-  fillIso   =fillIso_;
-  fillLepSynch   =fillLepSynch_;
-}
-
-void babyMaker::MakeBabyNtuple(std::string output_name){
+void babyMaker::MakeBabyNtuple(std::string output_name, fillextra fillextraConfig){
   std::string str = babypath + output+".root";
   const char *cstr = str.c_str();
   cout<<cstr<<endl;
@@ -145,23 +81,23 @@ void babyMaker::MakeBabyNtuple(std::string output_name){
   gen_susy.SetBranches(BabyTree);
 
   //optional, now still computes these variables, does it make sense not to do it when it's false, are we going to save some cpu?
-  if(filltaus)  Taus.SetBranches(BabyTree);
-  if(filltracks)  Tracks.SetBranches(BabyTree);
-  if(fillZll)  StopEvt.SetZllBranches(BabyTree);
-  if(fillPhoton) StopEvt.SetPhotonBranches(BabyTree);
-  if(fillMETfilt) StopEvt.SetMETFilterBranches(BabyTree);
-  if(fill2ndlep) StopEvt.SetSecondLepBranches(BabyTree);
-  if(fillExtraEvtVar) StopEvt.SetExtraVariablesBranches(BabyTree);
-  if(fillAK4EF)   jets.SetAK4Branches_EF(BabyTree);
-  if(fillAK4_Other)  jets.SetAK4Branches_Other(BabyTree);
-  if(fillOverleps)  jets.SetAK4Branches_Overleps(BabyTree);
-  if(fillAK4Synch)  jets.SetAK4Branches_SynchTools(BabyTree);
-  if(fillElID)  lep1.SetBranches_electronID(BabyTree);
-  if(fillIso)  lep1.SetBranches_Iso(BabyTree);
-  if(fillLepSynch)  lep1.SetBranches_SynchTools(BabyTree);
-  if(fillElID)  lep2.SetBranches_electronID(BabyTree);
-  if(fillIso)  lep2.SetBranches_Iso(BabyTree);
-  if(fillLepSynch)  lep2.SetBranches_SynchTools(BabyTree);
+  if(fillextraConfig.filltaus)  Taus.SetBranches(BabyTree);
+  if(fillextraConfig.filltracks)  Tracks.SetBranches(BabyTree);
+  if(fillextraConfig.fillZll)  StopEvt.SetZllBranches(BabyTree);
+  if(fillextraConfig.fillPhoton) StopEvt.SetPhotonBranches(BabyTree);
+  if(fillextraConfig.fillMETfilt) StopEvt.SetMETFilterBranches(BabyTree);
+  if(fillextraConfig.fill2ndlep) StopEvt.SetSecondLepBranches(BabyTree);
+  if(fillextraConfig.fillExtraEvtVar) StopEvt.SetExtraVariablesBranches(BabyTree);
+  if(fillextraConfig.fillAK4EF)   jets.SetAK4Branches_EF(BabyTree);
+  if(fillextraConfig.fillAK4_Other)  jets.SetAK4Branches_Other(BabyTree);
+  if(fillextraConfig.fillOverleps)  jets.SetAK4Branches_Overleps(BabyTree);
+  if(fillextraConfig.fillAK4Synch)  jets.SetAK4Branches_SynchTools(BabyTree);
+  if(fillextraConfig.fillElID)  lep1.SetBranches_electronID(BabyTree);
+  if(fillextraConfig.fillIso)  lep1.SetBranches_Iso(BabyTree);
+  if(fillextraConfig.fillLepSynch)  lep1.SetBranches_SynchTools(BabyTree);
+  if(fillextraConfig.fillElID)  lep2.SetBranches_electronID(BabyTree);
+  if(fillextraConfig.fillIso)  lep2.SetBranches_Iso(BabyTree);
+  if(fillextraConfig.fillLepSynch)  lep2.SetBranches_SynchTools(BabyTree);
 }
 
 void babyMaker::InitBabyNtuple(){
@@ -169,7 +105,7 @@ void babyMaker::InitBabyNtuple(){
   Taus.Reset();  Tracks.Reset();  gen_leps.Reset();  gen_nus.Reset();  gen_qs.Reset();  gen_bosons.Reset();  gen_susy.Reset();
 } 
 //================//
-int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::string path, std::string dataperiod){
+int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::string path, std::string dataperiod,sampleconfig sampleConfig,lepconfig lepConfig,jetconfig jetConfig,  gammaconfig gammaConfig, fillextra fillextraConfig,int skim_nvtx, float skim_met){
   // Set output file path
   babypath = path; output = output_name;
   // Benchmark
@@ -179,21 +115,19 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
   unsigned int nEvents_processed = 0;
   unsigned int nEvents_pass_skim_nVtx = 0;
   unsigned int nEvents_pass_skim_met = 0;
-  unsigned int nEvents_pass_skim_nGoodLep = 0;
-  unsigned int nEvents_pass_skim_nJets = 0;
+  unsigned int nEvents_pass_skim_nGoodLeps = 0;
+  unsigned int nEvents_pass_skim_nGoodJets = 0;
   unsigned int nEvents_pass_skim_nBJets=0;
   unsigned int nEvents_pass_skim_2ndlepVeto=0;
   unsigned int nEventsToDo = chain->GetEntries();
-  unsigned int jet_overlep1_idx = -9999;  
-  unsigned int jet_overlep2_idx = -9999;
+   int jet_overlep1_idx = -9999;  
+   int jet_overlep2_idx = -9999;
   
   if( nEvents >= 0 ) nEventsToDo = nEvents;
   TObjArray *listOfFiles = chain->GetListOfFiles();
   TIter fileIter(listOfFiles);
   TFile *currentFile = 0;
-  bool applyJECunc = false;
-  if(JES_type != 0) applyJECunc = true; 
-
+  int JES_type = 0;
   // is there a better way to do the electron sf, not in the looper?! it's so messy.  
   // Lepton MC reco efficiency for veto lep IDs
  
@@ -222,7 +156,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
   // Matching requirement for gen/reco leptons
   double matched_dr = 0.1;
   
-  if( (skim_applyLeptonSFs || skim_applyVetoLeptonSFs) && !skim_isDataFromFileName){
+  if( (lepConfig.dosf || lepConfig.dosf) && !sampleConfig.isdata){
 
     cout << "  Grabbing lepton scale factors " << endl;
      // Electron file
@@ -383,7 +317,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 }
 
   TFile *fxsec; TH1D *hxsec;
-  if(skim_isSignalFromFileName){
+  if(sampleConfig.issignal){
     fxsec = new TFile("xsec_susy_13tev.root","READ");
     if(fxsec->IsZombie()) {
       std::cout << "Somehow xsec_stop_13TeV.root is corrupted. Exit..." << std::endl;
@@ -392,7 +326,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
     hxsec = (TH1D*)fxsec->Get("h_xsec_c1n2");
   }
   TFile *pileupfile; TH1D *hPU; TH1D *hPUup; TH1D *hPUdown;
-  if(!skim_isDataFromFileName){
+  if(!sampleConfig.isdata){
     pileupfile = new TFile("puWeights_2016data_36p6fbinv.root","READ");
     if(pileupfile->IsZombie()) {
       std::cout << "Somehow puWeights_2016data_36p6fbinv.root is corrupted. Exit..." << std::endl;
@@ -407,14 +341,14 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
   setcounterLabel(counterhist,labels);
   TH3D* counterhistSig;
   TH2F* histNEvts;//count #evts per signal point
-  if(skim_isSignalFromFileName){//create histos only for signals
+  if(sampleConfig.issignal){//create histos only for signals
     counterhistSig = new TH3D( "h_counterSMS", "h_counterSMS", 37,99,1024, 19,-1,474, 35, 0.5,35.5);//15000 bins!
     setcounterLabel3D(counterhistSig,labels);
     histNEvts = new TH2F( "histNEvts", "h_histNEvts", 37,99,1024, 19,-1,474);//x=mStop, y=mLSP
     histNEvts->Sumw2();
   }
   // output Ntuple  and branches
-  MakeBabyNtuple( output_name + ".root");
+  MakeBabyNtuple( output_name + ".root", fillextraConfig);
   InitBabyNtuple();
   // Set JSON file
   const char* json_file = "json_files/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt";
@@ -429,7 +363,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
   char* jecpath;
   jecpath = getenv ("TOOLSPATH");
   // files for RunIISpring15 MC
-  if (skim_isDataFromFileName) {
+  if (sampleConfig.isdata) {
       if(dataperiod.find("2016B") != std::string::npos ||
        dataperiod.find("2016C") != std::string::npos ||
        dataperiod.find("2016D") != std::string::npos    ){
@@ -464,7 +398,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
     jetcorr_filenames_pfL1FastJetL2L3.push_back  (Form("%s/jetcorr/data/run2_25ns/Summer16_23Sep2016HV3_DATA/Summer16_23Sep2016HV3_DATA_L2L3Residual_AK4PFchs.txt",jecpath));
     jetcorr_uncertainty_filename = Form("%s/jetcorr/data/run2_25ns/Summer16_23Sep2016HV3_DATA/Summer16_23Sep2016HV3_DATA_Uncertainty_AK4PFchs.txt",jecpath);
     }
- } else if(skim_isSignalFromFileName){
+ } else if(sampleConfig.issignal){
     jetcorr_filenames_pfL1FastJetL2L3.push_back  (Form("%s/jetcorr/data/run2_25ns/Spring16_FastSimV1_L1FastJet_AK4PFchs.txt",jecpath));
     jetcorr_filenames_pfL1FastJetL2L3.push_back  (Form("%s/jetcorr/data/run2_25ns/Spring16_FastSimV1_L2Relative_AK4PFchs.txt",jecpath));
     jetcorr_filenames_pfL1FastJetL2L3.push_back  (Form("%s/jetcorr/data/run2_25ns/Spring16_FastSimV1_L3Absolute_AK4PFchs.txt",jecpath));
@@ -484,14 +418,14 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 
   jet_corrector_pfL1FastJetL2L3  = makeJetCorrector(jetcorr_filenames_pfL1FastJetL2L3);
   
-  if (!skim_isDataFromFileName && applyJECunc != 0) {
-    cout << "applying JEC uncertainties with weight " << applyJECunc << " from file: " << endl
+  if (!sampleConfig.isdata && jetConfig.dojecunc != 0) {
+    cout << "applying JEC uncertainties with weight " << jetConfig.dojecunc << " from file: " << endl
 	 << "   " << jetcorr_uncertainty_filename << endl;
     jetcorr_uncertainty = new JetCorrectionUncertainty(jetcorr_uncertainty_filename);
   }
     jetcorr_uncertainty_sys = new JetCorrectionUncertainty(jetcorr_uncertainty_filename);
 
-  if (skim_applyBtagSFs) {
+  if (jetConfig.dobtagsf) {
     // get btag efficiencies
     TFile* f_btag_eff;
     TH2D* h_btag_eff_b_temp = NULL;
@@ -500,7 +434,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
     TH2D* h_btag_eff_b_loose_temp = NULL;
     TH2D* h_btag_eff_c_loose_temp = NULL;
     TH2D* h_btag_eff_udsg_loose_temp = NULL;
-    if(!skim_isFastsim){
+    if(!sampleConfig.isfastsim){
       f_btag_eff = new TFile("$COREPATH/Tools/btagsf/data/run2_25ns/btageff__ttbar_powheg_pythia8_25ns_Moriond17.root");
       h_btag_eff_b_temp = (TH2D*) f_btag_eff->Get("h2_BTaggingEff_csv_med_Eff_b");
       h_btag_eff_c_temp = (TH2D*) f_btag_eff->Get("h2_BTaggingEff_csv_med_Eff_c");
@@ -532,9 +466,9 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
     f_btag_eff->Close(); 
     }    
  
-    jets.InitBtagSFTool(h_btag_eff_b,h_btag_eff_c,h_btag_eff_udsg, h_btag_eff_b_loose,h_btag_eff_c_loose,h_btag_eff_udsg_loose,skim_isFastsim); 
-    jets_jup.InitBtagSFTool(h_btag_eff_b,h_btag_eff_c,h_btag_eff_udsg, h_btag_eff_b_loose,h_btag_eff_c_loose,h_btag_eff_udsg_loose,skim_isFastsim); 
-    jets_jdown.InitBtagSFTool(h_btag_eff_b,h_btag_eff_c,h_btag_eff_udsg, h_btag_eff_b_loose,h_btag_eff_c_loose,h_btag_eff_udsg_loose,skim_isFastsim); 
+    jets.InitBtagSFTool(h_btag_eff_b,h_btag_eff_c,h_btag_eff_udsg, h_btag_eff_b_loose,h_btag_eff_c_loose,h_btag_eff_udsg_loose,sampleConfig.isfastsim); 
+    jets_jup.InitBtagSFTool(h_btag_eff_b,h_btag_eff_c,h_btag_eff_udsg, h_btag_eff_b_loose,h_btag_eff_c_loose,h_btag_eff_udsg_loose,sampleConfig.isfastsim); 
+    jets_jdown.InitBtagSFTool(h_btag_eff_b,h_btag_eff_c,h_btag_eff_udsg, h_btag_eff_b_loose,h_btag_eff_c_loose,h_btag_eff_udsg_loose,sampleConfig.isfastsim); 
 
   // Loop over the trees
 
@@ -600,7 +534,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
       //////////////////////////////////////////
       //              good run list           //
       //////////////////////////////////////////
-      if( evt_isRealData() && !goodrun(evt_run(), evt_lumiBlock()) ) continue;
+    //  if( evt_isRealData() && !goodrun(evt_run(), evt_lumiBlock()) ) continue;
       if( evt_isRealData() ) {
 	DorkyEventIdentifier id(evt_run(), evt_event(), evt_lumiBlock());
 	if (is_duplicate(id) ) continue;
@@ -616,7 +550,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 	StopEvt.weight_PUdown = hPUdown->GetBinContent(hPUdown->FindBin(StopEvt.pu_ntrue));
       }
 
-      if(skim_isSignalFromFileName){
+      if(sampleConfig.issignal){
 	//get susy particle masses from sparms
 	for(unsigned int nsparm = 0; nsparm<sparm_names().size(); ++nsparm){
 	  if(sparm_names().at(nsparm).Contains("mCh")) StopEvt.mass_chargino = sparm_values().at(nsparm);
@@ -680,7 +614,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
       if(thisFile.Contains("WJets") ||thisFile.Contains("WW") || thisFile.Contains("WZ") || thisFile.Contains("TTW") ) isWevent = true;
       if(thisFile.Contains("TTJets") || thisFile.Contains("TTTo2L2Nu") || thisFile.Contains("TT_") || thisFile.Contains("ST_") || thisFile.Contains("tZq") ||
 	 thisFile.Contains("TTW") || thisFile.Contains("TTZ") )istopevent = true;
-      if(skim_isSignalFromFileName || thisFile.Contains("T2tt") || thisFile.Contains("T2tb") || thisFile.Contains("T2bW") || thisFile.Contains("TChWH") )
+      if(sampleConfig.issignal || thisFile.Contains("T2tt") || thisFile.Contains("T2tb") || thisFile.Contains("T2bW") || thisFile.Contains("TChWH") )
 	isstopevent = true;
       //gen particles, put all these in gen particle tree. sooooo messy.
       if (!evt_isRealData()){
@@ -760,7 +694,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 	counterhist->Fill(20,StopEvt.weight_ISRup);
 	counterhist->Fill(21,StopEvt.weight_ISRdown);
 
-	if(skim_isSignalFromFileName){
+	if(sampleConfig.issignal){
 	  counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,19,StopEvt.weight_ISR);
 	  counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,20,StopEvt.weight_ISRup);
 	  counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,21,StopEvt.weight_ISRdown);
@@ -804,7 +738,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
       if(StopEvt.firstGoodVtxIdx!=0) continue; //really check that first vertex is good
       nEvents_pass_skim_nVtx++;
       //recalculate type 1 corrected met using new JEC
-      if(applyJECfromFile){
+      if(jetConfig.dojec){
         pair<float,float> newmet;
         pair<float,float> newmet_jup;
         pair<float,float> newmet_jdown;
@@ -826,10 +760,11 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
        }
       // pfmet over calomet filter
       StopEvt.filt_pfovercalomet = !(StopEvt.calomet>0&&StopEvt.pfmet/StopEvt.calomet>5);
-      if(evt_isRealData()){
+     /* if(evt_isRealData() && StopEvt.cms3tag.find("CMS4") == 0){
           StopEvt.pfmet = evt_muegclean_pfmet();
           StopEvt.pfmet_phi = evt_muegclean_pfmetPhi();
       }
+      */
       //
       //Lepton Variables
       //
@@ -848,43 +783,43 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 
       // Electrons
       for (unsigned int eidx = 0; eidx < els_p4().size(); eidx++){
-	if( !PassElectronVetoSelections(eidx, skim_vetoLep_el_pt, skim_vetoLep_el_eta) ) continue;
+	if( !PassElectronVetoSelections(eidx, lepConfig.ptcut_veto, lepConfig.etacut_veto) ) continue;
 	Lepton mylepton;
         mylepton.id  = -11*els_charge().at(eidx);
         mylepton.idx = eidx;
         mylepton.p4  = els_p4().at(eidx);
-	int overlapping_jet = getOverlappingJetIndex(mylepton.p4, pfjets_p4(), 0.4, skim_jet_pt, skim_jet_eta, false,jet_corrector_pfL1FastJetL2L3,applyJECfromFile,jetcorr_uncertainty,JES_type,skim_isFastsim);  //don't care about jid
+	int overlapping_jet = getOverlappingJetIndex(mylepton.p4, pfjets_p4(), 0.4, jetConfig.ptcut, jetConfig.etacut, false,jet_corrector_pfL1FastJetL2L3,jetConfig.dojec,jetcorr_uncertainty,JES_type,sampleConfig.isfastsim);  //don't care about jid
 	if( overlapping_jet>=0) idx_alloverlapjets.push_back(overlapping_jet);  //overlap removal for all jets w.r.t. all leptons
-        overlapping_jet = getOverlappingJetIndex(mylepton.p4, pfjets_p4(), 0.4, skim_jet_pt, skim_jet_eta, false,jet_corrector_pfL1FastJetL2L3,true,jetcorr_uncertainty_sys,1,skim_isFastsim);  //don't care about jid
+        overlapping_jet = getOverlappingJetIndex(mylepton.p4, pfjets_p4(), 0.4, jetConfig.ptcut, jetConfig.etacut, false,jet_corrector_pfL1FastJetL2L3,true,jetcorr_uncertainty_sys,1,sampleConfig.isfastsim);  //don't care about jid
         if( overlapping_jet>=0) idx_alloverlapjets_jup.push_back(overlapping_jet);  //overlap removal for all jets w.r.t. all leptons
-        overlapping_jet = getOverlappingJetIndex(mylepton.p4, pfjets_p4(), 0.4, skim_jet_pt, skim_jet_eta, false,jet_corrector_pfL1FastJetL2L3,true,jetcorr_uncertainty_sys,-1,skim_isFastsim);  //don't care about jid
+        overlapping_jet = getOverlappingJetIndex(mylepton.p4, pfjets_p4(), 0.4, jetConfig.ptcut, jetConfig.etacut, false,jet_corrector_pfL1FastJetL2L3,true,jetcorr_uncertainty_sys,-1,sampleConfig.isfastsim);  //don't care about jid
         if( overlapping_jet>=0) idx_alloverlapjets_jdown.push_back(overlapping_jet);  //overlap removal for all jets w.r.t. all leptons
 
-	if( ( PassElectronVetoSelections(eidx, skim_vetoLep_el_pt, skim_vetoLep_el_eta) ) &&
-	    (!PassElectronPreSelections(eidx, skim_looseLep_el_pt, skim_looseLep_el_eta) )    ) VetoLeps.push_back(mylepton);
-	if( ( PassElectronPreSelections(eidx, skim_looseLep_el_pt, skim_looseLep_el_eta) ) &&
-	    (!PassElectronPreSelections(eidx, skim_goodLep_el_pt, skim_goodLep_el_eta) )      ) LooseLeps.push_back(mylepton);
-	if( PassElectronPreSelections(eidx, skim_goodLep_el_pt, skim_goodLep_el_eta)          ) GoodLeps.push_back(mylepton);
+	if( ( PassElectronVetoSelections(eidx, lepConfig.ptcut_veto, lepConfig.etacut_veto) ) &&
+	    (!PassElectronPreSelections(eidx, lepConfig.ptcut_loose, lepConfig.etacut_loose) )    ) VetoLeps.push_back(mylepton);
+	if( ( PassElectronPreSelections(eidx, lepConfig.ptcut_loose, lepConfig.etacut_loose) ) &&
+	    (!PassElectronPreSelections(eidx, lepConfig.ptcut, lepConfig.etacut_el) )      ) LooseLeps.push_back(mylepton);
+	if( PassElectronPreSelections(eidx, lepConfig.ptcut, lepConfig.etacut_el)          ) GoodLeps.push_back(mylepton);
       }
 
       // Muons
       for (unsigned int midx = 0; midx < mus_p4().size(); midx++){
-	if( !PassMuonVetoSelections(midx, skim_vetoLep_mu_pt, skim_vetoLep_mu_eta) ) continue;
+	if( !PassMuonVetoSelections(midx, lepConfig.ptcut_veto, lepConfig.etacut_veto) ) continue;
 	Lepton mylepton;
         mylepton.id  = -13*mus_charge().at(midx);
         mylepton.idx = midx;
         mylepton.p4  = mus_p4().at(midx);
-	int overlapping_jet = getOverlappingJetIndex(mylepton.p4, pfjets_p4() , 0.4, skim_jet_pt, skim_jet_eta,false,jet_corrector_pfL1FastJetL2L3,applyJECfromFile,jetcorr_uncertainty,JES_type,skim_isFastsim);  //don't care about jid
+	int overlapping_jet = getOverlappingJetIndex(mylepton.p4, pfjets_p4() , 0.4, jetConfig.ptcut, jetConfig.etacut,false,jet_corrector_pfL1FastJetL2L3,jetConfig.dojec,jetcorr_uncertainty,JES_type,sampleConfig.isfastsim);  //don't care about jid
 	if( overlapping_jet>=0) idx_alloverlapjets.push_back(overlapping_jet);  //overlap removal for all jets w.r.t. all leptons
-        overlapping_jet = getOverlappingJetIndex(mylepton.p4, pfjets_p4() , 0.4, skim_jet_pt, skim_jet_eta,false,jet_corrector_pfL1FastJetL2L3,true,jetcorr_uncertainty_sys,1,skim_isFastsim);  //don't care about jid
+        overlapping_jet = getOverlappingJetIndex(mylepton.p4, pfjets_p4() , 0.4, jetConfig.ptcut, jetConfig.etacut,false,jet_corrector_pfL1FastJetL2L3,true,jetcorr_uncertainty_sys,1,sampleConfig.isfastsim);  //don't care about jid
         if( overlapping_jet>=0) idx_alloverlapjets_jup.push_back(overlapping_jet);  //overlap removal for all jets w.r.t. all leptons
-        overlapping_jet = getOverlappingJetIndex(mylepton.p4, pfjets_p4() , 0.4, skim_jet_pt, skim_jet_eta,false,jet_corrector_pfL1FastJetL2L3,true,jetcorr_uncertainty_sys,-1,skim_isFastsim);  //don't care about jid
+        overlapping_jet = getOverlappingJetIndex(mylepton.p4, pfjets_p4() , 0.4, jetConfig.ptcut, jetConfig.etacut,false,jet_corrector_pfL1FastJetL2L3,true,jetcorr_uncertainty_sys,-1,sampleConfig.isfastsim);  //don't care about jid
         if( overlapping_jet>=0) idx_alloverlapjets_jdown.push_back(overlapping_jet);  //overlap removal for all jets w.r.t. all leptons	
-	if( ( PassMuonVetoSelections(midx, skim_vetoLep_mu_pt, skim_vetoLep_mu_eta) ) &&
-	    (!PassMuonPreSelections(midx, skim_looseLep_mu_pt, skim_looseLep_mu_eta) )    ) VetoLeps.push_back(mylepton);
-	if( ( PassMuonPreSelections(midx, skim_looseLep_mu_pt, skim_looseLep_mu_eta) ) &&
-	    (!PassMuonPreSelections(midx, skim_goodLep_mu_pt, skim_goodLep_mu_eta) )      ) LooseLeps.push_back(mylepton);
-	if( PassMuonPreSelections(midx, skim_goodLep_mu_pt, skim_goodLep_mu_eta)          ) GoodLeps.push_back(mylepton);
+	if( ( PassMuonVetoSelections(midx, lepConfig.ptcut_veto, lepConfig.etacut_veto) ) &&
+	    (!PassMuonPreSelections(midx, lepConfig.ptcut_loose, lepConfig.etacut_loose) )    ) VetoLeps.push_back(mylepton);
+	if( ( PassMuonPreSelections(midx, lepConfig.ptcut_loose, lepConfig.etacut_loose) ) &&
+	    (!PassMuonPreSelections(midx, lepConfig.ptcut, lepConfig.etacut_mu) )      ) LooseLeps.push_back(mylepton);
+	if( PassMuonPreSelections(midx, lepConfig.ptcut, lepConfig.etacut_mu)          ) GoodLeps.push_back(mylepton);
 
       }
       //sort by pt
@@ -928,13 +863,13 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
       double lepSF_FS(1.0),lepSF_FS_Up(1.0), lepSF_FS_Dn(1.0);	
       
       // Lep1 SF
-      if(skim_applyLeptonSFs && !StopEvt.is_data && nVetoLeptons>0){
+      if(lepConfig.dosf && !StopEvt.is_data && nVetoLeptons>0){
 	if(abs(lep1.pdgid) == pdg_el){
            vector<float> updownerr = getupdownerr(h_el_SF,(float)lep1.p4.Pt(),(float)lep1.p4.Eta(),lepSF_pt_cutoff, lepSF_pt_min, 2.39,true);
            vector<float> updownerr_track = getupdownerr(h_el_SF_tracking,(float)lep1.p4.Pt(),(float)lep1.p4.Eta(),199,21, 2.39,false);
 	   lepSF    = updownerr.at(0); lepSF_Up = updownerr.at(1);lepSF_Dn=updownerr.at(2);  
            lepSF *= updownerr_track.at(0); lepSF_Up *=updownerr_track.at(1); lepSF_Dn *=updownerr_track.at(2);
-	   if(skim_isFastsim){
+	   if(sampleConfig.isfastsim){
               vector<float> updownerr_fs = getupdownerr(h_el_FS,(float)lep1.p4.Pt(),(float)lep1.p4.Eta(),lepSF_FS_pt_cutoff, lepSF_FS_pt_min, 2.39,true);
               lepSF *= updownerr_fs.at(0); lepSF_Up *=updownerr_fs.at(1); lepSF_Dn *=updownerr_fs.at(2);
 	  }
@@ -946,19 +881,19 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 	   lepSF *= h_mu_SF_tracking->GetBinContent( binX );
 	   lepSF_Up *= ( h_mu_SF_tracking->GetBinContent(binX) + h_mu_SF_tracking->GetBinError(binX) );
 	   lepSF_Dn *= ( h_mu_SF_tracking->GetBinContent(binX) - h_mu_SF_tracking->GetBinError(binX) );
-	   if(skim_isFastsim){
+	   if(sampleConfig.isfastsim){
               vector<float> updownerr_fs_mu = getupdownerr(h_mu_FS,(float)lep1.p4.Pt(),(float)lep1.p4.Eta(),lepSF_FS_pt_cutoff, lepSF_FS_pt_min, 2.1,true);
               lepSF *= updownerr_fs_mu.at(0); lepSF_Up *=updownerr_fs_mu.at(1); lepSF_Dn *=updownerr_fs_mu.at(2);
 	  }
 	}
       }
       // Lep2 SF
-      if( skim_applyLeptonSFs && !StopEvt.is_data && nVetoLeptons>1 ){
+      if( lepConfig.dosf && !StopEvt.is_data && nVetoLeptons>1 ){
 	if(abs(lep2.pdgid) == pdg_el){
 	  if(nGoodLeptons>1){
             vector<float> updownerr_lep2 = getupdownerr(h_el_SF,(float)lep2.p4.Pt(),(float)lep2.p4.Eta(),lepSF_pt_cutoff, lepSF_pt_min, 2.39,true);
 	    lepSF    *= updownerr_lep2.at(0); lepSF_Up *= updownerr_lep2.at(1);lepSF_Dn *= updownerr_lep2.at(2);  
-	    if(skim_isFastsim){
+	    if(sampleConfig.isfastsim){
               vector<float> updownerr_fs_lep2 = getupdownerr(h_el_FS,(float)lep2.p4.Pt(),(float)lep2.p4.Eta(),lepSF_FS_pt_cutoff, lepSF_FS_pt_min, 2.39,true);
               lepSF *= updownerr_fs_lep2.at(0); lepSF_Up *=updownerr_fs_lep2.at(1); lepSF_Dn *=updownerr_fs_lep2.at(2);
 	    }
@@ -967,7 +902,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 	  else{
             vector<float> updownerr_lep2_veto = getupdownerr(h_el_SF_veto,(float)lep2.p4.Pt(),(float)lep2.p4.Eta(),lepSF_pt_cutoff, lepSF_pt_min, 2.39,true);
             lepSF    *= updownerr_lep2_veto.at(0); lepSF_Up *= updownerr_lep2_veto.at(1);lepSF_Dn *= updownerr_lep2_veto.at(2); 
-	    if(skim_isFastsim){
+	    if(sampleConfig.isfastsim){
               vector<float> updownerr_fs_veto = getupdownerr(h_el_veto_FS,(float)lep2.p4.Pt(),(float)lep2.p4.Eta(),lepSF_FS_pt_cutoff, lepSF_FS_pt_min, 2.39,true);
               lepSF *= updownerr_fs_veto.at(0); lepSF_Up *=updownerr_fs_veto.at(1); lepSF_Dn *=updownerr_fs_veto.at(2);
 	    }
@@ -979,7 +914,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 	  if(nGoodLeptons>1){
             vector<float> updownerr_lep2_mu = getupdownerr(h_mu_SF,(float)lep2.p4.Pt(),(float)lep2.p4.Eta(),lepSF_pt_cutoff, lepSF_pt_min, 2.2,true);
 	    lepSF    *= updownerr_lep2_mu.at(0); lepSF_Up *= updownerr_lep2_mu.at(1);lepSF_Dn *= updownerr_lep2_mu.at(2);  
-	    if(skim_isFastsim){
+	    if(sampleConfig.isfastsim){
               vector<float> updownerr_fs_lep2_mu = getupdownerr(h_mu_FS,(float)lep2.p4.Pt(),(float)lep2.p4.Eta(),lepSF_FS_pt_cutoff, lepSF_FS_pt_min, 2.2,true);
               lepSF *= updownerr_fs_lep2_mu.at(0); lepSF_Up *=updownerr_fs_lep2_mu.at(1); lepSF_Dn *=updownerr_fs_lep2_mu.at(2);
 	    }
@@ -987,7 +922,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 	  else{
             vector<float> updownerr_veto_mu = getupdownerr(h_mu_SF_veto,(float)lep2.p4.Pt(),(float)lep2.p4.Eta(),lepSF_pt_cutoff, lepSF_pt_min, 2.2,true);
 	    lepSF    *= updownerr_veto_mu.at(0); lepSF_Up *= updownerr_veto_mu.at(1);lepSF_Dn *= updownerr_veto_mu.at(2);  
-	    if(skim_isFastsim){
+	    if(sampleConfig.isfastsim){
                vector<float> updownerr_veto_mu_fs = getupdownerr(h_mu_veto_FS,(float)lep2.p4.Pt(),(float)lep2.p4.Eta(),lepSF_pt_cutoff, lepSF_pt_min, 2.2,true);
 	       lepSF    *= updownerr_veto_mu_fs.at(0); lepSF_Up *= updownerr_veto_mu_fs.at(1);lepSF_Dn *= updownerr_veto_mu_fs.at(2);  
 	    }
@@ -1000,7 +935,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
       } // end if 2nd lepton reco lepton exists
 
       // If only 1 reco lepton, and is2lep event, then find lost gen lepton
-      if( skim_applyVetoLeptonSFs && !StopEvt.is_data && nVetoLeptons==1 && StopEvt.is2lep ){
+      if( lepConfig.dosf && !StopEvt.is_data && nVetoLeptons==1 && StopEvt.is2lep ){
 	for(int iGen=0; iGen<(int)gen_leps.p4.size(); iGen++){
 	  if( abs(gen_leps.id.at(iGen))!=11 && abs(gen_leps.id.at(iGen))!=13 ) continue;
 	  if( !gen_leps.fromHardProcessFinalState.at(iGen) ) continue;
@@ -1057,34 +992,34 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
       StopEvt.weight_lepSF_fastSim_down = lepSF_FS_Dn;
       if(debug) std::cout << "[babymaker::looper]: filling got lepton sf variables LINE:" <<__LINE__ << std::endl;
       // save the sum of weights for normalization offline to n-babies.
-      if(!evt_isRealData() && skim_applyLeptonSFs) {
+      if(!evt_isRealData() && lepConfig.dosf) {
        counterhist->Fill(28,StopEvt.weight_lepSF);
        counterhist->Fill(29,StopEvt.weight_lepSF_up);
        counterhist->Fill(30,StopEvt.weight_lepSF_down);
       }
-      if(!evt_isRealData() && skim_applyVetoLeptonSFs){
+      if(!evt_isRealData() && lepConfig.dosf){
 	counterhist->Fill(31,StopEvt.weight_vetoLepSF);
 	counterhist->Fill(32,StopEvt.weight_vetoLepSF_up);
 	counterhist->Fill(33,StopEvt.weight_vetoLepSF_down);
       }
-      if(!evt_isRealData() && skim_applyLeptonSFs && skim_isFastsim){
+      if(!evt_isRealData() && lepConfig.dosf && sampleConfig.isfastsim){
 	counterhist->Fill(34,StopEvt.weight_lepSF_fastSim);
 	counterhist->Fill(35,StopEvt.weight_lepSF_fastSim_up);
 	counterhist->Fill(36,StopEvt.weight_lepSF_fastSim_down);
       }
 
       // Signal
-      if(skim_isSignalFromFileName && !evt_isRealData() && skim_applyLeptonSFs) {
+      if(sampleConfig.issignal && !evt_isRealData() && lepConfig.dosf) {
        counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,27,StopEvt.weight_lepSF);
        counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,28,StopEvt.weight_lepSF_up);
        counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,29,StopEvt.weight_lepSF_down);
       }
-      if(skim_isSignalFromFileName && !evt_isRealData() && skim_applyVetoLeptonSFs){
+      if(sampleConfig.issignal && !evt_isRealData() && lepConfig.dosf){
 	counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,30,StopEvt.weight_vetoLepSF);
 	counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,31,StopEvt.weight_vetoLepSF_up);
 	counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,32,StopEvt.weight_vetoLepSF_down);
       }
-      if(skim_isSignalFromFileName && !evt_isRealData() && skim_applyLeptonSFs && skim_isFastsim){
+      if(sampleConfig.issignal && !evt_isRealData() && lepConfig.dosf && sampleConfig.isfastsim){
 	counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,33,StopEvt.weight_lepSF_fastSim);
 	counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,34,StopEvt.weight_lepSF_fastSim_up);
 	counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,35,StopEvt.weight_lepSF_fastSim_down);
@@ -1102,37 +1037,38 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 	jet_overlep1_idx = -9999;
 	jet_overlep2_idx = -9999;
       if(debug) std::cout << "[babymaker::looper]: filling jet variables LINE:" <<__LINE__ << std::endl;
-	if(nVetoLeptons>0) jet_overlep1_idx = getOverlappingJetIndex(lep1.p4, pfjets_p4(), 0.4, skim_jet_pt, skim_jet_eta, false,jet_corrector_pfL1FastJetL2L3,applyJECfromFile,jetcorr_uncertainty,JES_type,skim_isFastsim);  //don't care about jid
-	if(nVetoLeptons>1) jet_overlep2_idx = getOverlappingJetIndex(lep2.p4, pfjets_p4(), 0.4, skim_jet_pt, skim_jet_eta, false,jet_corrector_pfL1FastJetL2L3,applyJECfromFile,jetcorr_uncertainty,JES_type,skim_isFastsim);  //don't care about jid
+	if(nVetoLeptons>0) jet_overlep1_idx = getOverlappingJetIndex(lep1.p4, pfjets_p4(), 0.4, jetConfig.ptcut, jetConfig.etacut, false,jet_corrector_pfL1FastJetL2L3,jetConfig.dojec,jetcorr_uncertainty,JES_type,sampleConfig.isfastsim);  //don't care about jid
+	if(nVetoLeptons>1) jet_overlep2_idx = getOverlappingJetIndex(lep2.p4, pfjets_p4(), 0.4, jetConfig.ptcut, jetConfig.etacut, false,jet_corrector_pfL1FastJetL2L3,jetConfig.dojec,jetcorr_uncertainty,JES_type,sampleConfig.isfastsim);  //don't care about jid
 	
-      if(debug) std::cout << "[babymaker::looper]: filling jet variables LINE:" <<__LINE__ << std::endl;
+        if(debug) std::cout << "[babymaker::looper]: filling jet variables LINE:" <<__LINE__ << std::endl;
 	// Jets and b-tag variables feeding the index for the jet overlapping the selected leptons
-	jets.SetJetSelection("ak4", skim_jet_pt, skim_jet_eta, true); //save only jets passing jid
-	jets.SetJetSelection("ak8", skim_jet_ak8_pt, skim_jet_ak8_eta, true); //save only jets passing jid
-        jets.FillCommon(idx_alloverlapjets, jet_corrector_pfL1FastJetL2L3,btagprob_data,btagprob_mc,btagprob_heavy_UP, btagprob_heavy_DN, btagprob_light_UP,btagprob_light_DN,btagprob_FS_UP,btagprob_FS_DN,jet_overlep1_idx, jet_overlep2_idx,applyJECfromFile,jetcorr_uncertainty,JES_type, skim_applyBtagSFs, skim_isFastsim);
+	jets.SetJetSelection("ak4", jetConfig.ptcut, jetConfig.etacut, true); //save only jets passing jid
+	jets.SetJetSelection("ak8", jetConfig.ptcut_ak8, jetConfig.etacut_ak8, true); //save only jets passing jid
+        if(debug) std::cout << "[babymaker::looper]: filling jet variables LINE:" <<__LINE__ << std::endl;
+        jets.FillCommon(idx_alloverlapjets, jet_corrector_pfL1FastJetL2L3,btagprob_data,btagprob_mc,btagprob_heavy_UP, btagprob_heavy_DN, btagprob_light_UP,btagprob_light_DN,btagprob_FS_UP,btagprob_FS_DN,jet_overlep1_idx, jet_overlep2_idx,jetConfig.dojec,jetcorr_uncertainty,JES_type, jetConfig.dobtagsf, sampleConfig.isfastsim);
 
       if(debug) std::cout << "[babymaker::looper]: filling jet variables LINE:" <<__LINE__ << std::endl;
         //JEC up
         jet_overlep1_idx = -9999;
         jet_overlep2_idx = -9999;
-        if(nVetoLeptons>0) jet_overlep1_idx = getOverlappingJetIndex(lep1.p4, pfjets_p4(), 0.4, skim_jet_pt, skim_jet_eta, false,jet_corrector_pfL1FastJetL2L3,true,jetcorr_uncertainty_sys,1,skim_isFastsim);  //don't care about jid
-        if(nVetoLeptons>1) jet_overlep2_idx = getOverlappingJetIndex(lep2.p4, pfjets_p4(), 0.4, skim_jet_pt, skim_jet_eta, false,jet_corrector_pfL1FastJetL2L3,true,jetcorr_uncertainty_sys,1,skim_isFastsim);  //don't care about jid
+        if(nVetoLeptons>0) jet_overlep1_idx = getOverlappingJetIndex(lep1.p4, pfjets_p4(), 0.4, jetConfig.ptcut, jetConfig.etacut, false,jet_corrector_pfL1FastJetL2L3,true,jetcorr_uncertainty_sys,1,sampleConfig.isfastsim);  //don't care about jid
+        if(nVetoLeptons>1) jet_overlep2_idx = getOverlappingJetIndex(lep2.p4, pfjets_p4(), 0.4, jetConfig.ptcut, jetConfig.etacut, false,jet_corrector_pfL1FastJetL2L3,true,jetcorr_uncertainty_sys,1,sampleConfig.isfastsim);  //don't care about jid
 	
         // Jets and b-tag variables feeding the index for the jet overlapping the selected leptons
-        jets_jup.SetJetSelection("ak4", skim_jet_pt, skim_jet_eta, true); //save only jets passing jid
-        jets_jup.SetJetSelection("ak8", skim_jet_ak8_pt, skim_jet_ak8_eta, true); //save only jets passing jid
-        jets_jup.FillCommon(idx_alloverlapjets_jup, jet_corrector_pfL1FastJetL2L3,btagprob_data_jup,btagprob_mc_jup,btagprob_heavy_UP_jup, btagprob_heavy_DN_jup, btagprob_light_UP_jup,btagprob_light_DN_jup,btagprob_FS_UP_jup,btagprob_FS_DN_jup,jet_overlep1_idx, jet_overlep2_idx,true,jetcorr_uncertainty_sys,1, false, skim_isFastsim);
+        jets_jup.SetJetSelection("ak4", jetConfig.ptcut, jetConfig.etacut, true); //save only jets passing jid
+        jets_jup.SetJetSelection("ak8", jetConfig.ptcut_ak8, jetConfig.etacut_ak8, true); //save only jets passing jid
+        jets_jup.FillCommon(idx_alloverlapjets_jup, jet_corrector_pfL1FastJetL2L3,btagprob_data_jup,btagprob_mc_jup,btagprob_heavy_UP_jup, btagprob_heavy_DN_jup, btagprob_light_UP_jup,btagprob_light_DN_jup,btagprob_FS_UP_jup,btagprob_FS_DN_jup,jet_overlep1_idx, jet_overlep2_idx,true,jetcorr_uncertainty_sys,1, false, sampleConfig.isfastsim);
 	
         //JEC down
         jet_overlep1_idx = -9999;
         jet_overlep2_idx = -9999;
-        if(nVetoLeptons>0) jet_overlep1_idx = getOverlappingJetIndex(lep1.p4, pfjets_p4(), 0.4, skim_jet_pt, skim_jet_eta, false,jet_corrector_pfL1FastJetL2L3,true,jetcorr_uncertainty_sys,-1,skim_isFastsim);  //don't care about jid
-        if(nVetoLeptons>1) jet_overlep2_idx = getOverlappingJetIndex(lep2.p4, pfjets_p4(), 0.4, skim_jet_pt, skim_jet_eta, false,jet_corrector_pfL1FastJetL2L3,true,jetcorr_uncertainty_sys,-1,skim_isFastsim);  //don't care about jid
+        if(nVetoLeptons>0) jet_overlep1_idx = getOverlappingJetIndex(lep1.p4, pfjets_p4(), 0.4, jetConfig.ptcut, jetConfig.etacut, false,jet_corrector_pfL1FastJetL2L3,true,jetcorr_uncertainty_sys,-1,sampleConfig.isfastsim);  //don't care about jid
+        if(nVetoLeptons>1) jet_overlep2_idx = getOverlappingJetIndex(lep2.p4, pfjets_p4(), 0.4, jetConfig.ptcut, jetConfig.etacut, false,jet_corrector_pfL1FastJetL2L3,true,jetcorr_uncertainty_sys,-1,sampleConfig.isfastsim);  //don't care about jid
 	
         // Jets and b-tag variables feeding the index for the jet overlapping the selected leptons
-        jets_jdown.SetJetSelection("ak4", skim_jet_pt, skim_jet_eta, true); //save only jets passing jid
-        jets_jdown.SetJetSelection("ak8", skim_jet_ak8_pt, skim_jet_ak8_eta, true); //save only jets passing jid
-        jets_jdown.FillCommon(idx_alloverlapjets_jdown, jet_corrector_pfL1FastJetL2L3,btagprob_data_jdown,btagprob_mc_jdown,btagprob_heavy_UP_jdown, btagprob_heavy_DN_jdown, btagprob_light_UP_jdown,btagprob_light_DN_jdown,btagprob_FS_UP_jdown,btagprob_FS_DN_jdown,jet_overlep1_idx, jet_overlep2_idx,true,jetcorr_uncertainty_sys,-1, false, skim_isFastsim);
+        jets_jdown.SetJetSelection("ak4", jetConfig.ptcut, jetConfig.etacut, true); //save only jets passing jid
+        jets_jdown.SetJetSelection("ak8", jetConfig.ptcut_ak8, jetConfig.etacut_ak8, true); //save only jets passing jid
+        jets_jdown.FillCommon(idx_alloverlapjets_jdown, jet_corrector_pfL1FastJetL2L3,btagprob_data_jdown,btagprob_mc_jdown,btagprob_heavy_UP_jdown, btagprob_heavy_DN_jdown, btagprob_light_UP_jdown,btagprob_light_DN_jdown,btagprob_FS_UP_jdown,btagprob_FS_DN_jdown,jet_overlep1_idx, jet_overlep2_idx,true,jetcorr_uncertainty_sys,-1, false, sampleConfig.isfastsim);
       }
       
       if(debug) std::cout << "[babymaker::looper]: filling jet variables LINE:" <<__LINE__ << std::endl;
@@ -1167,54 +1103,54 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 	counterhist->Fill(26,StopEvt.weight_ISRnjets_UP);
 	counterhist->Fill(27,StopEvt.weight_ISRnjets_DN);
 
-	if(skim_isSignalFromFileName){
+	if(sampleConfig.issignal){
 	  counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,24,StopEvt.weight_ISRnjets);
 	  counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,25,StopEvt.weight_ISRnjets_UP);
 	  counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,26,StopEvt.weight_ISRnjets_DN);
 	}
       }
       // SAVE B TAGGING SF 
-     if (!evt_isRealData() && skim_applyBtagSFs) {
+     if (!evt_isRealData() && jetConfig.dobtagsf) {
         StopEvt.weight_btagsf = btagprob_data / btagprob_mc;
         StopEvt.weight_btagsf_heavy_UP = btagprob_heavy_UP/btagprob_mc;
         StopEvt.weight_btagsf_light_UP = btagprob_light_UP/btagprob_mc;
         StopEvt.weight_btagsf_heavy_DN = btagprob_heavy_DN/btagprob_mc;
         StopEvt.weight_btagsf_light_DN = btagprob_light_DN/btagprob_mc;
-	if(skim_isFastsim){
+	if(sampleConfig.isfastsim){
 	  StopEvt.weight_btagsf_fastsim_UP = btagprob_FS_UP/btagprob_mc;
 	  StopEvt.weight_btagsf_fastsim_DN = btagprob_FS_DN/btagprob_mc;
 	}
      }
      // save the sum of weights for normalization offline to n-babies.
-     if(!evt_isRealData() && skim_applyBtagSFs) {
+     if(!evt_isRealData() && jetConfig.dobtagsf) {
        counterhist->Fill(14,StopEvt.weight_btagsf);
        counterhist->Fill(15,StopEvt.weight_btagsf_heavy_UP);
        counterhist->Fill(16,StopEvt.weight_btagsf_light_UP);
        counterhist->Fill(17,StopEvt.weight_btagsf_heavy_DN);
        counterhist->Fill(18,StopEvt.weight_btagsf_light_DN);
-       if(skim_isFastsim){
+       if(sampleConfig.isfastsim){
 	 counterhist->Fill(23,StopEvt.weight_btagsf_fastsim_UP);
 	 counterhist->Fill(24,StopEvt.weight_btagsf_fastsim_DN);
        }
      }
-     if(skim_isSignalFromFileName && !evt_isRealData() && skim_applyBtagSFs){
+     if(sampleConfig.issignal && !evt_isRealData() && jetConfig.dobtagsf){
        counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,14,StopEvt.weight_btagsf);
        counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,15,StopEvt.weight_btagsf_heavy_UP);
        counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,16,StopEvt.weight_btagsf_light_UP);
        counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,17,StopEvt.weight_btagsf_heavy_DN);
        counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,18,StopEvt.weight_btagsf_light_DN);
-       if(skim_isFastsim){
+       if(sampleConfig.isfastsim){
 	 counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,22,StopEvt.weight_btagsf_fastsim_UP);
 	 counterhistSig->Fill(StopEvt.mass_stop,StopEvt.mass_lsp,23,StopEvt.weight_btagsf_fastsim_DN);
        }
      }
       // apply skim
       if(debug) std::cout << "[babymaker::looper]: going to apply skims LINE:" <<__LINE__ << std::endl;
-      if(nGoodLeptons < skim_nGoodLep) continue;      nEvents_pass_skim_nGoodLep++;
-//      if(!(jets.ngoodjets >= skim_nJets)) continue;
-       if(!(jets.ngoodjets >= skim_nJets) && !(jets_jup.ngoodjets >= skim_nJets) && !(jets_jdown.ngoodjets >= skim_nJets)) continue;
-      nEvents_pass_skim_nJets++;
-      if(!(jets.ngoodbtags >= skim_nBJets) && !(jets_jup.ngoodbtags_jup >= skim_nBJets) && !(jets_jdown.ngoodbtags_jdown >= skim_nBJets)) continue;
+      if(nGoodLeptons < lepConfig.nlep) continue;      nEvents_pass_skim_nGoodLeps++;
+//      if(!(jets.ngoodjets >= jetConfig.njets)) continue;
+       if(!(jets.ngoodjets >= jetConfig.njet) && !(jets_jup.ngoodjets >= jetConfig.njet) && !(jets_jdown.ngoodjets >= jetConfig.njet)) continue;
+      nEvents_pass_skim_nGoodJets++;
+//      if(!(jets.ngoodbtags >= skim_nBJets) && !(jets_jup.ngoodbtags_jup >= skim_nBJets) && !(jets_jdown.ngoodbtags_jdown >= skim_nBJets)) continue;
       nEvents_pass_skim_nBJets++;//
       // fastsim filter for bad jets//
       if(debug) std::cout << "[babymaker::looper]: fastsim filter LINE:" <<__LINE__ << std::endl;
@@ -1294,13 +1230,13 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
       // Photon Selection
       //
       if(debug) std::cout << "[babymaker::looper]: Photon Selection LINE:" <<__LINE__ << std::endl;
-      ph.SetPhotonSelection(skim_ph_pt, skim_ph_eta);
+      ph.SetPhotonSelection(gammaConfig.ptcut, gammaConfig.etacut);
       ph.FillCommon();
       StopEvt.nPhotons = ph.p4.size();
-      if(StopEvt.nPhotons < skim_nPhotons) continue;
+      if(StopEvt.nPhotons < gammaConfig.ngamma) continue;
       int leadph = -1;//use this in case we have a wide photon selection (like loose id), but want to use specific photon
       for(unsigned int i = 0; i<ph.p4.size(); ++i){
-	int overlapping_jet = getOverlappingJetIndex(ph.p4.at(i), jets.ak4pfjets_p4, 0.4, skim_jet_pt, skim_jet_eta,false,jet_corrector_pfL1FastJetL2L3,applyJECfromFile,jetcorr_uncertainty,JES_type,skim_isFastsim);
+	int overlapping_jet = getOverlappingJetIndex(ph.p4.at(i), jets.ak4pfjets_p4, 0.4, jetConfig.ptcut, jetConfig.etacut,false,jet_corrector_pfL1FastJetL2L3,jetConfig.dojec,jetcorr_uncertainty,JES_type,sampleConfig.isfastsim);
 	ph.overlapJetId.at(i) = overlapping_jet;
 	if(leadph!=-1 && ph.p4.at(i).Pt()<ph.p4.at(leadph).Pt()) continue;
 	if(StopEvt.ngoodleps>0 && ROOT::Math::VectorUtil::DeltaR(ph.p4.at(i), lep1.p4)<0.2) continue;
@@ -1323,8 +1259,8 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
       if(debug) std::cout << "[babymaker::looper]: filling jet variables LINE:" <<__LINE__ << std::endl;
       StopEvt.ak4pfjets_rho = evt_fixgridfastjet_all_rho();
       vector<int> jetIndexSortedCSV;
-      if(skim_isFastsim) jetIndexSortedCSV = JetUtil::JetIndexCSVsorted(jets.ak4pfjets_CSV, jets.ak4pfjets_p4, jets.ak4pfjets_loose_pfid, skim_jet_pt, skim_jet_eta, false);
-      else jetIndexSortedCSV = JetUtil::JetIndexCSVsorted(jets.ak4pfjets_CSV, jets.ak4pfjets_p4, jets.ak4pfjets_loose_pfid, skim_jet_pt, skim_jet_eta, true);
+      if(sampleConfig.isfastsim) jetIndexSortedCSV = JetUtil::JetIndexCSVsorted(jets.ak4pfjets_CSV, jets.ak4pfjets_p4, jets.ak4pfjets_loose_pfid, jetConfig.ptcut, jetConfig.etacut, false);
+      else jetIndexSortedCSV = JetUtil::JetIndexCSVsorted(jets.ak4pfjets_CSV, jets.ak4pfjets_p4, jets.ak4pfjets_loose_pfid, jetConfig.ptcut, jetConfig.etacut, true);
       vector<LorentzVector> mybjets; vector<LorentzVector> myaddjets;
       for(unsigned int idx = 0; idx<jetIndexSortedCSV.size(); ++idx){
 	if(jets.ak4pfjets_passMEDbtag.at(jetIndexSortedCSV[idx])==true) mybjets.push_back(jets.ak4pfjets_p4.at(jetIndexSortedCSV[idx]) );
@@ -1333,8 +1269,8 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 
       if(debug) std::cout << "[babymaker::looper]: filling jet variables LINE:" <<__LINE__ << std::endl;
       vector<int> jetIndexSortedCSV_jup;
-      if(skim_isFastsim) jetIndexSortedCSV_jup = JetUtil::JetIndexCSVsorted(jets_jup.ak4pfjets_CSV, jets_jup.ak4pfjets_p4, jets_jup.ak4pfjets_loose_pfid, skim_jet_pt, skim_jet_eta, false);
-      else jetIndexSortedCSV_jup = JetUtil::JetIndexCSVsorted(jets_jup.ak4pfjets_CSV, jets_jup.ak4pfjets_p4, jets_jup.ak4pfjets_loose_pfid, skim_jet_pt, skim_jet_eta, true);
+      if(sampleConfig.isfastsim) jetIndexSortedCSV_jup = JetUtil::JetIndexCSVsorted(jets_jup.ak4pfjets_CSV, jets_jup.ak4pfjets_p4, jets_jup.ak4pfjets_loose_pfid, jetConfig.ptcut, jetConfig.etacut, false);
+      else jetIndexSortedCSV_jup = JetUtil::JetIndexCSVsorted(jets_jup.ak4pfjets_CSV, jets_jup.ak4pfjets_p4, jets_jup.ak4pfjets_loose_pfid, jetConfig.ptcut, jetConfig.etacut, true);
       vector<LorentzVector> mybjets_jup; vector<LorentzVector> myaddjets_jup;
       for(unsigned int idx = 0; idx<jetIndexSortedCSV_jup.size(); ++idx){
         if(jets_jup.ak4pfjets_passMEDbtag.at(jetIndexSortedCSV_jup[idx])==true) mybjets_jup.push_back(jets_jup.ak4pfjets_p4.at(jetIndexSortedCSV_jup[idx]) );
@@ -1343,8 +1279,8 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 
       if(debug) std::cout << "[babymaker::looper]: filling jet variables LINE:" <<__LINE__ << std::endl;
       vector<int> jetIndexSortedCSV_jdown;
-      if(skim_isFastsim) jetIndexSortedCSV_jdown = JetUtil::JetIndexCSVsorted(jets_jdown.ak4pfjets_CSV, jets_jdown.ak4pfjets_p4, jets_jdown.ak4pfjets_loose_pfid, skim_jet_pt, skim_jet_eta, false);
-      else jetIndexSortedCSV_jdown = JetUtil::JetIndexCSVsorted(jets_jdown.ak4pfjets_CSV, jets_jdown.ak4pfjets_p4, jets_jdown.ak4pfjets_loose_pfid, skim_jet_pt, skim_jet_eta, true);
+      if(sampleConfig.isfastsim) jetIndexSortedCSV_jdown = JetUtil::JetIndexCSVsorted(jets_jdown.ak4pfjets_CSV, jets_jdown.ak4pfjets_p4, jets_jdown.ak4pfjets_loose_pfid, jetConfig.ptcut, jetConfig.etacut, false);
+      else jetIndexSortedCSV_jdown = JetUtil::JetIndexCSVsorted(jets_jdown.ak4pfjets_CSV, jets_jdown.ak4pfjets_p4, jets_jdown.ak4pfjets_loose_pfid, jetConfig.ptcut, jetConfig.etacut, true);
       vector<LorentzVector> mybjets_jdown; vector<LorentzVector> myaddjets_jdown;
       for(unsigned int idx = 0; idx<jetIndexSortedCSV_jdown.size(); ++idx){
         if(jets_jdown.ak4pfjets_passMEDbtag.at(jetIndexSortedCSV_jdown[idx])==true) mybjets_jdown.push_back(jets_jdown.ak4pfjets_p4.at(jetIndexSortedCSV_jdown[idx]) );
@@ -1448,7 +1384,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 	
       } // end if >0 jets      
 
-      if(fillZll){
+      if(fillextraConfig.fillZll){
       //
       // Zll Event Variables
       //
@@ -1528,7 +1464,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
       }//end of Zll
     }
      // Photon Event Variables
-    if(fillPhoton){ 
+    if(fillextraConfig.fillPhoton){ 
       if(StopEvt.ph_selectedidx>=0){
 	int oljind = ph.overlapJetId.at(StopEvt.ph_selectedidx);
 	double phmetpx = ( StopEvt.pfmet * cos(StopEvt.pfmet_phi) ) + ( ph.p4.at(StopEvt.ph_selectedidx).Px() );
@@ -1707,7 +1643,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
 	}
       } // end loop over pfCands
      if(vetotracks_v3<1) StopEvt.PassTrackVeto = true; else StopEvt.PassTrackVeto = false;
-      if(skim_2ndlepveto && !(StopEvt.nvetoleps!=1&& StopEvt.PassTrackVeto&& StopEvt.PassTauVeto)) continue;
+      if(lepConfig.dolepveto && !(StopEvt.nvetoleps!=1&& StopEvt.PassTrackVeto&& StopEvt.PassTauVeto)) continue;
       nEvents_pass_skim_2ndlepVeto++;
       if(debug)      std::cout << "[babymaker::looper]: updating geninfo for recoleptons LINE:" <<__LINE__ << std::endl;
       // Check that we have the gen leptons matched to reco leptons
@@ -1835,8 +1771,6 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
           new_pfmet_y += tau_p4s.at(0).py();
         }
       }
-      else
-        ;
       // add the subtract back to the met.
       float new_pfmet_x_jup = new_pfmet_x + (StopEvt.pfmet_jup * std::cos(StopEvt.pfmet_phi_jup));
       float new_pfmet_y_jup = new_pfmet_y + (StopEvt.pfmet_jup * std::sin(StopEvt.pfmet_phi_jup));
@@ -1881,7 +1815,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
       //----------------------------------------------//
       if(debug)      std::cout << "[babymaker::looper]: filling HLT vars" << std::endl;
       //////////////// 2015 Run II  //////////////////////
-      if(!skim_isSignalFromFileName){
+      if(!sampleConfig.issignal){
 	StopEvt.HLT_MET = passHLTTriggerPattern("HLT_PFMET170_NoiseCleaned_v") || passHLTTriggerPattern("HLT_PFMET170_JetIdCleaned_v") || passHLTTriggerPattern("HLT_PFMET170_HBHECleaned_v") || passHLTTriggerPattern("HLT_PFMET170_NotCleaned_v"); 
 	StopEvt.HLT_MET100_MHT100 = passHLTTriggerPattern("HLT_PFMET100_PFMHT100_IDTight_v");
 	StopEvt.HLT_SingleEl = passHLTTriggerPattern("HLT_Ele27_eta2p1_WPLoose_Gsf_v") || passHLTTriggerPattern("HLT_Ele27_eta2p1_WPTight_Gsf_v") ||  passHLTTriggerPattern("HLT_Ele105_CaloIdVT_GsfTrkIdT_v") || passHLTTriggerPattern("HLT_Ele115_CaloIdVT_GsfTrkIdT_v");
@@ -1911,13 +1845,13 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
   BabyFile->cd();
   BabyTree->Write();
   counterhist->Write();
-  if(skim_isSignalFromFileName){   counterhistSig->Write(); histNEvts->Write(); }
+  if(sampleConfig.issignal){   counterhistSig->Write(); histNEvts->Write(); }
   BabyFile->Close();
   // clean up
-  if(skim_isSignalFromFileName) { fxsec->Close(); delete fxsec; }
-  if(!skim_isDataFromFileName)  { pileupfile->Close(); delete pileupfile; }
-  if(skim_applyBtagSFs)           jets.deleteBtagSFTool();
-  if(!skim_isDataFromFileName && (skim_applyLeptonSFs || skim_applyVetoLeptonSFs) ){
+  if(sampleConfig.issignal) { fxsec->Close(); delete fxsec; }
+  if(!sampleConfig.isdata)  { pileupfile->Close(); delete pileupfile; }
+  if(jetConfig.dobtagsf)           jets.deleteBtagSFTool();
+  if(!sampleConfig.isdata && (lepConfig.dosf || lepConfig.dosf) ){
     f_el_SF->Close();       f_el_FS_ID->Close();    f_el_FS_Iso->Close(); f_mu_SF_id->Close();    f_mu_SF_iso->Close();   f_mu_SF_veto_id->Close();
     f_mu_SF_veto_iso->Close();    f_mu_FS_ID->Close();    f_mu_FS_Iso->Close();    f_vetoLep_eff->Close();
   }
@@ -1928,10 +1862,10 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
   cout << "-----------------------------" << endl;
   cout << "Events Processed                     " << nEvents_processed << endl;
   cout << "Events with " << skim_nvtx << " Good Vertex            " << nEvents_pass_skim_nVtx << endl;
-  cout << "Events with at least " << skim_nGoodLep << " Good Lepton   " << nEvents_pass_skim_nGoodLep << endl;
-  cout << "Events with at least " << skim_nJets << " Good Jets     " << nEvents_pass_skim_nJets << endl;
-  cout << "Events with at least " << skim_nBJets << " Good BJets   " << nEvents_pass_skim_nBJets << endl;
-  cout << "Events passing 2nd Lep Veto " << skim_2ndlepveto << "    " << nEvents_pass_skim_2ndlepVeto << endl;
+  cout << "Events with at least " << lepConfig.nlep << " Good Lepton   " << nEvents_pass_skim_nGoodLeps << endl;
+  cout << "Events with at least " << jetConfig.njet << " Good Jets     " << nEvents_pass_skim_nGoodJets << endl;
+//  cout << "Events with at least " << skim_nBJets << " Good BJets   " << nEvents_pass_skim_nBJets << endl;
+  cout << "Events passing 2nd Lep Veto " << lepConfig.dolepveto << "    " << nEvents_pass_skim_2ndlepVeto << endl;
   cout << "Events with MET > " << skim_met << " GeV             " << nEvents_pass_skim_met << endl;
   cout << "-----------------------------" << endl;
   cout << "CPU  Time:   " << Form( "%.01f", bmark->GetCpuTime("benchmark")  ) << endl;                                                                                          
