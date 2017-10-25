@@ -189,7 +189,7 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx,  Factoriz
         //deal with the overlaps
         if(jindex == overlep1_idx){
 		ak4pfjet_overlep1_p4  = p4sCorrJets.at(jindex);
-                ak4pfjet_overlep1_CSV = getbtagvalue("pfCombinedInclusiveSecondaryVertexV2BJetTags", jindex);
+                ak4pfjet_overlep1_CSV = pfjets_pfCombinedInclusiveSecondaryVertexV2BJetTag().at(jindex);
                 ak4pfjet_overlep1_deepCSV = getbtagvalue(deepCSV_prefix+"JetTags:probb",jindex) + getbtagvalue(deepCSV_prefix+"JetTags:probbb",jindex);
 		//ak4pfjet_overlep1_pu_id = pfjets_pileupJetId().at(jindex);
                 ak4pfjet_overlep1_chf = pfjets_chargedHadronE().at(jindex)/ (pfjets_undoJEC().at(jindex)*p4sCorrJets[jindex].energy());
@@ -202,7 +202,7 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx,  Factoriz
 	}
         if(jindex == overlep2_idx){
                 ak4pfjet_overlep2_p4  = p4sCorrJets.at(jindex);
-                ak4pfjet_overlep2_CSV = getbtagvalue("pfCombinedInclusiveSecondaryVertexV2BJetTags", jindex);
+                ak4pfjet_overlep2_CSV = pfjets_pfCombinedInclusiveSecondaryVertexV2BJetTag().at(jindex);
                 ak4pfjet_overlep2_deepCSV = getbtagvalue(deepCSV_prefix+"JetTags:probb",jindex) + getbtagvalue(deepCSV_prefix+"JetTags:probbb",jindex);
                 //ak4pfjet_overlep2_pu_id = pfjets_pileupJetId().at(jindex);
                 ak4pfjet_overlep2_chf = pfjets_chargedHadronE().at(jindex)/ (pfjets_undoJEC().at(jindex)*p4sCorrJets[jindex].energy());
@@ -240,7 +240,7 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx,  Factoriz
         ak4pfjets_phi.push_back(p4sCorrJets.at(jindex).phi());
         ak4pfjets_mass.push_back(p4sCorrJets.at(jindex).mass());
 
-        ak4pfjets_CSV.push_back(getbtagvalue("pfCombinedInclusiveSecondaryVertexV2BJetTags", jindex));
+        ak4pfjets_CSV.push_back(pfjets_pfCombinedInclusiveSecondaryVertexV2BJetTag().at(jindex));
         ak4pfjets_mva.push_back(getbtagvalue("pfCombinedMVAV2BJetTags", jindex));
         ak4pfjets_deepCSV.push_back(getbtagvalue(deepCSV_prefix+"JetTags:probb",jindex) + getbtagvalue(deepCSV_prefix+"JetTags:probbb",jindex));
         ak4pfjets_puid.push_back(loosePileupJetId(jindex));
@@ -274,9 +274,9 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx,  Factoriz
         HT = HT + p4sCorrJets.at(jindex).pt();
 	
 	//medium btag
-        //getbtagvalue("pfCombinedInclusiveSecondaryVertexV2BJetTags", jindex)
+        //pfjets_pfCombinedInclusiveSecondaryVertexV2BJetTag().at(jindex)
 	if( btagvalue > BTAG_MED ) {
-//        if(getbtagvalue("pfCombinedInclusiveSecondaryVertexV2BJetTags", jindex) > BTAG_MED){
+//        if(pfjets_pfCombinedInclusiveSecondaryVertexV2BJetTag().at(jindex) > BTAG_MED){
              ak4pfjets_passMEDbtag.push_back(true);
              nbtags_med++;
              if(nbtags_med == 1){
@@ -440,8 +440,8 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx,  Factoriz
             }
            }// end of if fail loose
 
-	if(getbtagvalue("pfCombinedInclusiveSecondaryVertexV2BJetTags", jindex)> btagdisc){
-	  btagdisc = getbtagvalue("pfCombinedInclusiveSecondaryVertexV2BJetTags", jindex);
+	if(pfjets_pfCombinedInclusiveSecondaryVertexV2BJetTag().at(jindex)> btagdisc){
+	  btagdisc = pfjets_pfCombinedInclusiveSecondaryVertexV2BJetTag().at(jindex);
 	  leadbtag_idx = jindex;
 	}
 
