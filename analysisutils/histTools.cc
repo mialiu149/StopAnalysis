@@ -134,13 +134,9 @@ void getHist( TH1F* &backgroundhist, std::string filename, std::string histname)
 }
 
 void getHist( TH2D* &backgroundhist, std::string filename, std::string histname){
-  backgroundhist->Print();
   TFile *infile = TFile::Open(filename.c_str(),"READ");
-  cout<<__LINE__<<":"<<infile->IsZombie()<<endl;
   if(infile->IsZombie())  cout<<"can not read from file :"<<filename<<endl;
   if(!infile->Get(histname.c_str())) cout<<"can not read from file :"<<filename<<endl;
-  cout<<infile->Get(histname.c_str())<<endl;
-  infile->Get(histname.c_str())->Print();
   backgroundhist = (TH2D*)(infile->Get(histname.c_str()));
   return;
 }
