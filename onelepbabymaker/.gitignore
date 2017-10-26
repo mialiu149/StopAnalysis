@@ -2,7 +2,9 @@
 *.o
 *.so
 *.d
-
+../analysisutils/*.o
+../analysisutils/*.so
+../analysisutils/*.d
 # Don't commit the main executable
 runBabyMaker
 
