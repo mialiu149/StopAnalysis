@@ -2,6 +2,7 @@
 #include "CMS3.h"
 #include "JetSelections.h"
 #include "btagsf/BTagCalibrationStandalone.h"
+#include "../analysisutils/histTools.h"
 
 using namespace tas;
  
@@ -31,10 +32,9 @@ float getmct(LorentzVector jet1,LorentzVector jet2) {
   return mct;
 }
 
-void JetTree::InitBtagSFTool(TH2D* h_btag_eff_b_, TH2D* h_btag_eff_c_, TH2D* h_btag_eff_udsg_,TH2D* h_btag_eff_b_loose_, TH2D* h_btag_eff_c_loose_, TH2D* h_btag_eff_udsg_loose_ ,bool isFastsim_) {
+void JetTree::InitBtagSFTool(bool isFastsim_) {
     char* jecpath;
     jecpath = getenv ("TOOLSPATH");
-    //calib = new BTagCalibration("csvv2", "btagsf/CSVv2_ichep_slimmed.csv"); // 25s version of SFs - slimmed version removed mujets and iterativefit from original one
     calib = new BTagCalibration("csvv2", "btagsf/CSVv2Moriond17_2017_1_26_BtoH.csv");
     reader_heavy = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "comb", "central"); // central
     reader_heavy_UP = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "comb", "up");  // sys up
@@ -58,15 +58,23 @@ void JetTree::InitBtagSFTool(TH2D* h_btag_eff_b_, TH2D* h_btag_eff_c_, TH2D* h_b
     reader_fastsim_loose = new BTagCalibrationReader(calib_fastsim, BTagEntry::OP_LOOSE, "fastsim", "central"); // central
     reader_fastsim_loose_UP = new BTagCalibrationReader(calib_fastsim, BTagEntry::OP_LOOSE, "fastsim", "up");  // sys up
     reader_fastsim_loose_DN = new BTagCalibrationReader(calib_fastsim, BTagEntry::OP_LOOSE, "fastsim", "down");  // sys down
-
-    h_btag_eff_b = h_btag_eff_b_;
-    h_btag_eff_c = h_btag_eff_c_;
-    h_btag_eff_udsg = h_btag_eff_udsg_;
-    h_btag_eff_b_loose = h_btag_eff_b_loose_;
-    h_btag_eff_c_loose = h_btag_eff_c_loose_;
-    h_btag_eff_udsg_loose = h_btag_eff_udsg_loose_;
-
-    std::cout << "loaded fastsim btag SFs" << std::endl;
+    if(!isFastsim_){
+      getHist(h_btag_eff_b,"$COREPATH/Tools/btagsf/data/run2_25ns/btageff__ttbar_powheg_pythia8_25ns_Moriond17.root","h2_BTaggingEff_csv_med_Eff_b");
+      getHist(h_btag_eff_c,"$COREPATH/Tools/btagsf/data/run2_25ns/btageff__ttbar_powheg_pythia8_25ns_Moriond17.root","h2_BTaggingEff_csv_med_Eff_c");
+      getHist(h_btag_eff_udsg,"$COREPATH/Tools/btagsf/data/run2_25ns/btageff__ttbar_powheg_pythia8_25ns_Moriond17.root","h2_BTaggingEff_csv_med_Eff_udsg");
+      getHist(h_btag_eff_b_loose,"$COREPATH/Tools/btagsf/data/run2_25ns/btageff__ttbar_powheg_pythia8_25ns_Moriond17.root","h2_BTaggingEff_csv_loose_Eff_b");
+      getHist(h_btag_eff_c_loose,"$COREPATH/Tools/btagsf/data/run2_25ns/btageff__ttbar_powheg_pythia8_25ns_Moriond17.root","h2_BTaggingEff_csv_loose_Eff_c");
+      getHist(h_btag_eff_udsg_loose,"$COREPATH/Tools/btagsf/data/run2_25ns/btageff__ttbar_powheg_pythia8_25ns_Moriond17.root","h2_BTaggingEff_csv_loose_Eff_udsg");
+    }
+    else{
+      getHist(h_btag_eff_b,"$COREPATH/Tools/btagsf/data/run2_fastsim/btageff__SMS-T1bbbb-T1qqqq_25ns_Moriond17.root","h2_BTaggingEff_csv_med_Eff_b");
+      getHist(h_btag_eff_c,"$COREPATH/Tools/btagsf/data/run2_fastsim/btageff__SMS-T1bbbb-T1qqqq_25ns_Moriond17.root","h2_BTaggingEff_csv_med_Eff_c");
+      getHist(h_btag_eff_udsg,"$COREPATH/Tools/btagsf/data/run2_fastsim/btageff__SMS-T1bbbb-T1qqqq_25ns_Moriond17.root","h2_BTaggingEff_csv_med_Eff_udsg");
+      getHist(h_btag_eff_b_loose,"$COREPATH/Tools/btagsf/data/run2_fastsim/btageff__SMS-T1bbbb-T1qqqq_25ns_Moriond17.root","h2_BTaggingEff_csv_loose_Eff_b");
+      getHist(h_btag_eff_c_loose,"$COREPATH/Tools/btagsf/data/run2_fastsim/btageff__SMS-T1bbbb-T1qqqq_25ns_Moriond17.root","h2_BTaggingEff_csv_loose_Eff_c");
+      getHist(h_btag_eff_udsg_loose,"$COREPATH/Tools/btagsf/data/run2_fastsim/btageff__SMS-T1bbbb-T1qqqq_25ns_Moriond17.root","h2_BTaggingEff_csv_loose_Eff_udsg");
+   }
+        std::cout << "loaded fastsim btag SFs" << std::endl;
     return;
 }
 

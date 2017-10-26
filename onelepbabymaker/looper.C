@@ -340,28 +340,10 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
     jetcorr_uncertainty_sys = new JetCorrectionUncertainty(jetcorr_uncertainty_filename);
 
   if (jetConfig.dobtagsf) {
-    if(!sampleConfig.isfastsim){
-      getHist(h_btag_eff_b,"$COREPATH/Tools/btagsf/data/run2_25ns/btageff__ttbar_powheg_pythia8_25ns_Moriond17.root","h2_BTaggingEff_csv_med_Eff_b");
-      getHist(h_btag_eff_c,"$COREPATH/Tools/btagsf/data/run2_25ns/btageff__ttbar_powheg_pythia8_25ns_Moriond17.root","h2_BTaggingEff_csv_med_Eff_c");
-      getHist(h_btag_eff_udsg,"$COREPATH/Tools/btagsf/data/run2_25ns/btageff__ttbar_powheg_pythia8_25ns_Moriond17.root","h2_BTaggingEff_csv_med_Eff_udsg");
-      getHist(h_btag_eff_b_loose,"$COREPATH/Tools/btagsf/data/run2_25ns/btageff__ttbar_powheg_pythia8_25ns_Moriond17.root","h2_BTaggingEff_csv_loose_Eff_b");
-      getHist(h_btag_eff_c_loose,"$COREPATH/Tools/btagsf/data/run2_25ns/btageff__ttbar_powheg_pythia8_25ns_Moriond17.root","h2_BTaggingEff_csv_loose_Eff_c");
-      getHist(h_btag_eff_udsg_loose,"$COREPATH/Tools/btagsf/data/run2_25ns/btageff__ttbar_powheg_pythia8_25ns_Moriond17.root","h2_BTaggingEff_csv_loose_Eff_udsg");
-    }
-    else{
-      getHist(h_btag_eff_b,"$COREPATH/Tools/btagsf/data/run2_fastsim/btageff__SMS-T1bbbb-T1qqqq_25ns_Moriond17.root","h2_BTaggingEff_csv_med_Eff_b");
-      getHist(h_btag_eff_c,"$COREPATH/Tools/btagsf/data/run2_fastsim/btageff__SMS-T1bbbb-T1qqqq_25ns_Moriond17.root","h2_BTaggingEff_csv_med_Eff_c");
-      getHist(h_btag_eff_udsg,"$COREPATH/Tools/btagsf/data/run2_fastsim/btageff__SMS-T1bbbb-T1qqqq_25ns_Moriond17.root","h2_BTaggingEff_csv_med_Eff_udsg");
-      getHist(h_btag_eff_b_loose,"$COREPATH/Tools/btagsf/data/run2_fastsim/btageff__SMS-T1bbbb-T1qqqq_25ns_Moriond17.root","h2_BTaggingEff_csv_loose_Eff_b");
-      getHist(h_btag_eff_c_loose,"$COREPATH/Tools/btagsf/data/run2_fastsim/btageff__SMS-T1bbbb-T1qqqq_25ns_Moriond17.root","h2_BTaggingEff_csv_loose_Eff_c");
-      getHist(h_btag_eff_udsg_loose,"$COREPATH/Tools/btagsf/data/run2_fastsim/btageff__SMS-T1bbbb-T1qqqq_25ns_Moriond17.root","h2_BTaggingEff_csv_loose_Eff_udsg");
-   }
+    jets.InitBtagSFTool(sampleConfig.isfastsim); 
+    jets_jup.InitBtagSFTool(sampleConfig.isfastsim); 
+    jets_jdown.InitBtagSFTool(sampleConfig.isfastsim); 
   }    
- 
-    jets.InitBtagSFTool(h_btag_eff_b,h_btag_eff_c,h_btag_eff_udsg, h_btag_eff_b_loose,h_btag_eff_c_loose,h_btag_eff_udsg_loose,sampleConfig.isfastsim); 
-    jets_jup.InitBtagSFTool(h_btag_eff_b,h_btag_eff_c,h_btag_eff_udsg, h_btag_eff_b_loose,h_btag_eff_c_loose,h_btag_eff_udsg_loose,sampleConfig.isfastsim); 
-    jets_jdown.InitBtagSFTool(h_btag_eff_b,h_btag_eff_c,h_btag_eff_udsg, h_btag_eff_b_loose,h_btag_eff_c_loose,h_btag_eff_udsg_loose,sampleConfig.isfastsim); 
-
   // Loop over the trees
 
   while ( (currentFile = (TFile*)fileIter.Next()) ) { 

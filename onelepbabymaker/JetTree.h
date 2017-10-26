@@ -29,7 +29,7 @@ public:
  
     void Reset ();
     void deleteBtagSFTool();
-    void InitBtagSFTool( TH2D* h_btag_eff_b, TH2D* h_btag_eff_c, TH2D* h_btag_eff_udsg, TH2D* h_btag_eff_b_loose, TH2D* h_btag_eff_c_loose, TH2D* h_btag_eff_udsg_loose,bool isFastsim_);
+    void InitBtagSFTool( bool isFastsim_);
     void SetBranches (TTree* tree);
     void SetAK4Branches_Other(TTree* tree);
     void SetAK4Branches_EF(TTree* tree);
