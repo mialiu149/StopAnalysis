@@ -14,7 +14,7 @@ typedef std::vector<float> vecd;
 typedef std::vector<std::string> vecs;
 typedef std::vector<int> veci;
 typedef std::vector<bool> vecb;
-enum TauDecay {NoTau, Lep_e, Lep_mu, Had_1prong, Had_3prong, other};
+enum TauDecay {NoTau, Lep_e, Lep_mu, Had_1prong, Had_3prong, Other};
 
 class GenParticleTree
 {
@@ -55,44 +55,6 @@ public:
 	veci gmotherid;
         veci gmotheridx;
 	veci gmotherstatus;
-
-// obsolete branches //
-        //TauDecay gentaudecay;
-
-        /*event level genps info
-        float alphaQCD;
-        float pthat;
-        float qScale;
-        float weight;
-        unsigned int signalProcessID;*/
-        //LorentzVector prod_vtx;
-        //vecLorentzVector lepdaughter_p4;
-        //vecd charge;
-        //vecd iso;
-        //vecd mass;
-        //vecb fromHardProcessBeforeFSR;
-        //vecb isDirectHardProcessTauDecayProductFinalState;
-        //vecb isDirectPromptTauDecayProductFinalState;
-        //vecb isLastCopyBeforeFSR;
-        //vecb isMostlyLikePythia6Status3;
-        //vecb isPromptDecayed;
-        //vecb isPromptFinalState;
-        //std::vector<veci> lepdaughter_id;
-        //vecd mothercharge;
-        //veci gmothercharge;
-        //TauDecay gentaudecay;
-
-	//vecLorentzVector simplemotherp4;
-	////veci simplemothercharge;
-	//veci simplemotherid;
-	//veci simplemotheridx;
-	//veci simplemotherstatus;
-	//vecLorentzVector simplegmotherp4;
-	////veci simplegmothercharge;
-	//veci simplegmotherid;
-	//veci simplegmotheridx;
-	//veci simplegmotherstatus;
-
 };
 
 #endif

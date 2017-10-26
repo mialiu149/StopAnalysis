@@ -1,5 +1,6 @@
 source setup.sh
-cd stop_variables
+cd ../analysisutils/
 make -j 30
-cd ..
+cd ../onelepbabymaker
+make clean
 make -j 30
