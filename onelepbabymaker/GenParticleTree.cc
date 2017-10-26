@@ -93,7 +93,7 @@ void GenParticleTree::FillCommon (int idx) {
        
 	if(nprongs == 1) gentaudecay.push_back(Had_1prong);
         if(nprongs == 3) gentaudecay.push_back(Had_3prong);
-        if((nprongs != 1 && nprongs != 3) && leptonic==false) gentaudecay.push_back(other);
+        if((nprongs != 1 && nprongs != 3) && leptonic==false) gentaudecay.push_back(Other);
 }
 
 void GenParticleTree::Reset()

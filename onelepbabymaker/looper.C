@@ -16,12 +16,13 @@
 #include "MCSelections.h"
 #include "StopSelections.h"
 #include "TriggerSelections.h"
-#include "stop_variables/mt2w.cc"
-#include "stop_variables/mt2w_bisect.cpp"
-#include "stop_variables/chi2.cc"
-#include "stop_variables/JetUtil.cc"
-#include "stop_variables/topness.cc"
-#include "stop_variables/MT2_implementations.cc"
+#include "../analysisutils/mt2w.cc"
+#include "../analysisutils/mt2w_bisect.cpp"
+#include "../analysisutils/chi2.cc"
+#include "../analysisutils/JetUtil.cc"
+#include "../analysisutils/topness.cc"
+#include "../analysisutils/MT2_implementations.cc"
+#include "../analysisutils/histTools.cc"
 #include "JetCorrector.h"
 #include "IsoTrackVeto.h"
 #include "PhotonSelections.h"
@@ -64,7 +65,6 @@ babyMaker::babyMaker(){
 void babyMaker::MakeBabyNtuple(std::string output_name, fillextra fillextraConfig){
   std::string str = babypath + output+".root";
   const char *cstr = str.c_str();
-  cout<<cstr<<endl;
   BabyFile = new TFile(cstr, "RECREATE");
   BabyTree = new TTree("t", "Stop2015 Baby Ntuple");
   StopEvt.SetBranches(BabyTree);
@@ -132,7 +132,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
   // Lepton MC reco efficiency for veto lep IDs
  
   // Final scale factor histograms for selected leptons
-  TH2D *h_el_SF = NULL;
+  TH2D * h_el_SF = NULL;
   TH2D *h_mu_SF = NULL;
   
   // Final scale factor histograms for veto leptons
@@ -159,29 +159,43 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
   if( (lepConfig.dosf || lepConfig.dosf) && !sampleConfig.isdata){
 
     cout << "  Grabbing lepton scale factors " << endl;
-     // Electron file
-    //f_el_SF          = new TFile("lepsf/analysis2016_12p9fb/scaleFactors.root", "read");
-    //f_el_SF_tracking = new TFile("lepsf/analysis2016_12p9fb/egammaEffi.txt_SF2D.root", "read");
-    f_el_SF          = new TFile("lepsf/analysis2016_36p46fb/scaleFactors.root", "read");
-    f_el_SF_tracking = new TFile("lepsf/analysis2016_36p46fb/egammaEffi.txt_EGM2D.root", "read");
+    // Get final fullsim, selected el, sfs
+    TH2D *h_el_SF_tracking  = NULL;
+    TH2D *h_el_SF_iso = NULL;
+    TH2D *h_el_SF_veto_id = NULL;
+    TH2D *h_el_SF_veto_iso = NULL;
+    getHist(h_el_SF,"$pwd/lepsf/analysis2016_36p46fb/scaleFactors.root","GsfElectronToCutBasedSpring15M");
+    getHist(h_el_SF_iso,"$pwd/lepsf/analysis2016_36p46fb/scaleFactors.root","MVAVLooseElectronToMini");
+    getHist(h_el_SF_tracking, "$pwd/lepsf/analysis2016_36p46fb/egammaEffi.txt_EGM2D.root","EGamma_SF2D");
+    getHist(h_el_SF_veto_id,"$pwd/lepsf/analysis2016_36p46fb/scaleFactors.root","GsfElectronToCutBasedSpring15V");
+    getHist(h_el_SF_veto_iso,"$pwd/lepsf/analysis2016_36p46fb/scaleFactors.root","MVAVLooseElectronToMini2");
+    h_el_SF->Multiply(h_el_SF_iso); h_el_SF->Multiply(h_el_SF_tracking);
+    h_el_SF = (TH2D*)h_el_SF->Clone("h_el_SF");// fix the name
+    h_el_SF_veto = (TH2D*)h_el_SF_veto_id->Clone("h_el_SF_veto");
+    h_el_SF_veto->Multiply(h_el_SF_veto_iso);
+    // Fastsim/Fullsim el files
+    TH2D* h_el_FS_ID = NULL; TH2D* h_el_FS_Iso = NULL; TH2D* h_el_veto_FS_ID = NULL; TH2D* h_el_veto_FS_Iso = NULL;
+    getHist(h_el_FS_ID,"$pwd/lepsf/analysis2016_36p46fb/sf_el_mediumCB.root","histo2D");
+    getHist(h_el_FS_Iso,"$pwd/lepsf/analysis2016_36p46fb/sf_el_mini01.root","histo2D");
+    getHist(f_el_veto_FS_ID,"$pwd/lepsf/analysis2016_36p46fb/sf_el_vetoCB.root","histo2D");
+    getHist(f_el_veto_FS_Iso,"$pwd/lepsf/analysis2016_36p46fb/sf_el_mini02.roo","histo2D");
+    h_el_FS = (TH2D*)h_el_FS_ID->Clone("h_el_FS");
+    h_el_FS->Multiply(h_el_FS_Iso);
+    h_el_veto_FS = (TH2D*)h_el_veto_FS_ID->Clone("h_el_FS");
+    h_el_veto_FS->Multiply(h_el_veto_FS_Iso);
     
-    // Muon files
+    getHist(h_el_vetoLepEff,"lepsf/analysis2016_36p46fb/lepeff__moriond17__ttbar_powheg_pythia8_25ns.root","h2_lepEff_vetoSel_Eff_el");    
+    getHist(h_mu_vetoLepEff,"lepsf/analysis2016_36p46fb/lepeff__moriond17__ttbar_powheg_pythia8_25ns.root","h2_lepEff_vetoSel_Eff_mu");    
+     // Muon files
     f_mu_SF_id       = new TFile("lepsf/analysis2016_36p46fb/TnP_NUM_MediumID_DENOM_generalTracks_VAR_map_pt_eta.root", "read"); 
     f_mu_SF_iso      = new TFile("lepsf/analysis2016_36p46fb/TnP_NUM_MiniIsoTight_DENOM_MediumID_VAR_map_pt_eta.root", "read"); // double unc
     f_mu_SF_ip       = new TFile("lepsf/analysis2016_36p46fb/TnP_NUM_TightIP2D_DENOM_MediumID_VAR_map_pt_eta.root", "read"); // double unc
     f_mu_SF_tracking = new TFile("lepsf/analysis2016_12p9fb/muons_tracking_sf.root", "read"); 
-    
     f_mu_SF_veto_id  = new TFile("lepsf/analysis2016_36p46fb/TnP_NUM_LooseID_DENOM_generalTracks_VAR_map_pt_eta.root", "read");
     f_mu_SF_veto_iso = new TFile("lepsf/analysis2016_36p46fb/TnP_NUM_MiniIsoTight_DENOM_LooseID_VAR_map_pt_eta.root", "read");
     f_mu_SF_veto_ip  = new TFile("lepsf/analysis2016_36p46fb/TnP_NUM_MediumIP2D_DENOM_LooseID_VAR_map_pt_eta.root", "read"); // double unc for this
-        // Fastsim/Fullsim el files
-    f_el_FS_ID  = new TFile("lepsf/analysis2016_36p46fb/sf_el_mediumCB.root", "read");
-    f_el_FS_Iso = new TFile("lepsf/analysis2016_36p46fb/sf_el_mini01.root", "read");
-    
-    f_el_veto_FS_ID  = new TFile("lepsf/analysis2016_36p46fb/sf_el_vetoCB.root", "read");
-    f_el_veto_FS_Iso = new TFile("lepsf/analysis2016_36p46fb/sf_el_mini02.root", "read"); 
-    
-    // Fastsim/Fullsim mu files
+
+   // Fastsim/Fullsim mu files
     f_mu_FS_ID  = new TFile("lepsf/analysis2016_36p46fb/sf_mu_mediumID.root", "read"); // double unc for this
     f_mu_FS_Iso = new TFile("lepsf/analysis2016_36p46fb/sf_mu_mediumID_mini02.root", "read"); // double unc for this
     f_mu_FS_Ip  = new TFile("lepsf/analysis2016_36p46fb/sf_mu_mediumID_tightIP2D.root", "read"); // double unc for this
@@ -193,13 +207,6 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
     // Veto lepton reco efficiency files
     f_vetoLep_eff = new TFile("lepsf/analysis2016_36p46fb/lepeff__moriond17__ttbar_powheg_pythia8_25ns.root", "read");
 
-    // Grab el histos
-    TH2D *h_el_SF_id_temp       = (TH2D*)f_el_SF->Get("GsfElectronToCutBasedSpring15M");
-    TH2D *h_el_SF_iso_temp      = (TH2D*)f_el_SF->Get("MVAVLooseElectronToMini");
-    TH2D *h_el_SF_tracking_temp = (TH2D*)f_el_SF_tracking->Get("EGamma_SF2D");
-    TH2D *h_el_SF_veto_id_temp  = (TH2D*)f_el_SF->Get("GsfElectronToCutBasedSpring15V");
-    TH2D *h_el_SF_veto_iso_temp = (TH2D*)f_el_SF->Get("MVAVLooseElectronToMini2");
-
     // Grab mu histos
     TH2D *h_mu_SF_id_temp  = (TH2D*)f_mu_SF_id->Get("SF");
     TH2D *h_mu_SF_iso_temp = (TH2D*)f_mu_SF_iso->Get("SF");
@@ -208,13 +215,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
     TH2D *h_mu_SF_veto_id_temp  = (TH2D*)f_mu_SF_veto_id->Get("SF");
     TH2D *h_mu_SF_veto_iso_temp = (TH2D*)f_mu_SF_veto_iso->Get("SF");
     TH2D *h_mu_SF_veto_ip_temp  = (TH2D*)f_mu_SF_veto_ip->Get("SF");
-
-    // Grab fastsim/fullsim el histos
-    TH2D *h_el_FS_ID_temp  = (TH2D*)f_el_FS_ID->Get("histo2D");
-    TH2D *h_el_FS_Iso_temp = (TH2D*)f_el_FS_Iso->Get("histo2D");
-    TH2D *h_el_veto_FS_ID_temp  = (TH2D*)f_el_veto_FS_ID->Get("histo2D");
-    TH2D *h_el_veto_FS_Iso_temp = (TH2D*)f_el_veto_FS_Iso->Get("histo2D");
-    
+   
     // Grab fastsim/fullsim mu histos
     TH2D *h_mu_FS_ID_temp  = (TH2D*)f_mu_FS_ID->Get("histo2D");
     TH2D *h_mu_FS_Iso_temp = (TH2D*)f_mu_FS_Iso->Get("histo2D");
@@ -222,25 +223,6 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
     TH2D *h_mu_veto_FS_ID_temp  = (TH2D*)f_mu_veto_FS_ID->Get("histo2D");
     TH2D *h_mu_veto_FS_Iso_temp = (TH2D*)f_mu_veto_FS_Iso->Get("histo2D");
     TH2D *h_mu_veto_FS_Ip_temp  = (TH2D*)f_mu_veto_FS_Ip->Get("histo2D");
-    
-    // Grab mc eff for veto lepton (for lost lepto SFs) histos
-    TH2D *h_el_vetoLepEff_temp = (TH2D*)f_vetoLep_eff->Get("h2_lepEff_vetoSel_Eff_el");
-    TH2D *h_mu_vetoLepEff_temp = (TH2D*)f_vetoLep_eff->Get("h2_lepEff_vetoSel_Eff_mu");
-   
-    // Get final fullsim, selected el, sfs
-    TH2D *h_el_SF_id  = (TH2D*)h_el_SF_id_temp->Clone("h_el_SF_id");
-    TH2D *h_el_SF_iso = (TH2D*)h_el_SF_iso_temp->Clone("h_el_SF_iso");
-    h_el_SF = (TH2D*)h_el_SF_id->Clone("h_el_SF");
-    h_el_SF->Multiply(h_el_SF_iso);
-    
-    // Get final fullsim, selected el, tracking sfs
-    h_el_SF_tracking = (TH2D*)h_el_SF_tracking_temp->Clone("h_el_SF_iso");
-    
-    // Get final fullsim, veto el, sfs
-    TH2D *h_el_SF_veto_id  = (TH2D*)h_el_SF_veto_id_temp->Clone("h_el_SF_veto_id");
-    TH2D *h_el_SF_veto_iso = (TH2D*)h_el_SF_veto_iso_temp->Clone("h_el_SF_veto_iso");
-    h_el_SF_veto = (TH2D*)h_el_SF_veto_id->Clone("h_el_SF_veto");
-    h_el_SF_veto->Multiply(h_el_SF_veto_iso);
     
     // Get final fullsim, selected mu, sfs
     TH2D *h_mu_SF_id  = (TH2D*)h_mu_SF_id_temp->Clone("h_mu_SF_id");
@@ -276,19 +258,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
     h_mu_SF_veto = (TH2D*)h_mu_SF_veto_id->Clone("h_mu_SF_veto");
     h_mu_SF_veto->Multiply(h_mu_SF_veto_iso);
     h_mu_SF_veto->Multiply(h_mu_SF_veto_ip);
-    
-    // Get final fullsim/fastsim, selected el, sfs
-    TH2D* h_el_FS_ID  = (TH2D*)h_el_FS_ID_temp->Clone("h_el_FS_ID");
-    TH2D* h_el_FS_Iso = (TH2D*)h_el_FS_Iso_temp->Clone("h_el_FS_Iso");
-    h_el_FS = (TH2D*)h_el_FS_ID->Clone("h_el_FS");
-    h_el_FS->Multiply(h_el_FS_Iso);
-    
-    // Get final fullsim/fastsim, veto el, sfs
-    TH2D* h_el_veto_FS_ID  = (TH2D*)h_el_veto_FS_ID_temp->Clone("h_el_veto_FS_ID");
-    TH2D* h_el_veto_FS_Iso = (TH2D*)h_el_veto_FS_Iso_temp->Clone("h_el_veto_FS_Iso");
-    h_el_veto_FS = (TH2D*)h_el_veto_FS_ID->Clone("h_el_FS");
-    h_el_veto_FS->Multiply(h_el_veto_FS_Iso);
-    
+   
     // Get final fullsim/fastsim, selected mu, sfs
     TH2D* h_mu_FS_ID  = (TH2D*)h_mu_FS_ID_temp->Clone("h_mu_FS_ID");
     TH2D* h_mu_FS_Iso = (TH2D*)h_mu_FS_Iso_temp->Clone("h_mu_FS_Iso");

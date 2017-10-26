@@ -32,7 +32,7 @@ CXXFLAGS       += -I$(TOOLSPATH)
 CXXFLAGS       += -I$(DORKYPATH)
 
 CORELIB        = $(COREPATH)/CMS3_CORE.so
-STOPVARLIB     = stop_variables/StopVariables.so
+STOPVARLIB     = ../analysisutils/libAnalysisUtils.so
 
 #runBabyMaker: runBabyMaker.o looper.o EventTree.o LeptonTree.o JetTree.o IsoTracksTree.o TauTree.o GenParticleTree.o PhotonTree.o StopSelections.o LinkDef_out.so
 #	$(LD) $(LDFLAGS)  -o runBabyMaker runBabyMaker.o looper.o EventTree.o JetTree.o LeptonTree.o PhotonTree.o IsoTracksTree.o TauTree.o GenParticleTree.o StopSelections.o $(GLIBS) -lGenVector -lEG $(CORELIB) $(STOPVARLIB) LinkDef_out.so -Wl,-rpath,./
