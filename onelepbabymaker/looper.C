@@ -128,35 +128,21 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
   TIter fileIter(listOfFiles);
   TFile *currentFile = 0;
   int JES_type = 0;
-  // is there a better way to do the electron sf, not in the looper?! it's so messy.  
   // Lepton MC reco efficiency for veto lep IDs
- 
   // Final scale factor histograms for selected leptons
-  TH2D * h_el_SF = NULL;
-  TH2D *h_mu_SF = NULL;
-   TH2D *h_el_SF_tracking  = NULL; 
+  TH2D * h_el_SF = NULL; TH2D * h_mu_SF = NULL;   TH2D *h_el_SF_tracking  = NULL; 
   // Final scale factor histograms for veto leptons
-  TH2D *h_el_SF_veto = NULL;
-  TH2D *h_mu_SF_veto = NULL;
-
-  TH1D *h_mu_SF_tracking = NULL;
+  TH2D *h_el_SF_veto = NULL;  TH2D *h_mu_SF_veto = NULL;  TH1D *h_mu_SF_tracking = NULL;
   // Final scale factor histograms for fastim/fullsim for selected leptons
-  TH2D *h_el_FS = NULL;
-  TH2D *h_mu_FS = NULL;
-
+  TH2D *h_el_FS = NULL;  TH2D *h_mu_FS = NULL;
   // Final scale factor histograms for fastim/fullsim for veto leptons
-  TH2D *h_el_veto_FS = NULL;
-  TH2D *h_mu_veto_FS = NULL;
-
+  TH2D *h_el_veto_FS = NULL;  TH2D *h_mu_veto_FS = NULL;
   // Final scale factor histograms for lost leptons
-  TH2D *h_el_vetoLepEff = NULL;
-  TH2D *h_mu_vetoLepEff = NULL;
-
+  TH2D *h_el_vetoLepEff = NULL;  TH2D *h_mu_vetoLepEff = NULL;
   // Matching requirement for gen/reco leptons
   double matched_dr = 0.1;
   
   if( (lepConfig.dosf || lepConfig.dosf) && !sampleConfig.isdata){
-
     cout << "  Grabbing lepton scale factors " << endl;
     // Get final fullsim, selected el, sfs
     TH2D *h_el_SF_iso = NULL; TH2D *h_el_SF_veto_id = NULL; TH2D *h_el_SF_veto_iso = NULL;
@@ -166,7 +152,6 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
     getHist(h_el_SF_veto_id,"$pwd/lepsf/analysis2016_36p46fb/scaleFactors.root","GsfElectronToCutBasedSpring15V");
     getHist(h_el_SF_veto_iso,"$pwd/lepsf/analysis2016_36p46fb/scaleFactors.root","MVAVLooseElectronToMini2");
     h_el_SF->Multiply(h_el_SF_iso); 
-//h_el_SF->Multiply(h_el_SF_tracking);
     h_el_SF = (TH2D*)h_el_SF->Clone("h_el_SF");// fix the name
     h_el_SF_veto = (TH2D*)h_el_SF_veto_id->Clone("h_el_SF_veto");
     h_el_SF_veto->Multiply(h_el_SF_veto_iso);
@@ -250,6 +235,7 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
     }
     hxsec = (TH1D*)fxsec->Get("h_xsec_c1n2");
   }
+
   TFile *pileupfile; TH1D *hPU; TH1D *hPUup; TH1D *hPUdown;
   if(!sampleConfig.isdata){
     pileupfile = new TFile("puWeights_2016data_36p6fbinv.root","READ");
@@ -261,6 +247,9 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
     hPUup   = (TH1D*)pileupfile->Get("puWeightUp");
     hPUdown = (TH1D*)pileupfile->Get("puWeightDown");
   }
+   //////////////////////////
+   ////counter histograms////
+   //////////////////////////
    string labels [] = {"nominal,muR=1 muF=1", "muR=1 muF=2","muR=1 muF=0.5","muR=1 muF=0.5","muR=2 muF=1","muR=2 muF=2","muR=2 muF=0.5","muR=0.5 muF=1","muR=0.5 muF=2","muR=0.5 muF=0.5","pdf_up","pdf_down","pdf_alphas_var_1","pdf_alphas_var_2","weight_btagsf","weight_btagsf_heavy_UP","weight_btagsf_light_UP","weight_btagsf_heavy_DN","weight_btagsf_light_DN","weight_ISR_nominal","weight_ISR_up","weight_ISR_down","NEvents","weight_btagsf_fastsim_UP","weight_btagsf_fastsim_DN","weight_ISRnjets_nominal","weight_ISRnjets_up","weight_ISRnjets_down","weight_lepSF","weight_lepSF_up","weight_lepSF_down","weight_vetoLepSF","weight_vetoLepSF_up","weight_vetoLepSF_down","weight_lepSF_fastSim","weight_lepSF_fastSim_up","weight_lepSF_fastSim_down"}; 
   TH1D* counterhist = new TH1D( "h_counter", "h_counter", 36, 0.5,36.5);
   setcounterLabel(counterhist,labels);
@@ -351,45 +340,23 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
     jetcorr_uncertainty_sys = new JetCorrectionUncertainty(jetcorr_uncertainty_filename);
 
   if (jetConfig.dobtagsf) {
-    // get btag efficiencies
-    TFile* f_btag_eff;
-    TH2D* h_btag_eff_b_temp = NULL;
-    TH2D* h_btag_eff_c_temp = NULL;
-    TH2D* h_btag_eff_udsg_temp = NULL;
-    TH2D* h_btag_eff_b_loose_temp = NULL;
-    TH2D* h_btag_eff_c_loose_temp = NULL;
-    TH2D* h_btag_eff_udsg_loose_temp = NULL;
     if(!sampleConfig.isfastsim){
-      f_btag_eff = new TFile("$COREPATH/Tools/btagsf/data/run2_25ns/btageff__ttbar_powheg_pythia8_25ns_Moriond17.root");
-      h_btag_eff_b_temp = (TH2D*) f_btag_eff->Get("h2_BTaggingEff_csv_med_Eff_b");
-      h_btag_eff_c_temp = (TH2D*) f_btag_eff->Get("h2_BTaggingEff_csv_med_Eff_c");
-      h_btag_eff_udsg_temp = (TH2D*) f_btag_eff->Get("h2_BTaggingEff_csv_med_Eff_udsg");
-      h_btag_eff_b_loose_temp = (TH2D*) f_btag_eff->Get("h2_BTaggingEff_csv_loose_Eff_b");
-      h_btag_eff_c_loose_temp = (TH2D*) f_btag_eff->Get("h2_BTaggingEff_csv_loose_Eff_c");
-      h_btag_eff_udsg_loose_temp = (TH2D*) f_btag_eff->Get("h2_BTaggingEff_csv_loose_Eff_udsg");
+      getHist(h_btag_eff_b,"$COREPATH/Tools/btagsf/data/run2_25ns/btageff__ttbar_powheg_pythia8_25ns_Moriond17.root","h2_BTaggingEff_csv_med_Eff_b");
+      getHist(h_btag_eff_c,"$COREPATH/Tools/btagsf/data/run2_25ns/btageff__ttbar_powheg_pythia8_25ns_Moriond17.root","h2_BTaggingEff_csv_med_Eff_c");
+      getHist(h_btag_eff_udsg,"$COREPATH/Tools/btagsf/data/run2_25ns/btageff__ttbar_powheg_pythia8_25ns_Moriond17.root","h2_BTaggingEff_csv_med_Eff_udsg");
+      getHist(h_btag_eff_b_loose,"$COREPATH/Tools/btagsf/data/run2_25ns/btageff__ttbar_powheg_pythia8_25ns_Moriond17.root","h2_BTaggingEff_csv_loose_Eff_b");
+      getHist(h_btag_eff_c_loose,"$COREPATH/Tools/btagsf/data/run2_25ns/btageff__ttbar_powheg_pythia8_25ns_Moriond17.root","h2_BTaggingEff_csv_loose_Eff_c");
+      getHist(h_btag_eff_udsg_loose,"$COREPATH/Tools/btagsf/data/run2_25ns/btageff__ttbar_powheg_pythia8_25ns_Moriond17.root","h2_BTaggingEff_csv_loose_Eff_udsg");
     }
     else{
-      f_btag_eff = new TFile("$COREPATH/Tools/btagsf/data/run2_fastsim/btageff__SMS-T1bbbb-T1qqqq_25ns_Moriond17.root");
-      h_btag_eff_b_temp = (TH2D*) f_btag_eff->Get("h2_BTaggingEff_csv_med_Eff_b");
-      h_btag_eff_c_temp = (TH2D*) f_btag_eff->Get("h2_BTaggingEff_csv_med_Eff_c");
-      h_btag_eff_udsg_temp = (TH2D*) f_btag_eff->Get("h2_BTaggingEff_csv_med_Eff_udsg");
-      h_btag_eff_b_loose_temp = (TH2D*) f_btag_eff->Get("h2_BTaggingEff_csv_loose_Eff_b");
-      h_btag_eff_c_loose_temp = (TH2D*) f_btag_eff->Get("h2_BTaggingEff_csv_loose_Eff_c");
-      h_btag_eff_udsg_loose_temp = (TH2D*) f_btag_eff->Get("h2_BTaggingEff_csv_loose_Eff_udsg");
-    }
-
-    BabyFile->cd();
-
-    h_btag_eff_b = (TH2D*) h_btag_eff_b_temp->Clone("h_btag_eff_b");
-    h_btag_eff_c = (TH2D*) h_btag_eff_c_temp->Clone("h_btag_eff_c");
-    h_btag_eff_udsg = (TH2D*) h_btag_eff_udsg_temp->Clone("h_btag_eff_udsg");
-
-    h_btag_eff_b_loose = (TH2D*) h_btag_eff_b_loose_temp->Clone("h_btag_eff_b_loose");
-    h_btag_eff_c_loose = (TH2D*) h_btag_eff_c_loose_temp->Clone("h_btag_eff_c_loose");
-    h_btag_eff_udsg_loose = (TH2D*) h_btag_eff_udsg_loose_temp->Clone("h_btag_eff_udsg_loose");
-
-    f_btag_eff->Close(); 
-    }    
+      getHist(h_btag_eff_b,"$COREPATH/Tools/btagsf/data/run2_fastsim/btageff__SMS-T1bbbb-T1qqqq_25ns_Moriond17.root","h2_BTaggingEff_csv_med_Eff_b");
+      getHist(h_btag_eff_c,"$COREPATH/Tools/btagsf/data/run2_fastsim/btageff__SMS-T1bbbb-T1qqqq_25ns_Moriond17.root","h2_BTaggingEff_csv_med_Eff_c");
+      getHist(h_btag_eff_udsg,"$COREPATH/Tools/btagsf/data/run2_fastsim/btageff__SMS-T1bbbb-T1qqqq_25ns_Moriond17.root","h2_BTaggingEff_csv_med_Eff_udsg");
+      getHist(h_btag_eff_b_loose,"$COREPATH/Tools/btagsf/data/run2_fastsim/btageff__SMS-T1bbbb-T1qqqq_25ns_Moriond17.root","h2_BTaggingEff_csv_loose_Eff_b");
+      getHist(h_btag_eff_c_loose,"$COREPATH/Tools/btagsf/data/run2_fastsim/btageff__SMS-T1bbbb-T1qqqq_25ns_Moriond17.root","h2_BTaggingEff_csv_loose_Eff_c");
+      getHist(h_btag_eff_udsg_loose,"$COREPATH/Tools/btagsf/data/run2_fastsim/btageff__SMS-T1bbbb-T1qqqq_25ns_Moriond17.root","h2_BTaggingEff_csv_loose_Eff_udsg");
+   }
+  }    
  
     jets.InitBtagSFTool(h_btag_eff_b,h_btag_eff_c,h_btag_eff_udsg, h_btag_eff_b_loose,h_btag_eff_c_loose,h_btag_eff_udsg_loose,sampleConfig.isfastsim); 
     jets_jup.InitBtagSFTool(h_btag_eff_b,h_btag_eff_c,h_btag_eff_udsg, h_btag_eff_b_loose,h_btag_eff_c_loose,h_btag_eff_udsg_loose,sampleConfig.isfastsim); 
@@ -1776,11 +1743,6 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
   if(sampleConfig.issignal) { fxsec->Close(); delete fxsec; }
   if(!sampleConfig.isdata)  { pileupfile->Close(); delete pileupfile; }
   if(jetConfig.dobtagsf)           jets.deleteBtagSFTool();
-/*  if(!sampleConfig.isdata && (lepConfig.dosf || lepConfig.dosf) ){
-    f_el_SF->Close();       f_el_FS_ID->Close();    f_el_FS_Iso->Close(); f_mu_SF_id->Close();    f_mu_SF_iso->Close();   f_mu_SF_veto_id->Close();
-    f_mu_SF_veto_iso->Close();    f_mu_FS_ID->Close();    f_mu_FS_Iso->Close();    f_vetoLep_eff->Close();
-  }
-*/ 
  // Benchmarking
   bmark->Stop("benchmark");
   cout << endl;
