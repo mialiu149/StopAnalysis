@@ -1021,10 +1021,9 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
       // apply skim
       if(debug) std::cout << "[babymaker::looper]: going to apply skims LINE:" <<__LINE__ << std::endl;
       if(nGoodLeptons < lepConfig.nlep) continue;      nEvents_pass_skim_nGoodLeps++;
-//      if(!(jets.ngoodjets >= jetConfig.njets)) continue;
-       if(!(jets.ngoodjets >= jetConfig.njet) && !(jets_jup.ngoodjets >= jetConfig.njet) && !(jets_jdown.ngoodjets >= jetConfig.njet)) continue;
+      if(!(jets.ngoodjets >= jetConfig.njet) && !(jets_jup.ngoodjets >= jetConfig.njet) && !(jets_jdown.ngoodjets >= jetConfig.njet)) continue;
       nEvents_pass_skim_nGoodJets++;
-//      if(!(jets.ngoodbtags >= skim_nBJets) && !(jets_jup.ngoodbtags_jup >= skim_nBJets) && !(jets_jdown.ngoodbtags_jdown >= skim_nBJets)) continue;
+      if(!(jets.ngoodbtags >= skim_nBJets) && !(jets_jup.ngoodbtags_jup >= skim_nBJets) && !(jets_jdown.ngoodbtags_jdown >= skim_nBJets)) continue;
       nEvents_pass_skim_nBJets++;//
       // fastsim filter for bad jets//
       if(debug) std::cout << "[babymaker::looper]: fastsim filter LINE:" <<__LINE__ << std::endl;
@@ -1453,33 +1452,8 @@ int babyMaker::looper(TChain* chain, std::string output_name, int nEvents, std::
       int vetotracks_v2(0), vetotracks_v3(0);
           if (debug) cout << "before highPtPFcands" << endl;
 
-      /*if (saveHighPtPFcands) {
       for (unsigned int ipf = 0; ipf < pfcands_p4().size(); ipf++) {
 	  float cand_pt = cms3.pfcands_p4().at(ipf).pt();
-	  //HIGH-PT PF CANDS
-	   Tracks.nhighPtPFcands = 0;
-	   float absiso  = TrackIso(ipf, 0.3, 0.0, true, false);
-	   float an04 = PFCandRelIsoAn04(ipf);	  
-	   if((cand_pt > 50) || (cand_pt > 300 && abs(cms3.pfcands_particleId().at(ipf)) == 13)){
-	     Tracks.highPtPFcands_pt.push_back    ( cand_pt                          );
-	     Tracks.highPtPFcands_eta.push_back   ( cms3.pfcands_p4().at(ipf).eta()  );
-	     Tracks.highPtPFcands_phi.push_back   ( cms3.pfcands_p4().at(ipf).phi()  );
-	     Tracks.highPtPFcands_mass.push_back  ( cms3.pfcands_mass().at(ipf)      );
-	     Tracks.highPtPFcands_absIso.push_back( absiso                           );
-	     Tracks.highPtPFcands_relIsoAn04.push_back( an04                         );
-	     Tracks.highPtPFcands_dz.push_back    ( cms3.pfcands_dz().at(ipf)        );
-	     Tracks.highPtPFcands_pdgId.push_back ( cms3.pfcands_particleId().at(ipf));
-	     Tracks.highPtPFcands_mcMatchId.push_back ( 0 );
-	     Tracks.nhighPtPFcands++;
-            }
-           else continue;
-           }//saveHighPtPFcands
-      }
-     */
-      for (unsigned int ipf = 0; ipf < pfcands_p4().size(); ipf++) {
-	  float cand_pt = cms3.pfcands_p4().at(ipf).pt();
-/*         
-*/	//selections of pf candidates
 	if(pfcands_charge().at(ipf) == 0) continue;
 	if(cand_pt < 5) continue;
 	if(fabs(pfcands_p4().at(ipf).eta()) > 2.4 ) continue;
