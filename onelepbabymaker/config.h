@@ -41,7 +41,7 @@ struct lepconfig {
 }; 
 
 struct jetconfig {
-  int njet;
+  int njet, nfatjet;
   float ptcut;
   float etacut;
   float ptcut_ak8;
@@ -50,10 +50,11 @@ struct jetconfig {
   bool  dojecunc;
   bool  dobtagsf;
   jetconfig(){
-     njet = 2;
-     ptcut = 30;
+     njet = 2;//2
+     ptcut = 20;//30
      etacut = 2.4;
-     ptcut_ak8 = 100;
+     nfatjet = 1;
+     ptcut_ak8 = 200;
      etacut_ak8 = 2.4;
      dojec = false;
      dojecunc = false;

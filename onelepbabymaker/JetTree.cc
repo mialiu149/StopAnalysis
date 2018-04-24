@@ -6,30 +6,27 @@
 
 using namespace tas;
  
-JetTree::JetTree (){
-}
+JetTree::JetTree (){}
 
-JetTree::JetTree (const std::string &prefix)
-  : prefix_(prefix) {
-}
+JetTree::JetTree (const std::string &prefix) : prefix_(prefix) {}
 
 inline bool sortIndexbyCSV( pair<int, float> &vec1, pair<int, float> &vec2 ) {
-  return vec1.second > vec2.second;
+    return vec1.second > vec2.second;
 }
 
 float getmbb(LorentzVector jet1,LorentzVector jet2) {
-  float mbb = (jet1+jet2).mass(); 
-  return mbb;
+    float mbb = (jet1+jet2).mass(); 
+    return mbb;
 }
 
 float getmct(LorentzVector jet1,LorentzVector jet2) {
-   float ptb1 = jet1.pt();
-   float ptb2 = jet2.pt();
-   float phib1 = jet1.phi();
-   float phib2 = jet2.phi();
-   float dPhibb = getdphi(phib1,phib2);
-   float mct = sqrt(2*ptb1*ptb2*(1+cos(dPhibb)));
-  return mct;
+    float ptb1 = jet1.pt();
+    float ptb2 = jet2.pt();
+    float phib1 = jet1.phi();
+    float phib2 = jet2.phi();
+    float dPhibb = getdphi(phib1,phib2);
+    float mct = sqrt(2*ptb1*ptb2*(1+cos(dPhibb)));
+    return mct;
 }
 
 void JetTree::InitBtagSFTool(bool isFastsim_) {
@@ -73,8 +70,8 @@ void JetTree::InitBtagSFTool(bool isFastsim_) {
       getHist(h_btag_eff_b_loose,"$COREPATH/Tools/btagsf/data/run2_fastsim/btageff__SMS-T1bbbb-T1qqqq_25ns_Moriond17.root","h2_BTaggingEff_csv_loose_Eff_b");
       getHist(h_btag_eff_c_loose,"$COREPATH/Tools/btagsf/data/run2_fastsim/btageff__SMS-T1bbbb-T1qqqq_25ns_Moriond17.root","h2_BTaggingEff_csv_loose_Eff_c");
       getHist(h_btag_eff_udsg_loose,"$COREPATH/Tools/btagsf/data/run2_fastsim/btageff__SMS-T1bbbb-T1qqqq_25ns_Moriond17.root","h2_BTaggingEff_csv_loose_Eff_udsg");
-   }
-        std::cout << "loaded fastsim btag SFs" << std::endl;
+    }
+    std::cout << "loaded fastsim btag SFs" << std::endl;
     return;
 }
 
@@ -139,7 +136,6 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx,  Factoriz
 			    break;
 		    }
 	    } // end loop over b discriminator names
-
 	    if( deepCSV_prefix == "NULL" ) {
 		    cout << "Error in JetTree.cc: Can't find DeepCSV discriminator names!" << endl;
 		    exit(1);
@@ -152,354 +148,359 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx,  Factoriz
     vector<pair <int, LorentzVector> > sortedJets_pt;
     vector <pair<int, float>> jet_csv_pairs;
 
-      vector<LorentzVector> p4sCorrJets; // store corrected p4 for ALL jets, so indices match CMS3 ntuple
-      vector<LorentzVector> p4sUCorrJets;
-      p4sCorrJets.clear();
-      p4sUCorrJets.clear();
-      for(unsigned int iJet = 0; iJet < cms3.pfjets_p4().size(); iJet++){
-        LorentzVector jetp4_cor = cms3.pfjets_p4().at(iJet);
-          // get uncorrected jet p4 to use as input for corrections
-        LorentzVector jetp4_uncor = pfjets_p4().at(iJet) * cms3.pfjets_undoJEC().at(iJet);
+    vector<LorentzVector> p4sCorrJets; // store corrected p4 for ALL jets, so indices match CMS3 ntuple
+    vector<LorentzVector> p4sUCorrJets;
+    p4sCorrJets.clear();
+    p4sUCorrJets.clear();
+    for(unsigned int iJet = 0; iJet < cms3.pfjets_p4().size(); iJet++){
+      LorentzVector jetp4_cor = cms3.pfjets_p4().at(iJet);
+        // get uncorrected jet p4 to use as input for corrections
+      LorentzVector jetp4_uncor = pfjets_p4().at(iJet) * cms3.pfjets_undoJEC().at(iJet);
 
-          // get L1FastL2L3Residual total correction
-          corrector->setRho   ( cms3.evt_fixgridfastjet_all_rho() );
-          corrector->setJetA  ( cms3.pfjets_area().at(iJet)       );
-          corrector->setJetPt ( jetp4_uncor.pt()               );
-          corrector->setJetEta( jetp4_uncor.eta()              );
-          double corr = corrector->getCorrection();
+      // get L1FastL2L3Residual total correction
+      corrector->setRho   ( cms3.evt_fixgridfastjet_all_rho() );
+      corrector->setJetA  ( cms3.pfjets_area().at(iJet)       );
+      corrector->setJetPt ( jetp4_uncor.pt()               );
+      corrector->setJetEta( jetp4_uncor.eta()              );
+      double corr = corrector->getCorrection();
 
-          // check for negative correction
-          if (corr < 0. && fabs(jetp4_uncor.eta()) < 4.7) {
-            std::cout << "ScanChain::Looper: WARNING: negative jet correction: " << corr
-                      << ", raw jet pt: " << jetp4_uncor.pt() << ", eta: " << jetp4_uncor.eta() << std::endl;
-          }
-
-          // include protections here on jet kinematics to prevent rare warnings/crashes
-          double var = 1.;
-          if (!evt_isRealData() && JES_type != 0 && jetp4_uncor.pt()*corr > 0. && fabs(jetp4_uncor.eta()) < 5.4) {
-            jetcorr_uncertainty->setJetEta(jetp4_uncor.eta());
-            jetcorr_uncertainty->setJetPt(jetp4_uncor.pt() * corr); // must use CORRECTED pt
-            double unc = jetcorr_uncertainty->getUncertainty(true);
-            var = (1. + JES_type * unc);
-          }
-
-          // apply new JEC to p4
-          jetp4_cor = jetp4_uncor * corr*var;
-          newjecorr.push_back(corr);
-          if(applynewcorr) p4sCorrJets.push_back(jetp4_cor);
-          else p4sCorrJets.push_back(pfjets_p4().at(iJet));
-          p4sUCorrJets.push_back(jetp4_uncor);
+      // check for negative correction
+      if (corr < 0. && fabs(jetp4_uncor.eta()) < 4.7) {
+        std::cout << "ScanChain::Looper: WARNING: negative jet correction: " << corr
+                  << ", raw jet pt: " << jetp4_uncor.pt() << ", eta: " << jetp4_uncor.eta() << std::endl;
       }
-      sortedJets_pt =  sort_pt(p4sCorrJets,JET_PT);
+
+      // include protections here on jet kinematics to prevent rare warnings/crashes
+      double var = 1.;
+      if (!evt_isRealData() && JES_type != 0 && jetp4_uncor.pt()*corr > 0. && fabs(jetp4_uncor.eta()) < 5.4) {
+        jetcorr_uncertainty->setJetEta(jetp4_uncor.eta());
+        jetcorr_uncertainty->setJetPt(jetp4_uncor.pt() * corr); // must use CORRECTED pt
+        double unc = jetcorr_uncertainty->getUncertainty(true);
+        var = (1. + JES_type * unc);
+      }
+
+      // apply new JEC to p4
+      jetp4_cor = jetp4_uncor * corr*var;
+      newjecorr.push_back(corr);
+      if(applynewcorr) p4sCorrJets.push_back(jetp4_cor);
+      else p4sCorrJets.push_back(pfjets_p4().at(iJet));
+      p4sUCorrJets.push_back(jetp4_uncor);
+    }
+    sortedJets_pt =  sort_pt(p4sCorrJets,JET_PT);
 
     for (size_t idx = 0; idx < pfjets_p4().size(); ++idx) {
-        jindex = sortedJets_pt.at(idx).first;
-        //deal with the overlaps
-        if(jindex == overlep1_idx){
-		ak4pfjet_overlep1_p4  = p4sCorrJets.at(jindex);
-                ak4pfjet_overlep1_CSV = pfjets_pfCombinedInclusiveSecondaryVertexV2BJetTag().at(jindex);
-                ak4pfjet_overlep1_deepCSV = getbtagvalue(deepCSV_prefix+"JetTags:probb",jindex) + getbtagvalue(deepCSV_prefix+"JetTags:probbb",jindex);
-		//ak4pfjet_overlep1_pu_id = pfjets_pileupJetId().at(jindex);
-                ak4pfjet_overlep1_chf = pfjets_chargedHadronE().at(jindex)/ (pfjets_undoJEC().at(jindex)*p4sCorrJets[jindex].energy());
-                ak4pfjet_overlep1_nhf = pfjets_neutralHadronE().at(jindex)/ (pfjets_undoJEC().at(jindex)*p4sCorrJets[jindex].energy());
-                ak4pfjet_overlep1_cef = pfjets_chargedEmE().at(jindex)/ (pfjets_undoJEC().at(jindex)*p4sCorrJets[jindex].energy());
-                ak4pfjet_overlep1_nef = pfjets_neutralEmE().at(jindex)/ (pfjets_undoJEC().at(jindex)*p4sCorrJets[jindex].energy());
-                ak4pfjet_overlep1_muf = pfjets_muonE().at(jindex)/ (pfjets_undoJEC().at(jindex)*p4sCorrJets[jindex].energy());
-                ak4pfjet_overlep1_cm  = pfjets_chargedMultiplicity().at(jindex);
-                ak4pfjet_overlep1_nm  = cms3.pfjets_neutralMultiplicity().at(jindex);
-	}
-        if(jindex == overlep2_idx){
-                ak4pfjet_overlep2_p4  = p4sCorrJets.at(jindex);
-                ak4pfjet_overlep2_CSV = pfjets_pfCombinedInclusiveSecondaryVertexV2BJetTag().at(jindex);
-                ak4pfjet_overlep2_deepCSV = getbtagvalue(deepCSV_prefix+"JetTags:probb",jindex) + getbtagvalue(deepCSV_prefix+"JetTags:probbb",jindex);
-                //ak4pfjet_overlep2_pu_id = pfjets_pileupJetId().at(jindex);
-                ak4pfjet_overlep2_chf = pfjets_chargedHadronE().at(jindex)/ (pfjets_undoJEC().at(jindex)*p4sCorrJets[jindex].energy());
-                ak4pfjet_overlep2_nhf = pfjets_neutralHadronE().at(jindex)/ (pfjets_undoJEC().at(jindex)*p4sCorrJets[jindex].energy());
-                ak4pfjet_overlep2_cef = pfjets_chargedEmE().at(jindex)/ (pfjets_undoJEC().at(jindex)*p4sCorrJets[jindex].energy());
-                ak4pfjet_overlep2_nef = pfjets_neutralEmE().at(jindex)/ (pfjets_undoJEC().at(jindex)*p4sCorrJets[jindex].energy());
-                ak4pfjet_overlep2_muf = pfjets_muonE().at(jindex)/ (pfjets_undoJEC().at(jindex)*p4sCorrJets[jindex].energy());
-                ak4pfjet_overlep2_cm  = pfjets_chargedMultiplicity().at(jindex);
-                ak4pfjet_overlep2_nm  = cms3.pfjets_neutralMultiplicity().at(jindex);
-        }
+      jindex = sortedJets_pt.at(idx).first;
+      //deal with the overlaps
+      if(jindex == overlep1_idx){
+	      ak4pfjet_overlep1_p4  = p4sCorrJets.at(jindex);
+        ak4pfjet_overlep1_CSV = pfjets_pfCombinedInclusiveSecondaryVertexV2BJetTag().at(jindex);
+        ak4pfjet_overlep1_deepCSV = getbtagvalue(deepCSV_prefix+"JetTags:probb",jindex) + getbtagvalue(deepCSV_prefix+"JetTags:probbb",jindex);
+        //ak4pfjet_overlep1_pu_id = pfjets_pileupJetId().at(jindex);
+        ak4pfjet_overlep1_chf = pfjets_chargedHadronE().at(jindex)/ (pfjets_undoJEC().at(jindex)*p4sCorrJets[jindex].energy());
+        ak4pfjet_overlep1_nhf = pfjets_neutralHadronE().at(jindex)/ (pfjets_undoJEC().at(jindex)*p4sCorrJets[jindex].energy());
+        ak4pfjet_overlep1_cef = pfjets_chargedEmE().at(jindex)/ (pfjets_undoJEC().at(jindex)*p4sCorrJets[jindex].energy());
+        ak4pfjet_overlep1_nef = pfjets_neutralEmE().at(jindex)/ (pfjets_undoJEC().at(jindex)*p4sCorrJets[jindex].energy());
+        ak4pfjet_overlep1_muf = pfjets_muonE().at(jindex)/ (pfjets_undoJEC().at(jindex)*p4sCorrJets[jindex].energy());
+        ak4pfjet_overlep1_cm  = pfjets_chargedMultiplicity().at(jindex);
+        ak4pfjet_overlep1_nm  = cms3.pfjets_neutralMultiplicity().at(jindex);
+      }
+      if(jindex == overlep2_idx){
+        ak4pfjet_overlep2_p4  = p4sCorrJets.at(jindex);
+        ak4pfjet_overlep2_CSV = pfjets_pfCombinedInclusiveSecondaryVertexV2BJetTag().at(jindex);
+        ak4pfjet_overlep2_deepCSV = getbtagvalue(deepCSV_prefix+"JetTags:probb",jindex) + getbtagvalue(deepCSV_prefix+"JetTags:probbb",jindex);
+        //ak4pfjet_overlep2_pu_id = pfjets_pileupJetId().at(jindex);
+        ak4pfjet_overlep2_chf = pfjets_chargedHadronE().at(jindex)/ (pfjets_undoJEC().at(jindex)*p4sCorrJets[jindex].energy());
+        ak4pfjet_overlep2_nhf = pfjets_neutralHadronE().at(jindex)/ (pfjets_undoJEC().at(jindex)*p4sCorrJets[jindex].energy());
+        ak4pfjet_overlep2_cef = pfjets_chargedEmE().at(jindex)/ (pfjets_undoJEC().at(jindex)*p4sCorrJets[jindex].energy());
+        ak4pfjet_overlep2_nef = pfjets_neutralEmE().at(jindex)/ (pfjets_undoJEC().at(jindex)*p4sCorrJets[jindex].energy());
+        ak4pfjet_overlep2_muf = pfjets_muonE().at(jindex)/ (pfjets_undoJEC().at(jindex)*p4sCorrJets[jindex].energy());
+        ak4pfjet_overlep2_cm  = pfjets_chargedMultiplicity().at(jindex);
+        ak4pfjet_overlep2_nm  = cms3.pfjets_neutralMultiplicity().at(jindex);
+      }
+      //remove overlaps & apply preselections
+      if(jindex == overlep1_idx || jindex == overlep2_idx) continue; //remove ovelaps from your jet collection
 
-        //remove overlaps & apply preselections
-        if(jindex == overlep1_idx || jindex == overlep2_idx) continue; //remove ovelaps from your jet collection
-
-	bool skipthis = false;
-	for(size_t jdx = 0; jdx < alloverlapjets_idx.size(); ++jdx){
-	  if(alloverlapjets_idx.at(jdx)==jindex) {
-	    skipthis = true;
-	    break;
-	  }
-	}
-	if(skipthis) continue; //remove all overlaps from jet collection
+    	bool skipthis = false;
+    	for(size_t jdx = 0; jdx < alloverlapjets_idx.size(); ++jdx){
+    	  if(alloverlapjets_idx.at(jdx)==jindex) {
+    	    skipthis = true;
+    	    break;
+    	  }
+    	}
+	    if(skipthis) continue; //remove all overlaps from jet collection
 
         //Jet selections
-        if(p4sCorrJets.at(jindex).pt() < m_ak4_pt_cut) continue;
-        if(fabs(p4sCorrJets.at(jindex).eta()) > m_ak4_eta_cut) continue;
-	if(!isLoosePFJetV2(jindex)) ++nFailJets;
-        if(!isFastsim && m_ak4_passid && !isLoosePFJetV2(jindex)) continue;
-        nGoodJets++;
-	float btagvalue = getbtagvalue(deepCSV_prefix+"JetTags:probb",jindex) + getbtagvalue(deepCSV_prefix+"JetTags:probbb",jindex);
-	jet_csv_pairs.push_back(make_pair(jindex,btagvalue));
-        ak4pfjets_p4.push_back(p4sCorrJets.at(jindex));
-        ak4pfjets_pt.push_back(p4sCorrJets.at(jindex).pt());
-        ak4pfjets_eta.push_back(p4sCorrJets.at(jindex).eta());
-        ak4pfjets_phi.push_back(p4sCorrJets.at(jindex).phi());
-        ak4pfjets_mass.push_back(p4sCorrJets.at(jindex).mass());
+      if(p4sCorrJets.at(jindex).pt() < m_ak4_pt_cut) continue;
+      if(fabs(p4sCorrJets.at(jindex).eta()) > m_ak4_eta_cut) continue;
+      if(!isLoosePFJetV2(jindex)) ++nFailJets;
+      if(!isFastsim && m_ak4_passid && !isLoosePFJetV2(jindex)) continue;
+      nGoodJets++;
+      float btagvalue = getbtagvalue(deepCSV_prefix+"JetTags:probb",jindex) + getbtagvalue(deepCSV_prefix+"JetTags:probbb",jindex);
+      jet_csv_pairs.push_back(make_pair(jindex,btagvalue));
+      ak4pfjets_p4.push_back(p4sCorrJets.at(jindex));
+      ak4pfjets_pt.push_back(p4sCorrJets.at(jindex).pt());
+      ak4pfjets_eta.push_back(p4sCorrJets.at(jindex).eta());
+      ak4pfjets_phi.push_back(p4sCorrJets.at(jindex).phi());
+      ak4pfjets_mass.push_back(p4sCorrJets.at(jindex).mass());
 
-        ak4pfjets_CSV.push_back(pfjets_pfCombinedInclusiveSecondaryVertexV2BJetTag().at(jindex));
-        ak4pfjets_mva.push_back(getbtagvalue("pfCombinedMVAV2BJetTags", jindex));
-        ak4pfjets_deepCSV.push_back(getbtagvalue(deepCSV_prefix+"JetTags:probb",jindex) + getbtagvalue(deepCSV_prefix+"JetTags:probbb",jindex));
-        ak4pfjets_puid.push_back(loosePileupJetId(jindex));
-        ak4pfjets_parton_flavor.push_back(pfjets_partonFlavour().at(jindex));
-	ak4pfjets_hadron_flavor.push_back(pfjets_hadronFlavour().at(jindex));
-        ak4pfjets_loose_puid.push_back(loosePileupJetId(jindex));
-        ak4pfjets_loose_pfid.push_back(isLoosePFJetV2(jindex));
-        ak4pfjets_medium_pfid.push_back(isMediumPFJet(jindex));
-        ak4pfjets_tight_pfid.push_back(isTightPFJet(jindex));
+      ak4pfjets_CSV.push_back(pfjets_pfCombinedInclusiveSecondaryVertexV2BJetTag().at(jindex));
+      ak4pfjets_mva.push_back(getbtagvalue("pfCombinedMVAV2BJetTags", jindex));
+      ak4pfjets_deepCSV.push_back(getbtagvalue(deepCSV_prefix+"JetTags:probb",jindex) + getbtagvalue(deepCSV_prefix+"JetTags:probbb",jindex));
+      ak4pfjets_puid.push_back(loosePileupJetId(jindex));
+      ak4pfjets_parton_flavor.push_back(pfjets_partonFlavour().at(jindex));
+      ak4pfjets_hadron_flavor.push_back(pfjets_hadronFlavour().at(jindex));
+      ak4pfjets_loose_puid.push_back(loosePileupJetId(jindex));
+      ak4pfjets_loose_pfid.push_back(isLoosePFJetV2(jindex));
+      ak4pfjets_medium_pfid.push_back(isMediumPFJet(jindex));
+      ak4pfjets_tight_pfid.push_back(isTightPFJet(jindex));
 
-        ak4pfjets_chf.push_back(pfjets_chargedHadronE().at(jindex)/ (pfjets_undoJEC().at(jindex)*p4sCorrJets[jindex].energy()) );
-        ak4pfjets_nhf.push_back(pfjets_neutralHadronE().at(jindex)/ (pfjets_undoJEC().at(jindex)*p4sCorrJets[jindex].energy()) );
-        ak4pfjets_cef.push_back(pfjets_chargedEmE().at(jindex)/ (pfjets_undoJEC().at(jindex)*p4sCorrJets[jindex].energy()) );
-        ak4pfjets_nef.push_back(pfjets_neutralEmE().at(jindex)/ (pfjets_undoJEC().at(jindex)*p4sCorrJets[jindex].energy()) );
-	ak4pfjets_muf.push_back(pfjets_muonE().at(jindex)/ (pfjets_undoJEC().at(jindex)*p4sCorrJets[jindex].energy()) );
-        ak4pfjets_cm.push_back(pfjets_chargedMultiplicity().at(jindex));
-        ak4pfjets_nm.push_back(cms3.pfjets_neutralMultiplicity().at(jindex));
+      ak4pfjets_chf.push_back(pfjets_chargedHadronE().at(jindex)/ (pfjets_undoJEC().at(jindex)*p4sCorrJets[jindex].energy()) );
+      ak4pfjets_nhf.push_back(pfjets_neutralHadronE().at(jindex)/ (pfjets_undoJEC().at(jindex)*p4sCorrJets[jindex].energy()) );
+      ak4pfjets_cef.push_back(pfjets_chargedEmE().at(jindex)/ (pfjets_undoJEC().at(jindex)*p4sCorrJets[jindex].energy()) );
+      ak4pfjets_nef.push_back(pfjets_neutralEmE().at(jindex)/ (pfjets_undoJEC().at(jindex)*p4sCorrJets[jindex].energy()) );
+      ak4pfjets_muf.push_back(pfjets_muonE().at(jindex)/ (pfjets_undoJEC().at(jindex)*p4sCorrJets[jindex].energy()) );
+      ak4pfjets_cm.push_back(pfjets_chargedMultiplicity().at(jindex));
+      ak4pfjets_nm.push_back(cms3.pfjets_neutralMultiplicity().at(jindex));
 	
-	if (!evt_isRealData()) {
-          ak4pfjets_mc3dr.push_back(pfjets_mc3dr().at(jindex));
-          ak4pfjets_mc3id.push_back(pfjets_mc3_id().at(jindex));
-          ak4pfjets_mc3idx.push_back(pfjets_mc3idx().at(jindex));
-          ak4pfjets_mcmotherid.push_back(pfjets_mc_motherid().at(jindex));
-	}
+    	if (!evt_isRealData()) {
+        ak4pfjets_mc3dr.push_back(pfjets_mc3dr().at(jindex));
+        ak4pfjets_mc3id.push_back(pfjets_mc3_id().at(jindex));
+        ak4pfjets_mc3idx.push_back(pfjets_mc3idx().at(jindex));
+        ak4pfjets_mcmotherid.push_back(pfjets_mc_motherid().at(jindex));
+    	}
 
-	//HTRatio
-	dPhiM = getdphi(evt_pfmetPhi(), p4sCorrJets.at(jindex).phi() );
-	if ( dPhiM  < (TMath::Pi()/2) ) htssm = htssm + p4sCorrJets.at(jindex).pt();
-        else htosm = htosm + p4sCorrJets.at(jindex).pt();	
+    	//HTRatio
+    	dPhiM = getdphi(evt_pfmetPhi(), p4sCorrJets.at(jindex).phi() );
+    	if ( dPhiM  < (TMath::Pi()/2) ) htssm = htssm + p4sCorrJets.at(jindex).pt();
+      else htosm = htosm + p4sCorrJets.at(jindex).pt();	
 
-        HT = HT + p4sCorrJets.at(jindex).pt();
+      HT = HT + p4sCorrJets.at(jindex).pt();
 	
-	//medium btag
-        //pfjets_pfCombinedInclusiveSecondaryVertexV2BJetTag().at(jindex)
-	if( btagvalue > BTAG_MED ) {
+	    //medium btag
+      //pfjets_pfCombinedInclusiveSecondaryVertexV2BJetTag().at(jindex)
+	    if( btagvalue > BTAG_MED ) {
 //        if(pfjets_pfCombinedInclusiveSecondaryVertexV2BJetTag().at(jindex) > BTAG_MED){
-             ak4pfjets_passMEDbtag.push_back(true);
-             nbtags_med++;
-             if(nbtags_med == 1){
-                ak4pfjets_leadMEDbjet_pt = p4sCorrJets.at(jindex).pt();  //plot leading bjet pT
-                ak4pfjets_leadMEDbjet_p4 = p4sCorrJets.at(jindex);
-             }
-                ak4pfjets_MEDbjet_pt.push_back(p4sCorrJets.at(jindex).pt());
-              // btag SF - not final yet
+        ak4pfjets_passMEDbtag.push_back(true);
+        nbtags_med++;
+        if(nbtags_med == 1){
+          ak4pfjets_leadMEDbjet_pt = p4sCorrJets.at(jindex).pt();  //plot leading bjet pT
+          ak4pfjets_leadMEDbjet_p4 = p4sCorrJets.at(jindex);
+        }
+        ak4pfjets_MEDbjet_pt.push_back(p4sCorrJets.at(jindex).pt());
+        // btag SF - not final yet
 
-              if (!evt_isRealData()&&applyBtagSFs) {
-                float eff = getBtagEffFromFile(p4sCorrJets[jindex].pt(),p4sCorrJets[jindex].eta(), pfjets_hadronFlavour().at(jindex), isFastsim,false);
-		BTagEntry::JetFlavor flavor = BTagEntry::FLAV_UDSG;
+        if (!evt_isRealData()&&applyBtagSFs) {
+          float eff = getBtagEffFromFile(p4sCorrJets[jindex].pt(),p4sCorrJets[jindex].eta(), pfjets_hadronFlavour().at(jindex), isFastsim,false);
+		      BTagEntry::JetFlavor flavor = BTagEntry::FLAV_UDSG;
 
-		if (abs(pfjets_hadronFlavour().at(jindex)) == 5) flavor = BTagEntry::FLAV_B;
-		else if (abs(pfjets_hadronFlavour().at(jindex)) == 4) flavor = BTagEntry::FLAV_C;
+      		if (abs(pfjets_hadronFlavour().at(jindex)) == 5) flavor = BTagEntry::FLAV_B;
+      		else if (abs(pfjets_hadronFlavour().at(jindex)) == 4) flavor = BTagEntry::FLAV_C;
+      
+      	        float pt_cutoff = std::max(20.,std::min(669.,double(p4sCorrJets[jindex].pt()))); //Sicong: lower it to 20GeV
+      	        float eta_cutoff = std::min(2.39,fabs(double(p4sCorrJets[jindex].eta())));
+      		float weight_cent(1.), weight_UP(1.), weight_DN(1.), weight_FS_UP(1.), weight_FS_DN(1.);
+      
+      //                cout<<"read uncertainty from btagsf reader:"<<endl;
+      		if (flavor == BTagEntry::FLAV_UDSG) {
+      		  weight_cent = reader_light->eval(flavor, eta_cutoff, pt_cutoff);
+      		  weight_UP = reader_light_UP->eval(flavor, eta_cutoff, pt_cutoff);
+      		  weight_DN = reader_light_DN->eval(flavor, eta_cutoff, pt_cutoff);
+      		} else {
+      		  weight_cent = reader_heavy->eval(flavor, eta_cutoff, pt_cutoff);
+      		  weight_UP = reader_heavy_UP->eval(flavor, eta_cutoff, pt_cutoff);
+      		  weight_DN = reader_heavy_DN->eval(flavor, eta_cutoff, pt_cutoff);
+      		}
+      		if (isFastsim) {
+      		  weight_FS_UP = weight_cent * reader_fastsim_UP->eval(flavor, eta_cutoff, pt_cutoff);
+      		  weight_FS_DN = weight_cent * reader_fastsim_DN->eval(flavor, eta_cutoff, pt_cutoff);
+      		  weight_cent *= reader_fastsim->eval(flavor, eta_cutoff, pt_cutoff);
+      		  weight_UP *= reader_fastsim->eval(flavor, eta_cutoff, pt_cutoff);//this is still just btagSF
+      		  weight_DN *= reader_fastsim->eval(flavor, eta_cutoff, pt_cutoff);//this is still just btagSF
+      		}
+        //              cout<<"got uncertainty from btagsf reader:"<<endl;
+                      btagprob_data *= weight_cent * eff;
+                      btagprob_mc *= eff;
+      		if (flavor == BTagEntry::FLAV_UDSG) {
+      		  btagprob_light_UP *= weight_UP * eff;
+      		  btagprob_light_DN *= weight_DN * eff;
+      		  btagprob_heavy_UP *= weight_cent * eff;
+      		  btagprob_heavy_DN *= weight_cent * eff;
+      		} else {
+      		  btagprob_light_UP *= weight_cent * eff;
+      		  btagprob_light_DN *= weight_cent * eff;
+      		  btagprob_heavy_UP *= weight_UP * eff;
+      		  btagprob_heavy_DN *= weight_DN * eff;
+                      }
+      		if(isFastsim){
+      		  btagprob_FS_UP *= weight_FS_UP * eff;
+      		  btagprob_FS_DN *= weight_FS_DN * eff;
+      		}
+        }// end of if it's not real data and apply btaggign scale factor
+      }// end of if it's medium
+      else if(btagvalue < BTAG_MED && btagvalue > BTAG_LOOSE){
+        ak4pfjets_passMEDbtag.push_back(false);
+        // these fail medium but pass loose
+        if(!evt_isRealData()&&applyBtagSFs){
+          float eff = getBtagEffFromFile(p4sCorrJets[jindex].pt(),p4sCorrJets[jindex].eta(), pfjets_hadronFlavour().at(jindex), isFastsim,false);
+          float eff_loose = getBtagEffFromFile(p4sCorrJets[jindex].pt(),p4sCorrJets[jindex].eta(), pfjets_hadronFlavour().at(jindex), isFastsim,true);
+		      BTagEntry::JetFlavor flavor = BTagEntry::FLAV_UDSG;
 
-	        float pt_cutoff = std::max(30.,std::min(669.,double(p4sCorrJets[jindex].pt())));
+      		if (abs(pfjets_hadronFlavour().at(jindex)) == 5) flavor = BTagEntry::FLAV_B;
+      		else if (abs(pfjets_hadronFlavour().at(jindex)) == 4) flavor = BTagEntry::FLAV_C;
+
+	        float pt_cutoff = std::max(20.,std::min(669.,double(p4sCorrJets[jindex].pt())));
 	        float eta_cutoff = std::min(2.39,fabs(double(p4sCorrJets[jindex].eta())));
-		float weight_cent(1.), weight_UP(1.), weight_DN(1.), weight_FS_UP(1.), weight_FS_DN(1.);
-
-//                cout<<"read uncertainty from btagsf reader:"<<endl;
-		if (flavor == BTagEntry::FLAV_UDSG) {
-		  weight_cent = reader_light->eval(flavor, eta_cutoff, pt_cutoff);
-		  weight_UP = reader_light_UP->eval(flavor, eta_cutoff, pt_cutoff);
-		  weight_DN = reader_light_DN->eval(flavor, eta_cutoff, pt_cutoff);
-		} else {
-		  weight_cent = reader_heavy->eval(flavor, eta_cutoff, pt_cutoff);
-		  weight_UP = reader_heavy_UP->eval(flavor, eta_cutoff, pt_cutoff);
-		  weight_DN = reader_heavy_DN->eval(flavor, eta_cutoff, pt_cutoff);
-		}
-		if (isFastsim) {
-		  weight_FS_UP = weight_cent * reader_fastsim_UP->eval(flavor, eta_cutoff, pt_cutoff);
-		  weight_FS_DN = weight_cent * reader_fastsim_DN->eval(flavor, eta_cutoff, pt_cutoff);
-		  weight_cent *= reader_fastsim->eval(flavor, eta_cutoff, pt_cutoff);
-		  weight_UP *= reader_fastsim->eval(flavor, eta_cutoff, pt_cutoff);//this is still just btagSF
-		  weight_DN *= reader_fastsim->eval(flavor, eta_cutoff, pt_cutoff);//this is still just btagSF
-		}
-  //              cout<<"got uncertainty from btagsf reader:"<<endl;
-                btagprob_data *= weight_cent * eff;
-                btagprob_mc *= eff;
-		if (flavor == BTagEntry::FLAV_UDSG) {
-		  btagprob_light_UP *= weight_UP * eff;
-		  btagprob_light_DN *= weight_DN * eff;
-		  btagprob_heavy_UP *= weight_cent * eff;
-		  btagprob_heavy_DN *= weight_cent * eff;
-		} else {
-		  btagprob_light_UP *= weight_cent * eff;
-		  btagprob_light_DN *= weight_cent * eff;
-		  btagprob_heavy_UP *= weight_UP * eff;
-		  btagprob_heavy_DN *= weight_DN * eff;
-                }
-		if(isFastsim){
-		  btagprob_FS_UP *= weight_FS_UP * eff;
-		  btagprob_FS_DN *= weight_FS_DN * eff;
-		}
-              }
-            }// end of if it's medium
-             else if(btagvalue < BTAG_MED && btagvalue > BTAG_LOOSE){
-               ak4pfjets_passMEDbtag.push_back(false);
-               // these fail medium but pass loose
-                if(!evt_isRealData()&&applyBtagSFs){
-                float eff = getBtagEffFromFile(p4sCorrJets[jindex].pt(),p4sCorrJets[jindex].eta(), pfjets_hadronFlavour().at(jindex), isFastsim,false);
-                float eff_loose = getBtagEffFromFile(p4sCorrJets[jindex].pt(),p4sCorrJets[jindex].eta(), pfjets_hadronFlavour().at(jindex), isFastsim,true);
-		BTagEntry::JetFlavor flavor = BTagEntry::FLAV_UDSG;
-
-		if (abs(pfjets_hadronFlavour().at(jindex)) == 5) flavor = BTagEntry::FLAV_B;
-		else if (abs(pfjets_hadronFlavour().at(jindex)) == 4) flavor = BTagEntry::FLAV_C;
-
-	        float pt_cutoff = std::max(30.,std::min(669.,double(p4sCorrJets[jindex].pt())));
-	        float eta_cutoff = std::min(2.39,fabs(double(p4sCorrJets[jindex].eta())));
-		float weight_cent(1.), weight_UP(1.), weight_DN(1.), weight_FS_UP(1.), weight_FS_DN(1.);
-		float weight_cent_loose(1.), weight_UP_loose(1.), weight_DN_loose(1.), weight_FS_UP_loose(1.), weight_FS_DN_loose(1.);
-                //                cout<<"read uncertainty from btagsf reader:"<<endl;
-		if (flavor == BTagEntry::FLAV_UDSG) {
-		  weight_cent = reader_light->eval(flavor, eta_cutoff, pt_cutoff);
-		  weight_UP = reader_light_UP->eval(flavor, eta_cutoff, pt_cutoff);
-		  weight_DN = reader_light_DN->eval(flavor, eta_cutoff, pt_cutoff);
-
-		  weight_cent_loose = reader_light_loose->eval(flavor, eta_cutoff, pt_cutoff);
-		  weight_UP_loose = reader_light_loose_UP->eval(flavor, eta_cutoff, pt_cutoff);
-		  weight_DN_loose = reader_light_loose_DN->eval(flavor, eta_cutoff, pt_cutoff);
-		} else {
-		  weight_cent = reader_heavy->eval(flavor, eta_cutoff, pt_cutoff);
-		  weight_UP = reader_heavy_UP->eval(flavor, eta_cutoff, pt_cutoff);
-		  weight_DN = reader_heavy_DN->eval(flavor, eta_cutoff, pt_cutoff);
-
-		  weight_cent_loose = reader_heavy_loose->eval(flavor, eta_cutoff, pt_cutoff);
-		  weight_UP_loose = reader_heavy_loose_UP->eval(flavor, eta_cutoff, pt_cutoff);
-		  weight_DN_loose = reader_heavy_loose_DN->eval(flavor, eta_cutoff, pt_cutoff);
-		}
-		if (isFastsim) {
-		  weight_FS_UP = weight_cent * reader_fastsim_loose_UP->eval(flavor, eta_cutoff, pt_cutoff);
-		  weight_FS_DN = weight_cent * reader_fastsim_loose_DN->eval(flavor, eta_cutoff, pt_cutoff);
-		  weight_cent *= reader_fastsim_loose->eval(flavor, eta_cutoff, pt_cutoff);
-		  weight_UP *= reader_fastsim_loose->eval(flavor, eta_cutoff, pt_cutoff);//this is still just btagSF
-		  weight_DN *= reader_fastsim_loose->eval(flavor, eta_cutoff, pt_cutoff);//this is still just btagSF
-		}
-  //              cout<<"got uncertainty from btagsf reader:"<<endl;
-                btagprob_data *= eff_loose*weight_cent_loose-eff*weight_cent;
-                btagprob_mc *= eff_loose-eff;
-		if (flavor == BTagEntry::FLAV_UDSG) {
-		  btagprob_light_UP *= weight_UP_loose * eff_loose- weight_UP*eff;
-		  btagprob_light_DN *= weight_DN_loose * eff_loose- weight_DN*eff;
-		  btagprob_heavy_UP *= weight_cent_loose * eff_loose-weight_cent*eff;
-		  btagprob_heavy_DN *= weight_cent_loose * eff_loose-weight_cent*eff;
-		} else {
-		  btagprob_light_UP *= weight_cent_loose * eff_loose-weight_cent*eff;
-		  btagprob_light_DN *= weight_cent_loose * eff_loose-weight_cent*eff;
-		  btagprob_heavy_UP *= weight_UP_loose * eff_loose- weight_UP*eff;
-		  btagprob_heavy_DN *= weight_DN_loose * eff_loose- weight_DN*eff;
-                }
-		if(isFastsim){
-		  btagprob_FS_UP *= weight_FS_UP_loose * eff_loose -weight_FS_UP * eff;
-		  btagprob_FS_DN *= weight_FS_DN_loose * eff_loose -weight_FS_DN * eff;
-		}
-               } // end of jets failing medium but pass loose
-              }
-              else { //these fail loose 
-              ak4pfjets_passMEDbtag.push_back(false);
-              if (!evt_isRealData()&&applyBtagSFs){
-              float eff = getBtagEffFromFile(p4sCorrJets[jindex].pt(),p4sCorrJets[jindex].eta(), pfjets_hadronFlavour().at(jindex), isFastsim,true);
-	      BTagEntry::JetFlavor flavor = BTagEntry::FLAV_UDSG;
-	      if (abs(pfjets_hadronFlavour().at(jindex)) == 5) flavor = BTagEntry::FLAV_B;
-	      else if (abs(pfjets_hadronFlavour().at(jindex)) == 4) flavor = BTagEntry::FLAV_C;
-	      float pt_cutoff = std::max(30.,std::min(669.,double(p4sCorrJets[jindex].pt())));
-	      float eta_cutoff = std::min(2.39,fabs(double(p4sCorrJets[jindex].eta())));
-	      float weight_cent(1.), weight_UP(1.), weight_DN(1.), weight_FS_UP(1.), weight_FS_DN(1.);
-	      if (flavor == BTagEntry::FLAV_UDSG) {
-		weight_cent = reader_light_loose->eval(flavor, eta_cutoff, pt_cutoff);
-		weight_UP = reader_light_loose_UP->eval(flavor, eta_cutoff, pt_cutoff);
-		weight_DN = reader_light_loose_DN->eval(flavor, eta_cutoff, pt_cutoff);
-	      } else {
-		weight_cent = reader_heavy_loose->eval(flavor, eta_cutoff, pt_cutoff);
-		weight_UP = reader_heavy_loose_UP->eval(flavor, eta_cutoff, pt_cutoff);
-		weight_DN = reader_heavy_loose_DN->eval(flavor, eta_cutoff, pt_cutoff);
-	      }
-	      if (isFastsim) {
-		weight_FS_UP = weight_cent * reader_fastsim_loose_UP->eval(flavor, eta_cutoff, pt_cutoff);//this is pure fastsimSF
-		weight_FS_DN = weight_cent * reader_fastsim_loose_DN->eval(flavor, eta_cutoff, pt_cutoff);//this is pure fastsimSF
-		weight_cent *= reader_fastsim_loose->eval(flavor, eta_cutoff, pt_cutoff);
-		weight_UP *= reader_fastsim_loose_UP->eval(flavor, eta_cutoff, pt_cutoff);//this is still just btagSF
-		weight_DN *= reader_fastsim_loose_DN->eval(flavor, eta_cutoff, pt_cutoff);//this is still just btagSF
-	      }
-              btagprob_data *= (1. - weight_cent * eff);
-              btagprob_mc *= (1. - eff);
-	      if (flavor == BTagEntry::FLAV_UDSG) {
-		btagprob_light_UP *= (1. - weight_UP * eff);
-		btagprob_light_DN *= (1. - weight_DN * eff);
-		btagprob_heavy_UP *= (1. - weight_cent * eff);
-		btagprob_heavy_DN *= (1. - weight_cent * eff);
-              } else {
-		btagprob_light_UP *= (1. - weight_cent * eff);
-		btagprob_light_DN *= (1. - weight_cent * eff);
-		btagprob_heavy_UP *= (1. - weight_UP * eff);
-		btagprob_heavy_DN *= (1. - weight_DN * eff);
-              }
-	      if(isFastsim){
-		btagprob_FS_UP *= (1. - weight_FS_UP * eff);
-		btagprob_FS_DN *= (1. - weight_FS_DN * eff);
-	      }
-            }
-           }// end of if fail loose
-
-	if(pfjets_pfCombinedInclusiveSecondaryVertexV2BJetTag().at(jindex)> btagdisc){
-	  btagdisc = pfjets_pfCombinedInclusiveSecondaryVertexV2BJetTag().at(jindex);
-	  leadbtag_idx = jindex;
-	}
-
-   ak4pfjets_leadbtag_p4 = p4sCorrJets.at(leadbtag_idx);//highest CSV jet
-   sort( jet_csv_pairs.begin(), jet_csv_pairs.end(), sortIndexbyCSV);
-   if(nGoodJets>1){
-   if(nbtags_med>0 && p4sCorrJets.size()>1) {
-     mbb = getmbb(p4sCorrJets.at(jet_csv_pairs.at(0).first),p4sCorrJets.at(jet_csv_pairs.at(1).first))  ; // at least one b-tagged, use CSV sorted
-     mct = getmct(p4sCorrJets.at(jet_csv_pairs.at(0).first),p4sCorrJets.at(jet_csv_pairs.at(1).first))  ; // at least one b-tagged, use CSV sorted
-     }
-   else {
-     mbb = getmbb(ak4pfjets_p4.at(0), ak4pfjets_p4.at(1)) ;  // no btagged use pt sorted.
-     mct = getmct(ak4pfjets_p4.at(0), ak4pfjets_p4.at(1)) ;  // no btagged use pt sorted.
-   } 
-  }
-   ngoodjets = nGoodJets;
-   nfailjets = nFailJets;
-   ak4_HT = HT;
-   ak4_mbb = mbb;
-   ak4_mct = mct;
-   HT=0;
-   ngoodbtags = nbtags_med;
-
-   ak4_htssm = htssm;
-   ak4_htosm = htosm;
-   htratiom   = htssm / (htosm + htssm);
-   ak4_htratiom = htratiom; 
-
-}
-   nGoodJets = 0;
+      		float weight_cent(1.), weight_UP(1.), weight_DN(1.), weight_FS_UP(1.), weight_FS_DN(1.);
+      		float weight_cent_loose(1.), weight_UP_loose(1.), weight_DN_loose(1.), weight_FS_UP_loose(1.), weight_FS_DN_loose(1.);
+          //                cout<<"read uncertainty from btagsf reader:"<<endl;
+      		if (flavor == BTagEntry::FLAV_UDSG) {
+      		  weight_cent = reader_light->eval(flavor, eta_cutoff, pt_cutoff);
+      		  weight_UP = reader_light_UP->eval(flavor, eta_cutoff, pt_cutoff);
+      		  weight_DN = reader_light_DN->eval(flavor, eta_cutoff, pt_cutoff);
+      
+      		  weight_cent_loose = reader_light_loose->eval(flavor, eta_cutoff, pt_cutoff);
+      		  weight_UP_loose = reader_light_loose_UP->eval(flavor, eta_cutoff, pt_cutoff);
+      		  weight_DN_loose = reader_light_loose_DN->eval(flavor, eta_cutoff, pt_cutoff);
+      		} else {
+      		  weight_cent = reader_heavy->eval(flavor, eta_cutoff, pt_cutoff);
+      		  weight_UP = reader_heavy_UP->eval(flavor, eta_cutoff, pt_cutoff);
+      		  weight_DN = reader_heavy_DN->eval(flavor, eta_cutoff, pt_cutoff);
+      
+      		  weight_cent_loose = reader_heavy_loose->eval(flavor, eta_cutoff, pt_cutoff);
+      		  weight_UP_loose = reader_heavy_loose_UP->eval(flavor, eta_cutoff, pt_cutoff);
+      		  weight_DN_loose = reader_heavy_loose_DN->eval(flavor, eta_cutoff, pt_cutoff);
+      		}
+      		if (isFastsim) {
+      		  weight_FS_UP = weight_cent * reader_fastsim_loose_UP->eval(flavor, eta_cutoff, pt_cutoff);
+      		  weight_FS_DN = weight_cent * reader_fastsim_loose_DN->eval(flavor, eta_cutoff, pt_cutoff);
+      		  weight_cent *= reader_fastsim_loose->eval(flavor, eta_cutoff, pt_cutoff);
+      		  weight_UP *= reader_fastsim_loose->eval(flavor, eta_cutoff, pt_cutoff);//this is still just btagSF
+      		  weight_DN *= reader_fastsim_loose->eval(flavor, eta_cutoff, pt_cutoff);//this is still just btagSF
+      		}
+        //              cout<<"got uncertainty from btagsf reader:"<<endl;
+          btagprob_data *= eff_loose*weight_cent_loose-eff*weight_cent;
+          btagprob_mc *= eff_loose-eff;
+      		if (flavor == BTagEntry::FLAV_UDSG) {
+      		  btagprob_light_UP *= weight_UP_loose * eff_loose- weight_UP*eff;
+      		  btagprob_light_DN *= weight_DN_loose * eff_loose- weight_DN*eff;
+      		  btagprob_heavy_UP *= weight_cent_loose * eff_loose-weight_cent*eff;
+      		  btagprob_heavy_DN *= weight_cent_loose * eff_loose-weight_cent*eff;}
+          else {
+      		  btagprob_light_UP *= weight_cent_loose * eff_loose-weight_cent*eff;
+      		  btagprob_light_DN *= weight_cent_loose * eff_loose-weight_cent*eff;
+      		  btagprob_heavy_UP *= weight_UP_loose * eff_loose- weight_UP*eff;
+      		  btagprob_heavy_DN *= weight_DN_loose * eff_loose- weight_DN*eff;
+          }
+      		if(isFastsim){
+      		  btagprob_FS_UP *= weight_FS_UP_loose * eff_loose -weight_FS_UP * eff;
+      		  btagprob_FS_DN *= weight_FS_DN_loose * eff_loose -weight_FS_DN * eff;
+      		}
+        } 
+      } // end of jets failing medium but pass loose
+      else { //these fail loose 
+        ak4pfjets_passMEDbtag.push_back(false);
+        if (!evt_isRealData()&&applyBtagSFs){
+          float eff = getBtagEffFromFile(p4sCorrJets[jindex].pt(),p4sCorrJets[jindex].eta(), pfjets_hadronFlavour().at(jindex), isFastsim,true);
+  	      BTagEntry::JetFlavor flavor = BTagEntry::FLAV_UDSG;
+  	      if (abs(pfjets_hadronFlavour().at(jindex)) == 5) flavor = BTagEntry::FLAV_B;
+  	      else if (abs(pfjets_hadronFlavour().at(jindex)) == 4) flavor = BTagEntry::FLAV_C;
+  	      float pt_cutoff = std::max(20.,std::min(669.,double(p4sCorrJets[jindex].pt())));
+  	      float eta_cutoff = std::min(2.39,fabs(double(p4sCorrJets[jindex].eta())));
+  	      float weight_cent(1.), weight_UP(1.), weight_DN(1.), weight_FS_UP(1.), weight_FS_DN(1.);
+  	      if (flavor == BTagEntry::FLAV_UDSG) {
+      		weight_cent = reader_light_loose->eval(flavor, eta_cutoff, pt_cutoff);
+      		weight_UP = reader_light_loose_UP->eval(flavor, eta_cutoff, pt_cutoff);
+      		weight_DN = reader_light_loose_DN->eval(flavor, eta_cutoff, pt_cutoff);
+  	      } else {
+      		weight_cent = reader_heavy_loose->eval(flavor, eta_cutoff, pt_cutoff);
+      		weight_UP = reader_heavy_loose_UP->eval(flavor, eta_cutoff, pt_cutoff);
+      		weight_DN = reader_heavy_loose_DN->eval(flavor, eta_cutoff, pt_cutoff);
+          }
+	        if (isFastsim) {
+        		weight_FS_UP = weight_cent * reader_fastsim_loose_UP->eval(flavor, eta_cutoff, pt_cutoff);//this is pure fastsimSF
+        		weight_FS_DN = weight_cent * reader_fastsim_loose_DN->eval(flavor, eta_cutoff, pt_cutoff);//this is pure fastsimSF
+        		weight_cent *= reader_fastsim_loose->eval(flavor, eta_cutoff, pt_cutoff);
+        		weight_UP *= reader_fastsim_loose_UP->eval(flavor, eta_cutoff, pt_cutoff);//this is still just btagSF
+        		weight_DN *= reader_fastsim_loose_DN->eval(flavor, eta_cutoff, pt_cutoff);//this is still just btagSF
+	        }
+            btagprob_data *= (1. - weight_cent * eff);
+            btagprob_mc *= (1. - eff);
+	        if (flavor == BTagEntry::FLAV_UDSG) {
+        		btagprob_light_UP *= (1. - weight_UP * eff);
+        		btagprob_light_DN *= (1. - weight_DN * eff);
+        		btagprob_heavy_UP *= (1. - weight_cent * eff);
+        		btagprob_heavy_DN *= (1. - weight_cent * eff);
+          } else {
+        		btagprob_light_UP *= (1. - weight_cent * eff);
+        		btagprob_light_DN *= (1. - weight_cent * eff);
+        		btagprob_heavy_UP *= (1. - weight_UP * eff);
+        		btagprob_heavy_DN *= (1. - weight_DN * eff);
+          }
+  	      if(isFastsim){
+        		btagprob_FS_UP *= (1. - weight_FS_UP * eff);
+        		btagprob_FS_DN *= (1. - weight_FS_DN * eff);
+  	      }
+        }
+      }// end of if fail loose
+  
+    	if(pfjets_pfCombinedInclusiveSecondaryVertexV2BJetTag().at(jindex)> btagdisc){
+    	  btagdisc = pfjets_pfCombinedInclusiveSecondaryVertexV2BJetTag().at(jindex);
+    	  leadbtag_idx = jindex;
+    	}
+      ak4pfjets_leadbtag_p4 = p4sCorrJets.at(leadbtag_idx);//highest CSV jet
+      sort( jet_csv_pairs.begin(), jet_csv_pairs.end(), sortIndexbyCSV);
+      if(nGoodJets>1){
+        if(nbtags_med>0 && p4sCorrJets.size()>1) {
+          mbb = getmbb(p4sCorrJets.at(jet_csv_pairs.at(0).first),p4sCorrJets.at(jet_csv_pairs.at(1).first))  ; // at least one b-tagged, use CSV sorted
+          mct = getmct(p4sCorrJets.at(jet_csv_pairs.at(0).first),p4sCorrJets.at(jet_csv_pairs.at(1).first))  ; // at least one b-tagged, use CSV sorted
+        }
+        else {
+          mbb = getmbb(ak4pfjets_p4.at(0), ak4pfjets_p4.at(1)) ;  // no btagged use pt sorted.
+          mct = getmct(ak4pfjets_p4.at(0), ak4pfjets_p4.at(1)) ;  // no btagged use pt sorted.
+        } 
+      }
+      ngoodjets = nGoodJets;
+      nfailjets = nFailJets;
+      ak4_HT = HT;
+      ak4_mbb = mbb;
+      ak4_mct = mct;
+      HT=0;
+      ngoodbtags = nbtags_med;
+      
+      ak4_htssm = htssm;
+      ak4_htosm = htosm;
+      htratiom   = htssm / (htosm + htssm);
+      ak4_htratiom = htratiom; 
+    }// end of loop for ak4 jets
+    nGoodJets = 0;
     // fill info for ak8pfjets
     for (size_t idx = 0; idx < ak8jets_p4().size(); ++idx)
     {
-        if(pfjets_p4().at(idx).pt() < m_ak8_pt_cut) continue;
-        if(fabs(pfjets_p4().at(idx).eta()) > m_ak8_eta_cut) continue;
-        if(!isFastsim && m_ak8_passid && !isLoosePFJetV2(idx)) continue;
+      if(pfjets_p4().at(idx).pt() < m_ak8_pt_cut) continue;
+      if(fabs(pfjets_p4().at(idx).eta()) > m_ak8_eta_cut) continue;
+      if(!isFastsim && m_ak8_passid && !isLoosePFJetV2(idx)) continue;
 
-        ak8pfjets_p4.push_back(ak8jets_p4().at(idx));
-        ak8pfjets_tau1.push_back(ak8jets_nJettinessTau1().at(idx));
-        ak8pfjets_tau2.push_back(ak8jets_nJettinessTau2().at(idx));
-        ak8pfjets_tau3.push_back(ak8jets_nJettinessTau3().at(idx));
-        //ak8pfjets_top_mass.push_back(ak8jets_topJetMass().at(idx));
-        ak8pfjets_pruned_mass.push_back(ak8jets_prunedMass().at(idx));
-//        ak8pfjets_trimmed_mass.push_back(ak8jets_trimmedMass().at(idx));
-//        ak8pfjets_filtered_mass.push_back(ak8jets_filteredMass().at(idx));
-	//ak8pfjets_pu_id.push_back(ak8jets_pileupJetId().at(idx));    
-        ak8pfjets_parton_flavor.push_back(ak8jets_partonFlavour().at(idx));
+      ak8pfjets_p4.push_back(ak8jets_p4().at(idx));
+      ak8pfjets_tau1.push_back(ak8jets_nJettinessTau1().at(idx));
+      ak8pfjets_tau2.push_back(ak8jets_nJettinessTau2().at(idx));
+      ak8pfjets_tau3.push_back(ak8jets_nJettinessTau3().at(idx));
+      ak8pfjets_pruned_mass.push_back(ak8jets_prunedMass().at(idx));
+      ak8pfjets_puppi_softdropMass.push_back(ak8jets_puppi_softdropMass().at(idx));
+//      ak8pfjets_top_mass.push_back(ak8jets_topJetMass().at(idx));
+//      ak8pfjets_trimmed_mass.push_back(ak8jets_trimmedMass().at(idx));
+//      ak8pfjets_filtered_mass.push_back(ak8jets_filteredMass().at(idx));
+//      ak8pfjets_pu_id.push_back(ak8jets_pileupJetId().at(idx));    
+      ak8pfjets_parton_flavor.push_back(ak8jets_partonFlavour().at(idx));
+      ak8pfjets_deep_rawdisc_qcd.push_back(ak8jets_deep_rawdisc_qcd().at(idx));
+      ak8pfjets_deep_rawdisc_top.push_back(ak8jets_deep_rawdisc_top().at(idx));
+      ak8pfjets_deep_rawdisc_w.push_back(ak8jets_deep_rawdisc_w().at(idx));
+      ak8pfjets_deep_rawdisc_z.push_back(ak8jets_deep_rawdisc_z().at(idx));
+      ak8pfjets_deep_rawdisc_zbb.push_back(ak8jets_deep_rawdisc_zbb().at(idx));
+      ak8pfjets_deep_rawdisc_hbb.push_back(ak8jets_deep_rawdisc_hbb().at(idx));
+      ak8pfjets_deep_rawdisc_h4q.push_back(ak8jets_deep_rawdisc_h4q().at(idx));
+      
 
-        nGoodJets++;
-
+      nGoodJets++;
     }
     ak8GoodPFJets = nGoodJets;
     nGoodJets=0;
@@ -518,11 +519,11 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx,  Factoriz
         
 void JetTree::SetJetSelection (std::string cone_size, float pt_cut,float eta, bool id)
 {
-  if (cone_size == "ak4") { m_ak4_pt_cut = pt_cut; m_ak4_eta_cut = eta; m_ak4_passid = id; }
-  else if (cone_size == "ak8") { m_ak8_pt_cut = pt_cut; m_ak8_eta_cut = eta; m_ak8_passid = id; }
-  else {std::cout << "Invalid cone size." << std::endl;}
-
-  return;
+    if (cone_size == "ak4") { m_ak4_pt_cut = pt_cut; m_ak4_eta_cut = eta; m_ak4_passid = id; }
+    else if (cone_size == "ak8") { m_ak8_pt_cut = pt_cut; m_ak8_eta_cut = eta; m_ak8_passid = id; }
+    else {std::cout << "Invalid cone size." << std::endl;}
+  
+    return;
 }
  
 void JetTree::GetJetSelections (std::string cone_size)
@@ -560,7 +561,7 @@ void JetTree::deleteBtagSFTool()
     delete reader_fastsim_loose_UP;
     delete reader_fastsim_loose_DN;
 
-   return;
+    return;
 } 
 void JetTree::Reset ()
 {
@@ -629,12 +630,20 @@ void JetTree::Reset ()
     ak8pfjets_tau1.clear();
     ak8pfjets_tau2.clear();
     ak8pfjets_tau3.clear();
-    ak8pfjets_top_mass.clear();
+    //ak8pfjets_top_mass.clear();
     ak8pfjets_pruned_mass.clear();
-    ak8pfjets_trimmed_mass.clear();
-    ak8pfjets_filtered_mass.clear();
-    ak8pfjets_pu_id.clear();    
+    ak8pfjets_puppi_softdropMass.clear();
+    //ak8pfjets_trimmed_mass.clear();
+    //ak8pfjets_filtered_mass.clear();
+    //ak8pfjets_pu_id.clear();    
     ak8pfjets_parton_flavor.clear();
+    ak8pfjets_deep_rawdisc_qcd.clear();
+    ak8pfjets_deep_rawdisc_top.clear();
+    ak8pfjets_deep_rawdisc_w.clear();
+    ak8pfjets_deep_rawdisc_z.clear();
+    ak8pfjets_deep_rawdisc_zbb.clear();
+    ak8pfjets_deep_rawdisc_hbb.clear();
+    ak8pfjets_deep_rawdisc_h4q.clear();
  
     ak4genjets_p4.clear();
  
@@ -686,13 +695,21 @@ void JetTree::SetAK8Branches (TTree* tree)
     tree->Branch(Form("%sak8pfjets_tau1", prefix_.c_str()) , &ak8pfjets_tau1);
     tree->Branch(Form("%sak8pfjets_tau2", prefix_.c_str()) , &ak8pfjets_tau2);
     tree->Branch(Form("%sak8pfjets_tau3", prefix_.c_str()) , &ak8pfjets_tau3);
-    tree->Branch(Form("%sak8pfjets_top_mass", prefix_.c_str()) , &ak8pfjets_top_mass);
+    //tree->Branch(Form("%sak8pfjets_top_mass", prefix_.c_str()) , &ak8pfjets_top_mass);
     tree->Branch(Form("%sak8pfjets_pruned_mass", prefix_.c_str()) , &ak8pfjets_pruned_mass);
-    tree->Branch(Form("%sak8pfjets_trimmed_mass", prefix_.c_str()) , &ak8pfjets_trimmed_mass);
-    tree->Branch(Form("%sak8pfjets_filtered_mass", prefix_.c_str()) , &ak8pfjets_filtered_mass);
-    tree->Branch(Form("%sak8pfjets_pu_id", prefix_.c_str()) , &ak8pfjets_pu_id);    
+    tree->Branch(Form("%sak8pfjets_puppi_softdropMass", prefix_.c_str()) , &ak8pfjets_puppi_softdropMass);
+    //tree->Branch(Form("%sak8pfjets_trimmed_mass", prefix_.c_str()) , &ak8pfjets_trimmed_mass);
+    //tree->Branch(Form("%sak8pfjets_filtered_mass", prefix_.c_str()) , &ak8pfjets_filtered_mass);
+    //tree->Branch(Form("%sak8pfjets_pu_id", prefix_.c_str()) , &ak8pfjets_pu_id);    
     tree->Branch(Form("%sak8pfjets_parton_flavor", prefix_.c_str()) , &ak8pfjets_parton_flavor);
-    tree->Branch(Form("%sak8GoodPFJets", prefix_.c_str()) , &ak8GoodPFJets);  
+    tree->Branch(Form("%sak8GoodPFJets", prefix_.c_str()) , &ak8GoodPFJets);
+    tree->Branch(Form("%sak8pfjets_deep_rawdisc_qcd", prefix_.c_str()) , &ak8pfjets_deep_rawdisc_qcd);
+    tree->Branch(Form("%sak8pfjets_deep_rawdisc_top", prefix_.c_str()) , &ak8pfjets_deep_rawdisc_top);
+    tree->Branch(Form("%sak8pfjets_deep_rawdisc_w", prefix_.c_str()) , &ak8pfjets_deep_rawdisc_w  );
+    tree->Branch(Form("%sak8pfjets_deep_rawdisc_z", prefix_.c_str()) , &ak8pfjets_deep_rawdisc_z  );
+    tree->Branch(Form("%sak8pfjets_deep_rawdisc_zbb", prefix_.c_str()) , &ak8pfjets_deep_rawdisc_zbb);
+    tree->Branch(Form("%sak8pfjets_deep_rawdisc_hbb", prefix_.c_str()) , &ak8pfjets_deep_rawdisc_hbb);
+    tree->Branch(Form("%sak8pfjets_deep_rawdisc_h4q", prefix_.c_str()) , &ak8pfjets_deep_rawdisc_h4q);  
 }
 
 void JetTree::SetAK4Branches_Overleps (TTree* tree)

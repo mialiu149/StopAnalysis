@@ -22,7 +22,7 @@ NGLIBS         = $(ROOTGLIBS)
 NGLIBS        += -lMinuit
 GLIBS          = $(filter-out -lNew, $(NGLIBS))
 
-COREPATH       = ../CORE
+COREPATH       = /home/users/siconglu/CMSTAS/CORE/
 TOOLSPATH      = $(COREPATH)/Tools
 DORKYPATH      = $(TOOLSPATH)/dorky
 

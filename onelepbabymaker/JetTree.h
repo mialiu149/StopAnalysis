@@ -138,9 +138,19 @@ public:
     vecd ak8pfjets_pruned_mass;
     vecd ak8pfjets_trimmed_mass;
     vecd ak8pfjets_filtered_mass;
+    vecd ak8pfjets_puppi_softdropMass;
     vecd ak8pfjets_pu_id;    
     veci ak8pfjets_parton_flavor;
-     
+    
+    //Try adding other ak8 information
+    vecd ak8pfjets_deep_rawdisc_qcd;
+    vecd ak8pfjets_deep_rawdisc_top;
+    vecd ak8pfjets_deep_rawdisc_w  ;
+    vecd ak8pfjets_deep_rawdisc_z  ;
+    vecd ak8pfjets_deep_rawdisc_zbb;
+    vecd ak8pfjets_deep_rawdisc_hbb;
+    vecd ak8pfjets_deep_rawdisc_h4q;
+
     // genjets    
     vecLorentzVector ak4genjets_p4;    
  

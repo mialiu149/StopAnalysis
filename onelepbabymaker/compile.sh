@@ -1,3 +1,4 @@
+source ~/.CMSSWSetup.sh
 source setup.sh
 cd ../analysisutils/
 make -j 30
