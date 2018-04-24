@@ -59,9 +59,10 @@ int main(int argc, char **argv){
   //
   // Skim Parameters 
   //
-  bool noskim = false;
+  bool noskim = true;
   int  nVtx              = 1;        
-  float met             = 50;      if (noskim) met=-1;
+  float met             = 50;      
+  if (noskim) met=-1;
 
   lepconfig lepConfig;
   if (noskim) lepConfig.nlep = -1;
@@ -78,6 +79,7 @@ int main(int argc, char **argv){
 
   fillextra fillextraConfig; 
   fillextraConfig.filltaus  =  true;
+  fillextraConfig.filltracks  =  true;
   fillextraConfig.filltracks  =  true;
 
   TChain *sample = new TChain("Events");
