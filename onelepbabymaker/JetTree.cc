@@ -484,7 +484,7 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx,  Factoriz
       ak8pfjets_tau1.push_back(ak8jets_nJettinessTau1().at(idx));
       ak8pfjets_tau2.push_back(ak8jets_nJettinessTau2().at(idx));
       ak8pfjets_tau3.push_back(ak8jets_nJettinessTau3().at(idx));
-      ak8pfjets_pruned_mass.push_back(ak8jets_prunedMass().at(idx));
+//      ak8pfjets_pruned_mass.push_back(ak8jets_prunedMass().at(idx));
       ak8pfjets_puppi_softdropMass.push_back(ak8jets_puppi_softdropMass().at(idx));
 //      ak8pfjets_top_mass.push_back(ak8jets_topJetMass().at(idx));
 //      ak8pfjets_trimmed_mass.push_back(ak8jets_trimmedMass().at(idx));
@@ -631,7 +631,7 @@ void JetTree::Reset ()
     ak8pfjets_tau2.clear();
     ak8pfjets_tau3.clear();
     //ak8pfjets_top_mass.clear();
-    ak8pfjets_pruned_mass.clear();
+    //ak8pfjets_pruned_mass.clear();
     ak8pfjets_puppi_softdropMass.clear();
     //ak8pfjets_trimmed_mass.clear();
     //ak8pfjets_filtered_mass.clear();
@@ -696,7 +696,7 @@ void JetTree::SetAK8Branches (TTree* tree)
     tree->Branch(Form("%sak8pfjets_tau2", prefix_.c_str()) , &ak8pfjets_tau2);
     tree->Branch(Form("%sak8pfjets_tau3", prefix_.c_str()) , &ak8pfjets_tau3);
     //tree->Branch(Form("%sak8pfjets_top_mass", prefix_.c_str()) , &ak8pfjets_top_mass);
-    tree->Branch(Form("%sak8pfjets_pruned_mass", prefix_.c_str()) , &ak8pfjets_pruned_mass);
+    //tree->Branch(Form("%sak8pfjets_pruned_mass", prefix_.c_str()) , &ak8pfjets_pruned_mass);
     tree->Branch(Form("%sak8pfjets_puppi_softdropMass", prefix_.c_str()) , &ak8pfjets_puppi_softdropMass);
     //tree->Branch(Form("%sak8pfjets_trimmed_mass", prefix_.c_str()) , &ak8pfjets_trimmed_mass);
     //tree->Branch(Form("%sak8pfjets_filtered_mass", prefix_.c_str()) , &ak8pfjets_filtered_mass);
