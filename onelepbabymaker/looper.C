@@ -355,6 +355,9 @@ int babyMaker::looper(TChain * chain, std::string output_name, int nEvents, std:
   char * jecpath;
   jecpath = getenv("TOOLSPATH");
   // files for RunIISpring15 MC
+  // From Nick Amin:
+  //I put the latest JECs into CORE (2017 branch) [1]https://github.com/cmstas/CORE/tree/2017/Tools/jetcorr/data/run2_25ns
+  //Fall17_*_V6_{DATA,MC}
   if (sampleConfig.isdata) {
     if (dataperiod.find("2016B") != std::string::npos ||
       dataperiod.find("2016C") != std::string::npos ||
@@ -390,16 +393,55 @@ int babyMaker::looper(TChain * chain, std::string output_name, int nEvents, std:
       jetcorr_filenames_pfL1FastJetL2L3.push_back(Form("%s/jetcorr/data/run2_25ns/Summer16_23Sep2016HV3_DATA/Summer16_23Sep2016HV3_DATA_L2L3Residual_AK4PFchs.txt", jecpath));
       jetcorr_uncertainty_filename = Form("%s/jetcorr/data/run2_25ns/Summer16_23Sep2016HV3_DATA/Summer16_23Sep2016HV3_DATA_Uncertainty_AK4PFchs.txt", jecpath);
     }
-  } else if (sampleConfig.issignal) {
-    jetcorr_filenames_pfL1FastJetL2L3.push_back(Form("%s/jetcorr/data/run2_25ns/Spring16_FastSimV1_L1FastJet_AK4PFchs.txt", jecpath));
-    jetcorr_filenames_pfL1FastJetL2L3.push_back(Form("%s/jetcorr/data/run2_25ns/Spring16_FastSimV1_L2Relative_AK4PFchs.txt", jecpath));
-    jetcorr_filenames_pfL1FastJetL2L3.push_back(Form("%s/jetcorr/data/run2_25ns/Spring16_FastSimV1_L3Absolute_AK4PFchs.txt", jecpath));
-    jetcorr_uncertainty_filename = Form("%s/jetcorr/data/run2_25ns/Spring16_FastSimV1_Uncertainty_AK4PFchs.txt", jecpath);
+    //Adding New...
+    
+    if (dataperiod.find("2017B") != std::string::npos) {
+      jetcorr_filenames_pfL1FastJetL2L3.push_back(Form("%s/jetcorr/data/run2_25ns/Fall17_17Nov2017B_V6_DATA/Fall17_17Nov2017B_V6_DATA_L1FastJet_AK4PFchs.txt", jecpath));
+      jetcorr_filenames_pfL1FastJetL2L3.push_back(Form("%s/jetcorr/data/run2_25ns/Fall17_17Nov2017B_V6_DATA/Fall17_17Nov2017B_V6_DATA_L2Relative_AK4PFchs.txt", jecpath));
+      jetcorr_filenames_pfL1FastJetL2L3.push_back(Form("%s/jetcorr/data/run2_25ns/Fall17_17Nov2017B_V6_DATA/Fall17_17Nov2017B_V6_DATA_L3Absolute_AK4PFchs.txt", jecpath));
+      jetcorr_filenames_pfL1FastJetL2L3.push_back(Form("%s/jetcorr/data/run2_25ns/Fall17_17Nov2017B_V6_DATA/Fall17_17Nov2017B_V6_DATA_L2L3Residual_AK4PFchs.txt", jecpath));
+                   jetcorr_uncertainty_filename = Form("%s/jetcorr/data/run2_25ns/Fall17_17Nov2017B_V6_DATA/Fall17_17Nov2017B_V6_DATA_Uncertainty_AK4PFchs.txt", jecpath);
+    }
+    if (dataperiod.find("2017C") != std::string::npos) {
+      jetcorr_filenames_pfL1FastJetL2L3.push_back(Form("%s/jetcorr/data/run2_25ns/Fall17_17Nov2017C_V6_DATA/Fall17_17Nov2017C_V6_DATA_L1FastJet_AK4PFchs.txt", jecpath));
+      jetcorr_filenames_pfL1FastJetL2L3.push_back(Form("%s/jetcorr/data/run2_25ns/Fall17_17Nov2017C_V6_DATA/Fall17_17Nov2017C_V6_DATA_L2Relative_AK4PFchs.txt", jecpath));
+      jetcorr_filenames_pfL1FastJetL2L3.push_back(Form("%s/jetcorr/data/run2_25ns/Fall17_17Nov2017C_V6_DATA/Fall17_17Nov2017C_V6_DATA_L3Absolute_AK4PFchs.txt", jecpath));
+      jetcorr_filenames_pfL1FastJetL2L3.push_back(Form("%s/jetcorr/data/run2_25ns/Fall17_17Nov2017C_V6_DATA/Fall17_17Nov2017C_V6_DATA_L2L3Residual_AK4PFchs.txt", jecpath));
+                   jetcorr_uncertainty_filename = Form("%s/jetcorr/data/run2_25ns/Fall17_17Nov2017C_V6_DATA/Fall17_17Nov2017C_V6_DATA_Uncertainty_AK4PFchs.txt", jecpath);
+    }
+    if (dataperiod.find("2017D") != std::string::npos) {
+      jetcorr_filenames_pfL1FastJetL2L3.push_back(Form("%s/jetcorr/data/run2_25ns/Fall17_17Nov2017D_V6_DATA/Fall17_17Nov2017D_V6_DATA_L1FastJet_AK4PFchs.txt", jecpath));
+      jetcorr_filenames_pfL1FastJetL2L3.push_back(Form("%s/jetcorr/data/run2_25ns/Fall17_17Nov2017D_V6_DATA/Fall17_17Nov2017D_V6_DATA_L2Relative_AK4PFchs.txt", jecpath));
+      jetcorr_filenames_pfL1FastJetL2L3.push_back(Form("%s/jetcorr/data/run2_25ns/Fall17_17Nov2017D_V6_DATA/Fall17_17Nov2017D_V6_DATA_L3Absolute_AK4PFchs.txt", jecpath));
+      jetcorr_filenames_pfL1FastJetL2L3.push_back(Form("%s/jetcorr/data/run2_25ns/Fall17_17Nov2017D_V6_DATA/Fall17_17Nov2017D_V6_DATA_L2L3Residual_AK4PFchs.txt", jecpath));
+                   jetcorr_uncertainty_filename = Form("%s/jetcorr/data/run2_25ns/Fall17_17Nov2017D_V6_DATA/Fall17_17Nov2017D_V6_DATA_Uncertainty_AK4PFchs.txt", jecpath);
+    }
+    if (dataperiod.find("2017E") != std::string::npos) {
+      jetcorr_filenames_pfL1FastJetL2L3.push_back(Form("%s/jetcorr/data/run2_25ns/Fall17_17Nov2017E_V6_DATA/Fall17_17Nov2017E_V6_DATA_L1FastJet_AK4PFchs.txt", jecpath));
+      jetcorr_filenames_pfL1FastJetL2L3.push_back(Form("%s/jetcorr/data/run2_25ns/Fall17_17Nov2017E_V6_DATA/Fall17_17Nov2017E_V6_DATA_L2Relative_AK4PFchs.txt", jecpath));
+      jetcorr_filenames_pfL1FastJetL2L3.push_back(Form("%s/jetcorr/data/run2_25ns/Fall17_17Nov2017E_V6_DATA/Fall17_17Nov2017E_V6_DATA_L3Absolute_AK4PFchs.txt", jecpath));
+      jetcorr_filenames_pfL1FastJetL2L3.push_back(Form("%s/jetcorr/data/run2_25ns/Fall17_17Nov2017E_V6_DATA/Fall17_17Nov2017E_V6_DATA_L2L3Residual_AK4PFchs.txt", jecpath));
+                   jetcorr_uncertainty_filename = Form("%s/jetcorr/data/run2_25ns/Fall17_17Nov2017E_V6_DATA/Fall17_17Nov2017E_V6_DATA_Uncertainty_AK4PFchs.txt", jecpath);
+    }
+    if (dataperiod.find("2017F") != std::string::npos) {
+      jetcorr_filenames_pfL1FastJetL2L3.push_back(Form("%s/jetcorr/data/run2_25ns/Fall17_17Nov2017F_V6_DATA/Fall17_17Nov2017F_V6_DATA_L1FastJet_AK4PFchs.txt", jecpath));
+      jetcorr_filenames_pfL1FastJetL2L3.push_back(Form("%s/jetcorr/data/run2_25ns/Fall17_17Nov2017F_V6_DATA/Fall17_17Nov2017F_V6_DATA_L2Relative_AK4PFchs.txt", jecpath));
+      jetcorr_filenames_pfL1FastJetL2L3.push_back(Form("%s/jetcorr/data/run2_25ns/Fall17_17Nov2017F_V6_DATA/Fall17_17Nov2017F_V6_DATA_L3Absolute_AK4PFchs.txt", jecpath));
+      jetcorr_filenames_pfL1FastJetL2L3.push_back(Form("%s/jetcorr/data/run2_25ns/Fall17_17Nov2017F_V6_DATA/Fall17_17Nov2017F_V6_DATA_L2L3Residual_AK4PFchs.txt", jecpath));
+                   jetcorr_uncertainty_filename = Form("%s/jetcorr/data/run2_25ns/Fall17_17Nov2017F_V6_DATA/Fall17_17Nov2017F_V6_DATA_Uncertainty_AK4PFchs.txt", jecpath);
+    }
+    
+  
+//  } else if (sampleConfig.issignal) {
+//    jetcorr_filenames_pfL1FastJetL2L3.push_back(Form("%s/jetcorr/data/run2_25ns/Spring16_FastSimV1_L1FastJet_AK4PFchs.txt", jecpath));
+//    jetcorr_filenames_pfL1FastJetL2L3.push_back(Form("%s/jetcorr/data/run2_25ns/Spring16_FastSimV1_L2Relative_AK4PFchs.txt", jecpath));
+//    jetcorr_filenames_pfL1FastJetL2L3.push_back(Form("%s/jetcorr/data/run2_25ns/Spring16_FastSimV1_L3Absolute_AK4PFchs.txt", jecpath));
+//                 jetcorr_uncertainty_filename = Form("%s/jetcorr/data/run2_25ns/Spring16_FastSimV1_Uncertainty_AK4PFchs.txt", jecpath);
   } else {
-    jetcorr_filenames_pfL1FastJetL2L3.push_back(Form("%s/jetcorr/data/run2_25ns/Summer16_23Sep2016V3_MC/Summer16_23Sep2016V3_MC_L1FastJet_AK4PFchs.txt", jecpath));
-    jetcorr_filenames_pfL1FastJetL2L3.push_back(Form("%s/jetcorr/data/run2_25ns/Summer16_23Sep2016V3_MC/Summer16_23Sep2016V3_MC_L2Relative_AK4PFchs.txt", jecpath));
-    jetcorr_filenames_pfL1FastJetL2L3.push_back(Form("%s/jetcorr/data/run2_25ns/Summer16_23Sep2016V3_MC/Summer16_23Sep2016V3_MC_L3Absolute_AK4PFchs.txt", jecpath));
-    jetcorr_uncertainty_filename = Form("%s/jetcorr/data/run2_25ns/Summer16_23Sep2016V3_MC/Summer16_23Sep2016V3_MC_Uncertainty_AK4PFchs.txt", jecpath);
+    jetcorr_filenames_pfL1FastJetL2L3.push_back(Form("%s/jetcorr/data/run2_25ns/Fall17_17Nov2017_V6_MC/Fall17_17Nov2017_V6_MC_L1FastJet_AK4PFchs.txt", jecpath));
+    jetcorr_filenames_pfL1FastJetL2L3.push_back(Form("%s/jetcorr/data/run2_25ns/Fall17_17Nov2017_V6_MC/Fall17_17Nov2017_V6_MC_L2Relative_AK4PFchs.txt", jecpath));
+    jetcorr_filenames_pfL1FastJetL2L3.push_back(Form("%s/jetcorr/data/run2_25ns/Fall17_17Nov2017_V6_MC/Fall17_17Nov2017_V6_MC_L3Absolute_AK4PFchs.txt", jecpath));
+                 jetcorr_uncertainty_filename = Form("%s/jetcorr/data/run2_25ns/Fall17_17Nov2017_V6_MC/Fall17_17Nov2017_V6_MC_Uncertainty_AK4PFchs.txt", jecpath);
   }
 
   cout << "applying JEC from following files:" << endl;
@@ -1174,7 +1216,13 @@ int babyMaker::looper(TChain * chain, std::string output_name, int nEvents, std:
       //if (!(jets.ngoodjets >= jetConfig.njet) && !(jets_jup.ngoodjets >= jetConfig.njet) && !(jets_jdown.ngoodjets >= jetConfig.njet)) continue;
       bool pass1jet = (jets.ak8GoodPFJets >= jetConfig.nfatjet); //Sicong: Add 1 jet region
       bool pass2jet = (jets.ngoodjets >= jetConfig.njet) || (jets_jup.ngoodjets >= jetConfig.njet) || (jets_jdown.ngoodjets >= jetConfig.njet);
-      if (!pass1jet && !pass2jet) continue; 
+      if (!pass1jet && !pass2jet) continue;
+      //bool pass_old2jet = false;//Sicong: Specifically for getting 1 jet region, s.t. we could estimate the background yield 
+      //if (jets.ngoodjets >= 2){
+      //    if (jets.ak4pfjets_p4[1].Pt()>30&&jets.ak4pfjets_p4[0].Pt()>30) pass_old2jet = true;
+      //}
+      //if (!pass1jet || pass_old2jet) continue;
+      //cout<<"Got 1 jet."<<endl; 
       nEvents_pass_skim_nGoodJets++;
       int skim_nBJets = 1;
       if (!(pass1jet) && !(jets.ngoodbtags >= skim_nBJets) && !(jets_jup.ngoodbtags_jup >= skim_nBJets) && !(jets_jdown.ngoodbtags_jdown >= skim_nBJets)) continue;

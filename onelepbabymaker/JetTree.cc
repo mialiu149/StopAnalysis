@@ -30,6 +30,9 @@ float getmct(LorentzVector jet1,LorentzVector jet2) {
 }
 
 void JetTree::InitBtagSFTool(bool isFastsim_) {
+    //From Nick Amin:
+    //and the latest btag SFs (inclusive + era dependent) in [2] https://github.com/cmstas/CORE/commit/3caca1e2d351125a4ac1fa779736b836c1db4a43
+
     char* jecpath;
     jecpath = getenv ("TOOLSPATH");
     calib = new BTagCalibration("csvv2", "btagsf/CSVv2Moriond17_2017_1_26_BtoH.csv");
