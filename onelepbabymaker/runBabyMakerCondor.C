@@ -41,6 +41,13 @@ int main(int argc, char **argv){
   if (infile.Contains("2016F")) dataperiod="2016F";
   if (infile.Contains("2016H")) dataperiod="2016H";
   if (infile.Contains("2016G")) dataperiod="2016G";
+  
+  if (infile.Contains("2017B")) dataperiod="2017B";
+  if (infile.Contains("2017C")) dataperiod="2017C";
+  if (infile.Contains("2017D")) dataperiod="2017D";
+  if (infile.Contains("2017E")) dataperiod="2017E";
+  if (infile.Contains("2017F")) dataperiod="2017F";
+  
 
   if (isDataFromFileName) cout << "running on DATA, based on file name: " << infile<<endl;
   else if(isSignalFromFileName) cout << "running on SIGNAL, based on file name: " << infile<<endl;

@@ -35,7 +35,11 @@ void JetTree::InitBtagSFTool(bool isFastsim_) {
 
     char* jecpath;
     jecpath = getenv ("TOOLSPATH");
-    calib = new BTagCalibration("csvv2", "btagsf/CSVv2Moriond17_2017_1_26_BtoH.csv");
+    
+    //calib = new BTagCalibration("csvv2", "btagsf/CSVv2Moriond17_2017_1_26_BtoH.csv");
+    calib = new BTagCalibration("deepCSV", Form("%s/btagsf/data/run2_25ns/DeepCSV_94XSF_V1_B_F.csv", jecpath));
+    //calib = new BTagCalibration("deepCSV", Form("%s/btagsf/data/run2_25ns/DeepCSV_94XSF_V2_B_F.csv", jecpath));
+
     reader_heavy = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "comb", "central"); // central
     reader_heavy_UP = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "comb", "up");  // sys up
     reader_heavy_DN = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "comb", "down");  // sys down
@@ -51,6 +55,7 @@ void JetTree::InitBtagSFTool(bool isFastsim_) {
     reader_light_loose_DN = new BTagCalibrationReader(calib, BTagEntry::OP_LOOSE, "incl", "down");  // sys down
 
     std::cout << "loaded fullsim btag SFs" << std::endl;
+    //Sicong: If we are not using fast sim, hence not changing the csv file for now... (Currently don't have the SF's yet. 
     calib_fastsim = new BTagCalibration("CSV", "btagsf/fastsim_csvv2_ttbar_26_1_2017.csv"); // 25ns fastsim version of SFs
     reader_fastsim = new BTagCalibrationReader(calib_fastsim, BTagEntry::OP_MEDIUM, "fastsim", "central"); // central
     reader_fastsim_UP = new BTagCalibrationReader(calib_fastsim, BTagEntry::OP_MEDIUM, "fastsim", "up");  // sys up
@@ -59,20 +64,24 @@ void JetTree::InitBtagSFTool(bool isFastsim_) {
     reader_fastsim_loose_UP = new BTagCalibrationReader(calib_fastsim, BTagEntry::OP_LOOSE, "fastsim", "up");  // sys up
     reader_fastsim_loose_DN = new BTagCalibrationReader(calib_fastsim, BTagEntry::OP_LOOSE, "fastsim", "down");  // sys down
     if(!isFastsim_){
-      getHist(h_btag_eff_b,"$COREPATH/Tools/btagsf/data/run2_25ns/btageff__ttbar_powheg_pythia8_25ns_Moriond17.root","h2_BTaggingEff_csv_med_Eff_b");
-      getHist(h_btag_eff_c,"$COREPATH/Tools/btagsf/data/run2_25ns/btageff__ttbar_powheg_pythia8_25ns_Moriond17.root","h2_BTaggingEff_csv_med_Eff_c");
-      getHist(h_btag_eff_udsg,"$COREPATH/Tools/btagsf/data/run2_25ns/btageff__ttbar_powheg_pythia8_25ns_Moriond17.root","h2_BTaggingEff_csv_med_Eff_udsg");
-      getHist(h_btag_eff_b_loose,"$COREPATH/Tools/btagsf/data/run2_25ns/btageff__ttbar_powheg_pythia8_25ns_Moriond17.root","h2_BTaggingEff_csv_loose_Eff_b");
-      getHist(h_btag_eff_c_loose,"$COREPATH/Tools/btagsf/data/run2_25ns/btageff__ttbar_powheg_pythia8_25ns_Moriond17.root","h2_BTaggingEff_csv_loose_Eff_c");
-      getHist(h_btag_eff_udsg_loose,"$COREPATH/Tools/btagsf/data/run2_25ns/btageff__ttbar_powheg_pythia8_25ns_Moriond17.root","h2_BTaggingEff_csv_loose_Eff_udsg");
+      char* eff_file_name;
+      eff_file_name = "$COREPATH/Tools/btagsf/data/run2_25ns/btageff__ttbar_amc_94X_deepCSV.root";// "btagsf/btageff__ttbar_amc_94X_deepCSV.root";//
+      getHist(h_btag_eff_b,eff_file_name,"h2_BTaggingEff_csv_med_Eff_b");
+      getHist(h_btag_eff_c,eff_file_name,"h2_BTaggingEff_csv_med_Eff_c");
+      getHist(h_btag_eff_udsg,eff_file_name,"h2_BTaggingEff_csv_med_Eff_udsg");
+      getHist(h_btag_eff_b_loose,eff_file_name,"h2_BTaggingEff_csv_loose_Eff_b");
+      getHist(h_btag_eff_c_loose,eff_file_name,"h2_BTaggingEff_csv_loose_Eff_c");
+      getHist(h_btag_eff_udsg_loose,eff_file_name,"h2_BTaggingEff_csv_loose_Eff_udsg");
     }
     else{
-      getHist(h_btag_eff_b,"$COREPATH/Tools/btagsf/data/run2_fastsim/btageff__SMS-T1bbbb-T1qqqq_25ns_Moriond17.root","h2_BTaggingEff_csv_med_Eff_b");
-      getHist(h_btag_eff_c,"$COREPATH/Tools/btagsf/data/run2_fastsim/btageff__SMS-T1bbbb-T1qqqq_25ns_Moriond17.root","h2_BTaggingEff_csv_med_Eff_c");
-      getHist(h_btag_eff_udsg,"$COREPATH/Tools/btagsf/data/run2_fastsim/btageff__SMS-T1bbbb-T1qqqq_25ns_Moriond17.root","h2_BTaggingEff_csv_med_Eff_udsg");
-      getHist(h_btag_eff_b_loose,"$COREPATH/Tools/btagsf/data/run2_fastsim/btageff__SMS-T1bbbb-T1qqqq_25ns_Moriond17.root","h2_BTaggingEff_csv_loose_Eff_b");
-      getHist(h_btag_eff_c_loose,"$COREPATH/Tools/btagsf/data/run2_fastsim/btageff__SMS-T1bbbb-T1qqqq_25ns_Moriond17.root","h2_BTaggingEff_csv_loose_Eff_c");
-      getHist(h_btag_eff_udsg_loose,"$COREPATH/Tools/btagsf/data/run2_fastsim/btageff__SMS-T1bbbb-T1qqqq_25ns_Moriond17.root","h2_BTaggingEff_csv_loose_Eff_udsg");
+      char* eff_file_name;
+      eff_file_name = "$COREPATH/Tools/btagsf/data/run2_fastsim/btageff__SMS-T1bbbb-T1qqqq_25ns_Moriond17.root";
+      getHist(h_btag_eff_b,eff_file_name,"h2_BTaggingEff_csv_med_Eff_b");
+      getHist(h_btag_eff_c,eff_file_name,"h2_BTaggingEff_csv_med_Eff_c");
+      getHist(h_btag_eff_udsg,eff_file_name,"h2_BTaggingEff_csv_med_Eff_udsg");
+      getHist(h_btag_eff_b_loose,eff_file_name,"h2_BTaggingEff_csv_loose_Eff_b");
+      getHist(h_btag_eff_c_loose,eff_file_name,"h2_BTaggingEff_csv_loose_Eff_c");
+      getHist(h_btag_eff_udsg_loose,eff_file_name,"h2_BTaggingEff_csv_loose_Eff_udsg");
     }
     std::cout << "loaded fastsim btag SFs" << std::endl;
     return;
