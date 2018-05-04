@@ -35,10 +35,7 @@ void JetTree::InitBtagSFTool(bool isFastsim_) {
 
     char* jecpath;
     jecpath = getenv ("TOOLSPATH");
-    
-    //calib = new BTagCalibration("csvv2", "btagsf/CSVv2Moriond17_2017_1_26_BtoH.csv");
-    calib = new BTagCalibration("deepCSV", Form("%s/btagsf/data/run2_25ns/DeepCSV_94XSF_V1_B_F.csv", jecpath));
-    //calib = new BTagCalibration("deepCSV", Form("%s/btagsf/data/run2_25ns/DeepCSV_94XSF_V2_B_F.csv", jecpath));
+    calib = new BTagCalibration("deepCSV", Form("%s/btagsf/data/run2_25ns/DeepCSV_94XSF_V2_B_F.csv", jecpath));
 
     reader_heavy = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "comb", "central"); // central
     reader_heavy_UP = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "comb", "up");  // sys up
