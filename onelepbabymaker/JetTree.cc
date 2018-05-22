@@ -35,6 +35,7 @@ void JetTree::InitBtagSFTool(bool isFastsim_) {
 
     char* jecpath;
     jecpath = getenv ("TOOLSPATH");
+    cout<<Form("%s/btagsf/data/run2_25ns/DeepCSV_94XSF_V2_B_F.csv", jecpath)<<endl;
     calib = new BTagCalibration("deepCSV", Form("%s/btagsf/data/run2_25ns/DeepCSV_94XSF_V2_B_F.csv", jecpath));
 
     reader_heavy = new BTagCalibrationReader(calib, BTagEntry::OP_MEDIUM, "comb", "central"); // central
@@ -583,6 +584,7 @@ void JetTree::Reset ()
     dphi_ak4pfjet_met.clear();
     ak4pfjets_qg_disc.clear();    
     ak4pfjets_CSV.clear();
+    ak4pfjets_deepCSV.clear();
     ak4pfjets_mva.clear();
     ak4pfjets_puid.clear();
     ak4pfjets_parton_flavor.clear();
