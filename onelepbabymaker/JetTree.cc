@@ -508,6 +508,28 @@ void JetTree::FillCommon(std::vector<unsigned int> alloverlapjets_idx,  Factoriz
       ak8pfjets_deep_rawdisc_hbb.push_back(ak8jets_deep_rawdisc_hbb().at(idx));
       ak8pfjets_deep_rawdisc_h4q.push_back(ak8jets_deep_rawdisc_h4q().at(idx));
       
+      for ( auto name : ak8jets_bDiscriminatorNames() )
+        ak8pfjets_bDiscriminatorNames.push_back(name.Data());
+      for ( auto b_vec : ak8jets_bDiscriminators() )
+        ak8pfjets_bDiscriminators.push_back(b_vec);
+      
+//      ak8pfjets_decorr_binscore_top.push_back(ak8jets_decorr_binscore_top().at(idx));
+//      ak8pfjets_decorr_binscore_w.push_back(ak8jets_decorr_binscore_w().at(idx));
+//      ak8pfjets_decorr_binscore_z.push_back(ak8jets_decorr_binscore_z().at(idx));
+//      ak8pfjets_decorr_binscore_zbb.push_back(ak8jets_decorr_binscore_zbb().at(idx));
+//      ak8pfjets_decorr_binscore_hbb.push_back(ak8jets_decorr_binscore_hbb().at(idx));
+//      ak8pfjets_decorr_binscore_h4q.push_back(ak8jets_decorr_binscore_h4q().at(idx));
+//      ak8pfjets_decorr_rawscore_top.push_back(ak8jets_decorr_rawscore_top().at(idx));
+//      ak8pfjets_decorr_rawscore_w.push_back(ak8jets_decorr_rawscore_w().at(idx));
+//      ak8pfjets_decorr_rawscore_z.push_back(ak8jets_decorr_rawscore_z().at(idx));
+//      ak8pfjets_decorr_rawscore_zbb.push_back(ak8jets_decorr_rawscore_zbb().at(idx));
+//      ak8pfjets_decorr_rawscore_hbb.push_back(ak8jets_decorr_rawscore_hbb().at(idx));
+//      ak8pfjets_decorr_rawscore_h4q.push_back(ak8jets_decorr_rawscore_h4q().at(idx));
+//      ak8pfjets_decorr_rawscore_qcd.push_back(ak8jets_decorr_rawscore_qcd().at(idx));
+//      ak8pfjets_decorr_flavscore_bb.push_back(ak8jets_decorr_flavscore_bb().at(idx));
+//      ak8pfjets_decorr_flavscore_cc.push_back(ak8jets_decorr_flavscore_cc().at(idx));
+//      ak8pfjets_decorr_flavscore_bb_no_gluon.push_back(ak8jets_decorr_flavscore_bb_no_gluon().at(idx));
+//      ak8pfjets_decorr_flavscore_cc_no_gluon.push_back(ak8jets_decorr_flavscore_cc_no_gluon().at(idx));
 
       nGoodJets++;
     }
@@ -653,6 +675,28 @@ void JetTree::Reset ()
     ak8pfjets_deep_rawdisc_zbb.clear();
     ak8pfjets_deep_rawdisc_hbb.clear();
     ak8pfjets_deep_rawdisc_h4q.clear();
+    
+    ak8pfjets_bDiscriminatorNames.clear();
+    ak8pfjets_bDiscriminators.clear();
+    
+//    ak8pfjets_decorr_binscore_top.clear();
+//    ak8pfjets_decorr_binscore_w.clear();
+//    ak8pfjets_decorr_binscore_z.clear();
+//    ak8pfjets_decorr_binscore_zbb.clear();
+//    ak8pfjets_decorr_binscore_hbb.clear();
+//    ak8pfjets_decorr_binscore_h4q.clear();
+//    ak8pfjets_decorr_rawscore_top.clear();
+//    ak8pfjets_decorr_rawscore_w.clear();
+//    ak8pfjets_decorr_rawscore_z.clear();
+//    ak8pfjets_decorr_rawscore_zbb.clear();
+//    ak8pfjets_decorr_rawscore_hbb.clear();
+//    ak8pfjets_decorr_rawscore_h4q.clear();
+//    ak8pfjets_decorr_rawscore_qcd.clear();
+//    ak8pfjets_decorr_flavscore_bb.clear();
+//    ak8pfjets_decorr_flavscore_cc.clear();
+//    ak8pfjets_decorr_flavscore_bb_no_gluon.clear();
+//    ak8pfjets_decorr_flavscore_cc_no_gluon.clear();
+
  
     ak4genjets_p4.clear();
  
@@ -718,7 +762,33 @@ void JetTree::SetAK8Branches (TTree* tree)
     tree->Branch(Form("%sak8pfjets_deep_rawdisc_z", prefix_.c_str()) , &ak8pfjets_deep_rawdisc_z  );
     tree->Branch(Form("%sak8pfjets_deep_rawdisc_zbb", prefix_.c_str()) , &ak8pfjets_deep_rawdisc_zbb);
     tree->Branch(Form("%sak8pfjets_deep_rawdisc_hbb", prefix_.c_str()) , &ak8pfjets_deep_rawdisc_hbb);
-    tree->Branch(Form("%sak8pfjets_deep_rawdisc_h4q", prefix_.c_str()) , &ak8pfjets_deep_rawdisc_h4q);  
+    tree->Branch(Form("%sak8pfjets_deep_rawdisc_h4q", prefix_.c_str()) , &ak8pfjets_deep_rawdisc_h4q);
+    
+    tree->Branch(Form("%sak8pfjets_bDiscriminatorNames", prefix_.c_str()) , &ak8pfjets_bDiscriminatorNames);
+    tree->Branch(Form("%sak8pfjets_bDiscriminators", prefix_.c_str()) , &ak8pfjets_bDiscriminators);
+
+//    tree->Branch(Form("%sak8pfjets_decorr_binscore_top", prefix_.c_str()) , &ak8pfjets_decorr_binscore_top);
+//    tree->Branch(Form("%sak8pfjets_decorr_binscore_w", prefix_.c_str()) , &ak8pfjets_decorr_binscore_w);
+//    tree->Branch(Form("%sak8pfjets_decorr_binscore_z", prefix_.c_str()) , &ak8pfjets_decorr_binscore_z);
+//    tree->Branch(Form("%sak8pfjets_decorr_binscore_zbb", prefix_.c_str()) , &ak8pfjets_decorr_binscore_zbb);
+//    tree->Branch(Form("%sak8pfjets_decorr_binscore_hbb", prefix_.c_str()) , &ak8pfjets_decorr_binscore_hbb);
+//    tree->Branch(Form("%sak8pfjets_decorr_binscore_h4q", prefix_.c_str()) , &ak8pfjets_decorr_binscore_h4q);
+//    tree->Branch(Form("%sak8pfjets_decorr_rawscore_top", prefix_.c_str()) , &ak8pfjets_decorr_rawscore_top);
+//    tree->Branch(Form("%sak8pfjets_decorr_rawscore_w", prefix_.c_str()) , &ak8pfjets_decorr_rawscore_w);
+//    tree->Branch(Form("%sak8pfjets_decorr_rawscore_z", prefix_.c_str()) , &ak8pfjets_decorr_rawscore_z);
+//    tree->Branch(Form("%sak8pfjets_decorr_rawscore_zbb", prefix_.c_str()) , &ak8pfjets_decorr_rawscore_zbb);
+//    tree->Branch(Form("%sak8pfjets_decorr_rawscore_hbb", prefix_.c_str()) , &ak8pfjets_decorr_rawscore_hbb);
+//    tree->Branch(Form("%sak8pfjets_decorr_rawscore_h4q", prefix_.c_str()) , &ak8pfjets_decorr_rawscore_h4q);
+//    tree->Branch(Form("%sak8pfjets_decorr_rawscore_qcd", prefix_.c_str()) , &ak8pfjets_decorr_rawscore_qcd);
+//    tree->Branch(Form("%sak8pfjets_decorr_flavscore_bb", prefix_.c_str()) , &ak8pfjets_decorr_flavscore_bb);
+//    tree->Branch(Form("%sak8pfjets_decorr_flavscore_cc", prefix_.c_str()) , &ak8pfjets_decorr_flavscore_cc);
+//    tree->Branch(Form("%sak8pfjets_decorr_flavscore_bb_no_gluon", prefix_.c_str()) , &ak8pfjets_decorr_flavscore_bb_no_gluon);            
+//    tree->Branch(Form("%sak8pfjets_decorr_flavscore_cc_no_gluon", prefix_.c_str()) , &ak8pfjets_decorr_flavscore_cc_no_gluon);    
+    
+    
+    
+    
+    
 }
 
 void JetTree::SetAK4Branches_Overleps (TTree* tree)

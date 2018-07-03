@@ -74,13 +74,13 @@ void EventTree::FillCommon (const std::string &root_file_name)
       pu_ntrue = puInfo_trueNumInteractions().at(0);
       genweights = cms3.genweights();
       genweightsID = cms3.genweightsID();
-
-      if(signal){
-	sparms_values = sparm_values();
-	for ( auto name : sparm_names() )
-	  sparms_names.push_back(name.Data());
-          sparms_subProcessId     = sparm_subProcessId();	
-      }
+       
+      //if(signal){
+      //	sparms_values = sparm_values();
+      //	for ( auto name : sparm_names() )
+      //	  sparms_names.push_back(name.Data());
+      //          sparms_subProcessId     = sparm_subProcessId();	
+      //}
       genmet = gen_met();
       genmet_phi = gen_metPhi();
 

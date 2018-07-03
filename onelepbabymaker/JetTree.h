@@ -18,6 +18,9 @@ typedef std::vector<float> vecd;
 typedef std::vector<bool> vecb;
 typedef std::vector<int> veci;
 typedef std::vector<std::vector<int> > vecii;
+
+typedef std::vector<std::string> vecs;
+typedef std::vector<std::vector<float> > vecdd;
  
 class JetTree
 {
@@ -150,6 +153,28 @@ public:
     vecd ak8pfjets_deep_rawdisc_zbb;
     vecd ak8pfjets_deep_rawdisc_hbb;
     vecd ak8pfjets_deep_rawdisc_h4q;
+    
+    vecs ak8pfjets_bDiscriminatorNames;
+    vecdd ak8pfjets_bDiscriminators;
+    
+
+//    vecd ak8pfjets_decorr_binscore_top         ;
+//    vecd ak8pfjets_decorr_binscore_w           ;
+//    vecd ak8pfjets_decorr_binscore_z           ;
+//    vecd ak8pfjets_decorr_binscore_zbb         ;
+//    vecd ak8pfjets_decorr_binscore_hbb         ;
+//    vecd ak8pfjets_decorr_binscore_h4q         ;
+//    vecd ak8pfjets_decorr_rawscore_top         ;
+//    vecd ak8pfjets_decorr_rawscore_w           ;
+//    vecd ak8pfjets_decorr_rawscore_z           ;
+//    vecd ak8pfjets_decorr_rawscore_zbb         ;
+//    vecd ak8pfjets_decorr_rawscore_hbb         ;
+//    vecd ak8pfjets_decorr_rawscore_h4q         ;
+//    vecd ak8pfjets_decorr_rawscore_qcd         ;
+//    vecd ak8pfjets_decorr_flavscore_bb         ;
+//    vecd ak8pfjets_decorr_flavscore_cc         ;
+//    vecd ak8pfjets_decorr_flavscore_bb_no_gluon;
+//    vecd ak8pfjets_decorr_flavscore_cc_no_gluon;
 
     // genjets    
     vecLorentzVector ak4genjets_p4;    

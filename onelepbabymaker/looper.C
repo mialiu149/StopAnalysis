@@ -481,6 +481,7 @@ int babyMaker::looper(TChain * chain, std::string output_name, int nEvents, std:
     // Loop over Events 
     //
     unsigned int nEventsTree = tree -> GetEntriesFast();
+    cout << "Total number of events:" << nEventsTree << endl;
 
     for (unsigned int evt = 0; evt < nEventsTree; evt++) {
       if (nEvents_processed >= nEventsToDo) break;
@@ -544,12 +545,12 @@ int babyMaker::looper(TChain * chain, std::string output_name, int nEvents, std:
 
       if (sampleConfig.issignal) {
         //get susy particle masses from sparms
-        for (unsigned int nsparm = 0; nsparm < sparm_names().size(); ++nsparm) {
-          if (sparm_names().at(nsparm).Contains("mCh")) StopEvt.mass_chargino = sparm_values().at(nsparm);
-          StopEvt.mass_stop = StopEvt.mass_chargino; // modification for whmet
-          if (sparm_names().at(nsparm).Contains("mLSP")) StopEvt.mass_lsp = sparm_values().at(nsparm);
-          if (sparm_names().at(nsparm).Contains("mGl")) StopEvt.mass_gluino = sparm_values().at(nsparm);
-        }
+        //for (unsigned int nsparm = 0; nsparm < sparm_names().size(); ++nsparm) {
+        //  if (sparm_names().at(nsparm).Contains("mCh")) StopEvt.mass_chargino = sparm_values().at(nsparm);
+        //  StopEvt.mass_stop = StopEvt.mass_chargino; // modification for whmet
+        //  if (sparm_names().at(nsparm).Contains("mLSP")) StopEvt.mass_lsp = sparm_values().at(nsparm);
+        //  if (sparm_names().at(nsparm).Contains("mGl")) StopEvt.mass_gluino = sparm_values().at(nsparm);
+        //}
         if (genps_weight() > 0) histNEvts -> Fill(StopEvt.mass_stop, StopEvt.mass_lsp, 1);
         else if (genps_weight() < 0) histNEvts -> Fill(StopEvt.mass_stop, StopEvt.mass_lsp, -1);
         StopEvt.xsec = hxsec -> GetBinContent(hxsec -> FindBin(StopEvt.mass_stop));
